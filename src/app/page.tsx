@@ -1,95 +1,110 @@
-import Image from "next/image";
+"use client";
+
+import Canvas from "./canvas";
 import styles from "./page.module.css";
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+type Vec2 = { x: number; y: number };
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+export default function Home() {
+	const cursor = {
+		x: 50,
+		y: 50,
+	};
+	class Particle {
+		x: number;
+		y: number;
+		particleTrailWidth: number;
+		strokeColor: string;
+		theta = Math.random();
+		t = Math.random() * 150;
+		context: CanvasRenderingContext2D;
+		cursor: Vec2;
+
+		constructor(
+			x: number,
+			y: number,
+			particleTrailWidth: number,
+			strokeColor: string,
+			context: CanvasRenderingContext2D,
+			cursor: Vec2,
+		) {
+			this.x = x;
+			this.y = y;
+			this.particleTrailWidth = particleTrailWidth;
+			this.strokeColor = strokeColor;
+			this.theta = Math.random() * Math.PI * 2;
+			// this.rotateSpeed = rotateSpeed;
+			this.t = Math.random() * 150;
+			this.context = context;
+			this.cursor = cursor;
+		}
+
+		update() {
+			const ls = { x: this.x, y: this.y };
+			// this.x = this.cursor.x + Math.cos(this.theta) * this.t;
+			// this.y = this.cursor.y + Math.sin(this.theta) * this.t;
+
+			this.x = this.cursor.x - 1;
+			this.y = this.cursor.y - 1;
+
+			this.context.strokeStyle = this.strokeColor;
+			setTimeout(() => {
+				this.context.strokeStyle = "fff";
+			}, 500);
+
+			this.context.beginPath();
+			this.context.lineWidth = this.particleTrailWidth;
+			this.context.moveTo(ls.x, ls.y);
+			this.context.lineTo(this.x, this.y);
+			this.context.stroke();
+		}
+	}
+
+	function mouseMove(e) {
+		cursor.x = e.clientX;
+		cursor.y = e.clientY;
+	}
+
+	function touchHandler(e) {
+		e.preventDefault();
+		cursor.x = e.touches[0].clientX;
+		cursor.y = e.touches[0].clientY;
+	}
+
+	// addEventListener("resize", () => setSize());
+	// function setSize() {
+	//   canvas.height = innerHeight;
+	//   canvas.width = innerWidth;
+	// }
+
+	function draw(context: CanvasRenderingContext2D, count) {
+		// context.clearRect(500, 500, context.canvas.width, context.canvas.height);
+		context.fillStyle = "hotpink";
+		const delta = count % 500;
+		// context?.fillRect(2 + delta, 200, 3, 3);
+
+		const particle = new Particle(
+			cursor.x,
+			cursor.y,
+			0.5,
+			"#fb0b03",
+			context,
+			cursor,
+		);
+		particle.update();
+
+		// setTimeout(() => {
+		// 	context.clearRect(2 + delta, 200, 3, 3);
+		// }, 550);
+	}
+
+	return (
+		<div
+			className={styles.page}
+			onMouseMove={mouseMove}
+			onTouchMove={touchHandler}
+		>
+			<Canvas id="cvs" height={500} width={500} draw={draw} />
+		</div>
+	);
 }
