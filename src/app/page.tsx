@@ -48,9 +48,6 @@ export default function Home() {
 			this.y = this.cursor.y - 1;
 
 			this.context.strokeStyle = this.strokeColor;
-			setTimeout(() => {
-				this.context.strokeStyle = "fff";
-			}, 500);
 
 			this.context.beginPath();
 			this.context.lineWidth = this.particleTrailWidth;
@@ -80,18 +77,25 @@ export default function Home() {
 	function draw(context: CanvasRenderingContext2D, count) {
 		// context.clearRect(500, 500, context.canvas.width, context.canvas.height);
 		context.fillStyle = "hotpink";
-		const delta = count % 500;
-		// context?.fillRect(2 + delta, 200, 3, 3);
 
-		const particle = new Particle(
+		const particleOne = new Particle(
 			cursor.x,
 			cursor.y,
 			0.5,
-			"#fb0b03",
+			"#5e5e5e",
 			context,
 			cursor,
 		);
-		particle.update();
+		particleOne.update();
+		const particleTwo = new Particle(
+			cursor.x,
+			cursor.y,
+			0.5,
+			"#5e5e5e",
+			context,
+			cursor,
+		);
+		particleTwo.update();
 
 		// setTimeout(() => {
 		// 	context.clearRect(2 + delta, 200, 3, 3);
@@ -104,7 +108,12 @@ export default function Home() {
 			onMouseMove={mouseMove}
 			onTouchMove={touchHandler}
 		>
-			<Canvas id="cvs" height={500} width={500} draw={draw} />
+			<Canvas
+				id="cvs"
+				height={document.body.clientHeight}
+				width={document.body.clientWidth}
+				draw={draw}
+			/>
 		</div>
 	);
 }

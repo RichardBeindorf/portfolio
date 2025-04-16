@@ -13,7 +13,6 @@ export default function Canvas(props: any) {
 		let animationID: number;
 		if (canvas?.getContext) {
 			const context = canvas?.getContext("2d");
-			context.strokeStyle = "#000"; // black stroke
 			context.fillStyle = "#fff"; // white background fill
 			context.fillRect(0, 0, canvas.width, canvas.height);
 
