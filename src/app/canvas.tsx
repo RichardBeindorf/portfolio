@@ -13,7 +13,7 @@ export default function Canvas(props: any) {
 		if (canvas?.getContext) {
 			const context = canvas?.getContext("2d");
 
-			context.globalAlpha = 0.5; // trying this out, makes all part half transparent
+			context.globalAlpha = 0.5; // wichtig, um den Überrest der Linie zu verdecken
 
 			context.fillStyle = "white";
 			context.fillRect(0, 0, canvas.width, canvas.height);

@@ -8,7 +8,7 @@ type Vec2 = { x: number; y: number };
 
 export default function Home() {
 	const [_document, set_document] = React.useState(null);
-	const lastPos = useRef<number[]>([0, 0]);
+	const lastPos = useRef<number[] | null>(null);
 
 	React.useEffect(() => {
 		set_document(document);
@@ -39,8 +39,7 @@ export default function Home() {
 			cursor: Vec2,
 			lastPos: RefObject<number[]>,
 		) {
-			this.lastX = lastPos.current[0];
-			this.lastY = lastPos.current[1];
+			[this.lastX, this.lastY] = lastPos.current ?? [cursor.x, cursor.y];
 			this.newX = x;
 			this.newY = y;
 			this.lineTrailWidth = lineTrailWidth;
@@ -48,13 +47,12 @@ export default function Home() {
 			this.cursor = cursor;
 		}
 		update() {
-			// const ls = { x: this.newX, y: this.newY };
-
-			// hier stand noch (cursor.x) - 1, warum auch immer idk
 			this.newX = this.cursor.x;
 			this.newY = this.cursor.y;
 
 			this.context.strokeStyle = "#f300c7d1";
+			this.context.lineCap = "round";
+			// this.context.filter = "blur(0.5px)";
 
 			this.context.beginPath();
 			// this.context.lineWidth = this.lineTrailWidth;
@@ -82,7 +80,7 @@ export default function Home() {
 		const particleOne = new Line(
 			cursor.x,
 			cursor.y,
-			0.3,
+			1,
 			context,
 			cursor,
 			lastPos,
@@ -91,12 +89,20 @@ export default function Home() {
 	}
 
 	return (
-		<div
-			className={styles.page}
-			onMouseMove={mouseMove}
-			onTouchMove={touchHandler}
-		>
-			<Canvas id="cvs" height={canvasHeight} width={canvasWidth} draw={draw} />
-		</div>
+		<>
+			<div
+				className={styles.page}
+				onMouseMove={mouseMove}
+				onTouchMove={touchHandler}
+			>
+				<Canvas
+					id="cvs"
+					height={canvasHeight}
+					width={canvasWidth}
+					draw={draw}
+				/>
+			</div>
+			<div className={styles.dots}>Hello World</div>
+		</>
 	);
 }
