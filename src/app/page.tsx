@@ -1,58 +1,68 @@
 "use client";
 
+import React, { RefObject, useRef } from "react";
 import Canvas from "./canvas";
 import styles from "./page.module.css";
 
 type Vec2 = { x: number; y: number };
 
 export default function Home() {
+	const [_document, set_document] = React.useState(null);
+	const lastPos = useRef<number[]>([0, 0]);
+
+	React.useEffect(() => {
+		set_document(document);
+	}, []);
+
 	const cursor = {
 		x: 50,
 		y: 50,
 	};
-	class Particle {
-		x: number;
-		y: number;
-		particleTrailWidth: number;
-		strokeColor: string;
-		theta = Math.random();
-		t = Math.random() * 150;
+
+	const canvasHeight = 900;
+	const canvasWidth = _document?.body.clientWidth;
+
+	class Line {
+		newX: number;
+		newY: number;
+		lastX: number;
+		lastY: number;
+		lineTrailWidth: number;
 		context: CanvasRenderingContext2D;
 		cursor: Vec2;
 
 		constructor(
 			x: number,
 			y: number,
-			particleTrailWidth: number,
-			strokeColor: string,
+			lineTrailWidth: number,
 			context: CanvasRenderingContext2D,
 			cursor: Vec2,
+			lastPos: RefObject<number[]>,
 		) {
-			this.x = x;
-			this.y = y;
-			this.particleTrailWidth = particleTrailWidth;
-			this.strokeColor = strokeColor;
-			this.theta = Math.random() * Math.PI * 2;
-			// this.rotateSpeed = rotateSpeed;
-			this.t = Math.random() * 150;
+			this.lastX = lastPos.current[0];
+			this.lastY = lastPos.current[1];
+			this.newX = x;
+			this.newY = y;
+			this.lineTrailWidth = lineTrailWidth;
 			this.context = context;
 			this.cursor = cursor;
 		}
-
 		update() {
-			const ls = { x: this.x, y: this.y };
-			// this.x = this.cursor.x + Math.cos(this.theta) * this.t;
-			// this.y = this.cursor.y + Math.sin(this.theta) * this.t;
+			// const ls = { x: this.newX, y: this.newY };
 
-			this.x = this.cursor.x - 1;
-			this.y = this.cursor.y - 1;
+			// hier stand noch (cursor.x) - 1, warum auch immer idk
+			this.newX = this.cursor.x;
+			this.newY = this.cursor.y;
 
-			this.context.strokeStyle = this.strokeColor;
+			this.context.strokeStyle = "#4d4d4dba";
 
 			this.context.beginPath();
-			this.context.lineWidth = this.particleTrailWidth;
-			this.context.moveTo(ls.x, ls.y);
-			this.context.lineTo(this.x, this.y);
+			// this.context.lineWidth = this.lineTrailWidth;
+			this.context.moveTo(this.lastX, this.lastY); // verwirrend, aber moveTo bewegt nichts irgendwo hin, sondern heißt eher "hier fangen wir an"
+			// and saving it to remember next time
+			lastPos.current = [this.newX, this.newY];
+
+			this.context.lineTo(this.newX, this.newY);
 			this.context.stroke();
 		}
 	}
@@ -68,38 +78,16 @@ export default function Home() {
 		cursor.y = e.touches[0].clientY;
 	}
 
-	// addEventListener("resize", () => setSize());
-	// function setSize() {
-	//   canvas.height = innerHeight;
-	//   canvas.width = innerWidth;
-	// }
-
-	function draw(context: CanvasRenderingContext2D, count) {
-		// context.clearRect(500, 500, context.canvas.width, context.canvas.height);
-		context.fillStyle = "hotpink";
-
-		const particleOne = new Particle(
+	function draw(context: CanvasRenderingContext2D) {
+		const particleOne = new Line(
 			cursor.x,
 			cursor.y,
-			0.5,
-			"#5e5e5e",
+			0.3,
 			context,
 			cursor,
+			lastPos,
 		);
 		particleOne.update();
-		const particleTwo = new Particle(
-			cursor.x,
-			cursor.y,
-			0.5,
-			"#5e5e5e",
-			context,
-			cursor,
-		);
-		particleTwo.update();
-
-		// setTimeout(() => {
-		// 	context.clearRect(2 + delta, 200, 3, 3);
-		// }, 550);
 	}
 
 	return (
@@ -108,12 +96,7 @@ export default function Home() {
 			onMouseMove={mouseMove}
 			onTouchMove={touchHandler}
 		>
-			<Canvas
-				id="cvs"
-				height={document.body.clientHeight}
-				width={document.body.clientWidth}
-				draw={draw}
-			/>
+			<Canvas id="cvs" height={canvasHeight} width={canvasWidth} draw={draw} />
 		</div>
 	);
 }

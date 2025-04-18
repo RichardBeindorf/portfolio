@@ -9,16 +9,21 @@ export default function Canvas(props: any) {
 
 	useEffect(() => {
 		const canvas = ref.current;
-		let count = 0;
 		let animationID: number;
 		if (canvas?.getContext) {
 			const context = canvas?.getContext("2d");
-			context.fillStyle = "#fff"; // white background fill
+
+			// context.globalAlpha = 0.5; // trying this out, makes all part half transparent
+
+			context.fillStyle = "white";
 			context.fillRect(0, 0, canvas.width, canvas.height);
 
 			function renderer() {
-				count++;
-				draw(context, count);
+				draw(context);
+
+				context.fillStyle = "rgb(255 255 255 / 10%)";
+				context.fillRect(0, 0, canvas.width, canvas.height);
+
 				animationID = window.requestAnimationFrame(renderer);
 			}
 			renderer();
