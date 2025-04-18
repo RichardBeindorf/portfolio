@@ -54,7 +54,7 @@ export default function Home() {
 			this.newX = this.cursor.x;
 			this.newY = this.cursor.y;
 
-			this.context.strokeStyle = "#4d4d4dba";
+			this.context.strokeStyle = "#f300c7d1";
 
 			this.context.beginPath();
 			// this.context.lineWidth = this.lineTrailWidth;
