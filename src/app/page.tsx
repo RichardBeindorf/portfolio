@@ -95,6 +95,8 @@ export default function Home() {
 				onMouseMove={mouseMove}
 				onTouchMove={touchHandler}
 			>
+				<h1 className={styles.intro}>Hello My Name is Richard 👋</h1>
+				<span>Welcome to my portfolio site</span>
 				<Canvas
 					id="cvs"
 					height={canvasHeight}
@@ -102,7 +104,6 @@ export default function Home() {
 					draw={draw}
 				/>
 			</div>
-			<div className={styles.dots}>Hello World</div>
 		</>
 	);
 }

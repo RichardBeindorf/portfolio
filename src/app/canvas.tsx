@@ -1,5 +1,5 @@
 "use client";
-
+import styles from "./canvas.module.css";
 import { useEffect, useRef } from "react";
 // import type { CanvasProps } from "react-html-props";
 
@@ -15,7 +15,7 @@ export default function Canvas(props: any) {
 
 			context.globalAlpha = 0.5; // wichtig, um den Überrest der Linie zu verdecken
 
-			context.fillStyle = "white";
+			context.fillStyle = "transparent";
 			context.fillRect(0, 0, canvas.width, canvas.height);
 
 			function renderer() {
@@ -31,5 +31,5 @@ export default function Canvas(props: any) {
 		return () => window.cancelAnimationFrame(animationID);
 	}, [draw]);
 
-	return <canvas ref={ref} {...rest} />;
+	return <canvas className={styles.canvass} ref={ref} {...rest} />;
 }
