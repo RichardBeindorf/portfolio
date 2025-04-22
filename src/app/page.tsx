@@ -8,15 +8,15 @@ type Vec2 = { x: number; y: number };
 
 export default function Home() {
 	const [_document, set_document] = React.useState(null);
-	const lastPos = useRef<number[] | null>(null);
+	// const lastPos = useRef<number[] | null>(null);
 
 	React.useEffect(() => {
 		set_document(document);
 	}, []);
 
-	const cursor = {
-		x: 50,
-		y: 50,
+	const cursor: {x: number | null, y: number | null} = {
+		x: null,
+		y: null,
 	};
 
 	const canvasHeight = 900;
@@ -37,9 +37,11 @@ export default function Home() {
 			lineTrailWidth: number,
 			context: CanvasRenderingContext2D,
 			cursor: Vec2,
-			lastPos: RefObject<number[]>,
+			// lastPos: RefObject<number[]>,
 		) {
-			[this.lastX, this.lastY] = lastPos.current ?? [cursor.x, cursor.y];
+			// [this.lastX, this.lastY] = lastPos.current ?? [cursor.x, cursor.y];
+			this.lastX = 400;
+			this.lastY = 400;
 			this.newX = x;
 			this.newY = y;
 			this.lineTrailWidth = lineTrailWidth;
@@ -47,21 +49,25 @@ export default function Home() {
 			this.cursor = cursor;
 		}
 		update() {
-			this.newX = this.cursor.x;
-			this.newY = this.cursor.y;
-
-			this.context.strokeStyle = "#f300c7d1";
-			this.context.lineCap = "round";
-			// this.context.filter = "blur(0.5px)";
-
-			this.context.beginPath();
-			// this.context.lineWidth = this.lineTrailWidth;
-			this.context.moveTo(this.lastX, this.lastY); // verwirrend, aber moveTo bewegt nichts irgendwo hin, sondern heißt eher "hier fangen wir an"
-			// and saving it to remember next time
-			lastPos.current = [this.newX, this.newY];
-
-			this.context.lineTo(this.newX, this.newY);
-			this.context.stroke();
+			
+			setTimeout(() => {
+				console.log(this.newX, this.newY)
+				this.newX = this.cursor.x;
+				this.newY = this.cursor.y;
+	
+				this.context.strokeStyle = "#F24150";
+				this.context.lineCap = "round";
+				// this.context.filter = "blur(0.5px)";
+	
+				this.context.beginPath();
+				// this.context.lineWidth = this.lineTrailWidth;
+				this.context.moveTo(this.lastX, this.lastY); // verwirrend, aber moveTo bewegt nichts irgendwo hin, sondern heißt eher "hier fangen wir an"
+				// and saving it to remember next time
+				// lastPos.current = [this.newX, this.newY];
+	
+				this.context.lineTo(this.newX, this.newY);
+				this.context.stroke();
+			}, 2000);
 		}
 	}
 
@@ -77,15 +83,17 @@ export default function Home() {
 	}
 
 	function draw(context: CanvasRenderingContext2D) {
-		const particleOne = new Line(
-			cursor.x,
-			cursor.y,
-			1,
-			context,
-			cursor,
-			lastPos,
-		);
-		particleOne.update();
+		if(cursor.x && cursor.y){
+			const particleOne = new Line(
+				cursor.x,
+				cursor.y,
+				1,
+				context,
+				cursor,
+				// lastPos,
+			);
+			particleOne.update();
+		}
 	}
 
 	return (

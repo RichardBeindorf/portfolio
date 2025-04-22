@@ -21,8 +21,8 @@ export default function Canvas(props: any) {
 			function renderer() {
 				draw(context);
 
-				context.fillStyle = "rgb(255 255 255 / 15%)";
-				context.fillRect(0, 0, canvas.width, canvas.height);
+				// context.fillStyle = "rgb(255 255 255 / 15%)";
+				// context.fillRect(0, 0, canvas.width, canvas.height);
 
 				animationID = window.requestAnimationFrame(renderer);
 			}
