@@ -1,14 +1,14 @@
 "use client";
-
+import { permanentMarker, oswald300, oswald400, oswald500 } from "./styles/font";
 import React, { RefObject, useRef } from "react";
-import Canvas from "./canvas";
+import Canvas from "../components/canvas";
 import styles from "./page.module.css";
 
 type Vec2 = { x: number; y: number };
 
 export default function Home() {
 	const [_document, set_document] = React.useState(null);
-	// const lastPos = useRef<number[] | null>(null);
+	const lastPos = useRef<number[] | null>(null);
 
 	React.useEffect(() => {
 		set_document(document);
@@ -37,11 +37,11 @@ export default function Home() {
 			lineTrailWidth: number,
 			context: CanvasRenderingContext2D,
 			cursor: Vec2,
-			// lastPos: RefObject<number[]>,
+			lastPos: RefObject<number[]>,
 		) {
-			// [this.lastX, this.lastY] = lastPos.current ?? [cursor.x, cursor.y];
 			this.lastX = 400;
 			this.lastY = 400;
+			[this.lastX, this.lastY] = lastPos.current ?? [cursor.x, cursor.y];
 			this.newX = x;
 			this.newY = y;
 			this.lineTrailWidth = lineTrailWidth;
@@ -49,9 +49,7 @@ export default function Home() {
 			this.cursor = cursor;
 		}
 		update() {
-			
-			setTimeout(() => {
-				console.log(this.newX, this.newY)
+				
 				this.newX = this.cursor.x;
 				this.newY = this.cursor.y;
 	
@@ -63,11 +61,10 @@ export default function Home() {
 				// this.context.lineWidth = this.lineTrailWidth;
 				this.context.moveTo(this.lastX, this.lastY); // verwirrend, aber moveTo bewegt nichts irgendwo hin, sondern heißt eher "hier fangen wir an"
 				// and saving it to remember next time
-				// lastPos.current = [this.newX, this.newY];
+				lastPos.current = [this.newX, this.newY];
 	
 				this.context.lineTo(this.newX, this.newY);
 				this.context.stroke();
-			}, 2000);
 		}
 	}
 
@@ -82,6 +79,10 @@ export default function Home() {
 		cursor.y = e.touches[0].clientY;
 	}
 
+	// function clickHandler (e){
+	
+	// }
+
 	function draw(context: CanvasRenderingContext2D) {
 		if(cursor.x && cursor.y){
 			const particleOne = new Line(
@@ -90,7 +91,7 @@ export default function Home() {
 				1,
 				context,
 				cursor,
-				// lastPos,
+				lastPos,
 			);
 			particleOne.update();
 		}
@@ -110,6 +111,7 @@ export default function Home() {
 					height={canvasHeight}
 					width={canvasWidth}
 					draw={draw}
+					// onClick={clickHandler}
 				/>
 			</div>
 		</>
