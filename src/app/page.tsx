@@ -1,8 +1,8 @@
 "use client";
-import { permanentMarker, oswald300, oswald400, oswald500 } from "./styles/font";
+import { permanentMarker, oswald300, oswald400, oswald500 } from "../styles/font";
 import React, { RefObject, useRef } from "react";
 import Canvas from "../components/canvas";
-import styles from "./page.module.css";
+import styles from "../styles/page.module.css";
 
 type Vec2 = { x: number; y: number };
 
@@ -79,10 +79,6 @@ export default function Home() {
 		cursor.y = e.touches[0].clientY;
 	}
 
-	// function clickHandler (e){
-	
-	// }
-
 	function draw(context: CanvasRenderingContext2D) {
 		if(cursor.x && cursor.y){
 			const particleOne = new Line(
@@ -104,14 +100,12 @@ export default function Home() {
 				onMouseMove={mouseMove}
 				onTouchMove={touchHandler}
 			>
-				<h1 className={styles.intro}>Hello My Name is Richard 👋</h1>
-				<span>Welcome to my portfolio site</span>
+				<h1 style={permanentMarker.style}>Hello, <br/> I`m Richard <br/> a Creative Develper <br/> based in Hamburg</h1>
 				<Canvas
 					id="cvs"
 					height={canvasHeight}
 					width={canvasWidth}
 					draw={draw}
-					// onClick={clickHandler}
 				/>
 			</div>
 		</>

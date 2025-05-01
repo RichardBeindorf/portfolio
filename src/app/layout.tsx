@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import "./styles/globals.css";
-
+import "../styles/globals.css";
 
 
 export const metadata: Metadata = {
@@ -18,7 +17,7 @@ export default function RootLayout({
 			<head>
 				<link rel="icon" href="/favicon.png" sizes="any" />
 			</head>
-			<body className={permanentMarker.cla}>
+			<body>
 				{children}
 			</body>
 		</html>

@@ -1,5 +1,5 @@
 "use client";
-import styles from "./styles/canvas.module.css";
+import styles from "./canvas.module.css";
 import { useEffect, useRef } from "react";
 // import type { CanvasProps } from "react-html-props";
 
