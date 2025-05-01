@@ -3,6 +3,7 @@
 import React, { RefObject, useRef } from "react";
 import Canvas from "./canvas";
 import styles from "./page.module.css";
+import ScribbleFigure from "@/components/scribbleFigure";
 
 type Vec2 = { x: number; y: number };
 
@@ -97,6 +98,7 @@ export default function Home() {
 			>
 				<h1 className={styles.intro}>Hello My Name is Richard 👋</h1>
 				<span>Welcome to my portfolio site</span>
+				<ScribbleFigure/>
 				<Canvas
 					id="cvs"
 					height={canvasHeight}
