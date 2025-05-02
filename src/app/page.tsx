@@ -2,10 +2,23 @@
 
 import React, { RefObject, useRef } from "react";
 import Canvas from "./canvas";
-import styles from "./page.module.css";
 import ScribbleFigure from "@/components/scribbleFigure";
+import styled from "styled-components";
 
 type Vec2 = { x: number; y: number };
+
+const IntroHeader = styled.h1`
+	position: absolute;
+	top: 200px;
+	left: 400px;
+	z-index: 100;
+`;
+
+const WelcomeMain = styled.div`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+`;
 
 export default function Home() {
 	const [_document, set_document] = React.useState(null);
@@ -90,14 +103,11 @@ export default function Home() {
 	}
 
 	return (
-		<>
-			<div
-				className={styles.page}
+			<WelcomeMain
 				onMouseMove={mouseMove}
 				onTouchMove={touchHandler}
 			>
-				<h1 className={styles.intro}>Hello My Name is Richard 👋</h1>
-				<span>Welcome to my portfolio site</span>
+				<IntroHeader>Hello My Name is Richard 👋</IntroHeader>
 				<ScribbleFigure/>
 				<Canvas
 					id="cvs"
@@ -105,7 +115,6 @@ export default function Home() {
 					width={canvasWidth}
 					draw={draw}
 				/>
-			</div>
-		</>
+			</WelcomeMain>
 	);
 }
