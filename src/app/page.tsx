@@ -1,9 +1,14 @@
 "use client";
-
+import { permanentMarker, oswald300, oswald400, oswald500 } from "../styles/font";
 import React, { RefObject, useRef } from "react";
+<<<<<<< HEAD
+import Canvas from "../components/canvas";
+import styles from "../styles/page.module.css";
+=======
 import Canvas from "./canvas";
 import ScribbleFigure from "@/components/scribbleFigure";
 import styled from "styled-components";
+>>>>>>> main
 
 type Vec2 = { x: number; y: number };
 
@@ -28,9 +33,9 @@ export default function Home() {
 		set_document(document);
 	}, []);
 
-	const cursor = {
-		x: 50,
-		y: 50,
+	const cursor: {x: number | null, y: number | null} = {
+		x: null,
+		y: null,
 	};
 
 	const canvasHeight = 900;
@@ -53,6 +58,8 @@ export default function Home() {
 			cursor: Vec2,
 			lastPos: RefObject<number[]>,
 		) {
+			this.lastX = 400;
+			this.lastY = 400;
 			[this.lastX, this.lastY] = lastPos.current ?? [cursor.x, cursor.y];
 			this.newX = x;
 			this.newY = y;
@@ -61,21 +68,22 @@ export default function Home() {
 			this.cursor = cursor;
 		}
 		update() {
-			this.newX = this.cursor.x;
-			this.newY = this.cursor.y;
-
-			this.context.strokeStyle = "#f300c7d1";
-			this.context.lineCap = "round";
-			// this.context.filter = "blur(0.5px)";
-
-			this.context.beginPath();
-			// this.context.lineWidth = this.lineTrailWidth;
-			this.context.moveTo(this.lastX, this.lastY); // verwirrend, aber moveTo bewegt nichts irgendwo hin, sondern heißt eher "hier fangen wir an"
-			// and saving it to remember next time
-			lastPos.current = [this.newX, this.newY];
-
-			this.context.lineTo(this.newX, this.newY);
-			this.context.stroke();
+				
+				this.newX = this.cursor.x;
+				this.newY = this.cursor.y;
+	
+				this.context.strokeStyle = "#F24150";
+				this.context.lineCap = "round";
+				// this.context.filter = "blur(0.5px)";
+	
+				this.context.beginPath();
+				// this.context.lineWidth = this.lineTrailWidth;
+				this.context.moveTo(this.lastX, this.lastY); // verwirrend, aber moveTo bewegt nichts irgendwo hin, sondern heißt eher "hier fangen wir an"
+				// and saving it to remember next time
+				lastPos.current = [this.newX, this.newY];
+	
+				this.context.lineTo(this.newX, this.newY);
+				this.context.stroke();
 		}
 	}
 
@@ -91,15 +99,17 @@ export default function Home() {
 	}
 
 	function draw(context: CanvasRenderingContext2D) {
-		const particleOne = new Line(
-			cursor.x,
-			cursor.y,
-			1,
-			context,
-			cursor,
-			lastPos,
-		);
-		particleOne.update();
+		if(cursor.x && cursor.y){
+			const particleOne = new Line(
+				cursor.x,
+				cursor.y,
+				1,
+				context,
+				cursor,
+				lastPos,
+			);
+			particleOne.update();
+		}
 	}
 
 	return (
@@ -107,8 +117,12 @@ export default function Home() {
 				onMouseMove={mouseMove}
 				onTouchMove={touchHandler}
 			>
+<<<<<<< HEAD
+				<h1 style={permanentMarker.style}>Hello, <br/> I`m Richard <br/> a Creative Develper <br/> based in Hamburg</h1>
+=======
 				<IntroHeader>Hello My Name is Richard 👋</IntroHeader>
 				<ScribbleFigure/>
+>>>>>>> main
 				<Canvas
 					id="cvs"
 					height={canvasHeight}
