@@ -1,10 +1,29 @@
 "use client";
 import { permanentMarker, oswald300, oswald400, oswald500 } from "../styles/font";
 import React, { RefObject, useRef } from "react";
+<<<<<<< HEAD
 import Canvas from "../components/canvas";
 import styles from "../styles/page.module.css";
+=======
+import Canvas from "./canvas";
+import ScribbleFigure from "@/components/scribbleFigure";
+import styled from "styled-components";
+>>>>>>> main
 
 type Vec2 = { x: number; y: number };
+
+const IntroHeader = styled.h1`
+	position: absolute;
+	top: 200px;
+	left: 400px;
+	z-index: 100;
+`;
+
+const WelcomeMain = styled.div`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+`;
 
 export default function Home() {
 	const [_document, set_document] = React.useState(null);
@@ -94,20 +113,22 @@ export default function Home() {
 	}
 
 	return (
-		<>
-			<div
-				className={styles.page}
+			<WelcomeMain
 				onMouseMove={mouseMove}
 				onTouchMove={touchHandler}
 			>
+<<<<<<< HEAD
 				<h1 style={permanentMarker.style}>Hello, <br/> I`m Richard <br/> a Creative Develper <br/> based in Hamburg</h1>
+=======
+				<IntroHeader>Hello My Name is Richard 👋</IntroHeader>
+				<ScribbleFigure/>
+>>>>>>> main
 				<Canvas
 					id="cvs"
 					height={canvasHeight}
 					width={canvasWidth}
 					draw={draw}
 				/>
-			</div>
-		</>
+			</WelcomeMain>
 	);
 }
