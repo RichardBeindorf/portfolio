@@ -1,9 +1,14 @@
 "use client";
+import styled from "styled-components";
 import styles from "./canvas.module.css";
 import { useEffect, useRef } from "react";
 // import type { CanvasProps } from "react-html-props";
 
-export default function Canvas(props: any) {
+const Cvs = styled.canvas`
+	z-index: 1;
+`;
+
+export default function Canvas(props: any) {	
 	const { draw, ...rest } = props;
 	const ref = useRef<HTMLCanvasElement | null>(null);
 
@@ -31,5 +36,5 @@ export default function Canvas(props: any) {
 		return () => window.cancelAnimationFrame(animationID);
 	}, [draw]);
 
-	return <canvas className={styles.canvass} ref={ref} {...rest} />;
+	return <Cvs className={styles.canvass} ref={ref} {...rest} />;
 }
