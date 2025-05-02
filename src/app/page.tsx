@@ -1,14 +1,11 @@
 "use client";
 import { permanentMarker, oswald300, oswald400, oswald500 } from "../styles/font";
 import React, { RefObject, useRef } from "react";
-<<<<<<< HEAD
-import Canvas from "../components/canvas";
-import styles from "../styles/page.module.css";
-=======
-import Canvas from "./canvas";
 import ScribbleFigure from "@/components/scribbleFigure";
+import Canvas from "@/components/canvas";
 import styled from "styled-components";
->>>>>>> main
+
+
 
 type Vec2 = { x: number; y: number };
 
@@ -17,6 +14,8 @@ const IntroHeader = styled.h1`
 	top: 200px;
 	left: 400px;
 	z-index: 100;
+	
+	text-align: center;
 `;
 
 const WelcomeMain = styled.div`
@@ -28,6 +27,7 @@ const WelcomeMain = styled.div`
 export default function Home() {
 	const [_document, set_document] = React.useState(null);
 	const lastPos = useRef<number[] | null>(null);
+	const lineData = useRef([{x:0, y:0}])
 
 	React.useEffect(() => {
 		set_document(document);
@@ -77,7 +77,7 @@ export default function Home() {
 				// this.context.filter = "blur(0.5px)";
 	
 				this.context.beginPath();
-				// this.context.lineWidth = this.lineTrailWidth;
+				this.context.lineWidth = this.lineTrailWidth;
 				this.context.moveTo(this.lastX, this.lastY); // verwirrend, aber moveTo bewegt nichts irgendwo hin, sondern heißt eher "hier fangen wir an"
 				// and saving it to remember next time
 				lastPos.current = [this.newX, this.newY];
@@ -89,7 +89,9 @@ export default function Home() {
 
 	function mouseMove(e) {
 		cursor.x = e.clientX;
-		cursor.y = e.clientY;
+		cursor.y = e.clientY +11;
+		lineData.current.push({x: e.clientX, y: (e.clientY + 11)});
+		console.log(lineData);
 	}
 
 	function touchHandler(e) {
@@ -103,7 +105,7 @@ export default function Home() {
 			const particleOne = new Line(
 				cursor.x,
 				cursor.y,
-				1,
+				1.5,
 				context,
 				cursor,
 				lastPos,
@@ -117,12 +119,8 @@ export default function Home() {
 				onMouseMove={mouseMove}
 				onTouchMove={touchHandler}
 			>
-<<<<<<< HEAD
-				<h1 style={permanentMarker.style}>Hello, <br/> I`m Richard <br/> a Creative Develper <br/> based in Hamburg</h1>
-=======
-				<IntroHeader>Hello My Name is Richard 👋</IntroHeader>
+				<IntroHeader style={permanentMarker.style} >I`m Richard <br/> a Creative Developer <br/> based in Hamburg</IntroHeader>
 				<ScribbleFigure/>
->>>>>>> main
 				<Canvas
 					id="cvs"
 					height={canvasHeight}
