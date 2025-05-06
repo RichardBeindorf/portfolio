@@ -1,6 +1,6 @@
 "use client";
 import { permanentMarker } from "../styles/font";
-import React, { useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import ScribbleFigure from "@/components/scribbleFigure";
 import styled from "styled-components";
 import { Canvas } from "@react-three/fiber";
@@ -20,13 +20,12 @@ const WelcomeMain = styled.main`
 	justify-content: center;
 	align-items: center;
 `;
-const CanvasLayer = styled(Canvas)`
+const CanvasWrapper = styled.div`
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 1000px;
-    overflow: hidden;
+    height: 100%;
 `;
 
 export default function Home() {
@@ -49,26 +48,27 @@ export default function Home() {
 	function mouseMove(e) {
 		cursor.x = e.clientX;
 		cursor.y = e.clientY +11;
-		setLines(prev => [...prev, [e.clientX, e.clientY + 11]]);
-		console.log(lines);
+		setLines( [...lines, [e.clientX, e.clientY]]);
 	}
 
-	function touchHandler(e) {
-		e.preventDefault();
-		cursor.x = e.touches[0].clientX;
-		cursor.y = e.touches[0].clientY;
-	}
+	// function touchHandler(e) {
+	// 	e.preventDefault();
+	// 	cursor.x = e.touches[0].clientX;
+	// 	cursor.y = e.touches[0].clientY;
+	// }
 
 	return (
 			<WelcomeMain
 				onMouseMove={mouseMove}
-				onTouchMove={touchHandler}
+				// onTouchMove={touchHandler}
 			>
 				<IntroHeader style={permanentMarker.style} >I`m Richard <br/> a Creative Developer <br/> based in Hamburg</IntroHeader>
 				<ScribbleFigure/>
-				<CanvasLayer>
-					<ThreeLine points={lines}/>
-				</CanvasLayer>
+				<CanvasWrapper>
+					<Canvas orthographic camera={{ zoom: 1, position: [0, 0, 100] }}>
+						<ThreeLine points={lines}/>
+					</Canvas>
+				</CanvasWrapper>
 			</WelcomeMain>
 	);
 }
