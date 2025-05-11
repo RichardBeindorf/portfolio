@@ -1,10 +1,12 @@
 "use client";
 import { permanentMarker } from "../styles/font";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useState } from "react";
 import ScribbleFigure from "@/components/scribbleFigure";
 import styled from "styled-components";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import ThreeLine from "@/components/threeLine";
+import { Object3DEventMap } from "three";
+import { InteractiveObject3DEventMap } from "three/examples/jsm/Addons.js";
 
 const IntroHeader = styled.h1`
 	position: absolute;
@@ -27,6 +29,11 @@ const CanvasWrapper = styled.div`
     width: 100%;
     height: 100%;
 `;
+function Raycaster (){ 
+	const raycaster = useThree((state) => state.raycaster);
+	// console.log(raycaster);
+	return <></>
+} 
 
 export default function Home() {
 	// const [_document, set_document] = React.useState(null);
@@ -36,6 +43,7 @@ export default function Home() {
 	// React.useEffect(() => {
 	// 	set_document(document);
 	// }, []);
+
 
 	const cursor: {x: number | null, y: number | null} = {
 		x: null,
@@ -57,6 +65,7 @@ export default function Home() {
 	// 	cursor.y = e.touches[0].clientY;
 	// }
 
+
 	return (
 			<WelcomeMain
 				onMouseMove={mouseMove}
@@ -67,6 +76,11 @@ export default function Home() {
 				<CanvasWrapper>
 					<Canvas orthographic camera={{ zoom: 1, position: [0, 0, 100] }}>
 						<ThreeLine points={lines}/>
+						<mesh>
+							<planeGeometry args={[1000,1000,30,30]}/>
+							<meshBasicMaterial color="royalblue"/>
+						</mesh>
+						<Raycaster/>
 					</Canvas>
 				</CanvasWrapper>
 			</WelcomeMain>

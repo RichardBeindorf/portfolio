@@ -1,11 +1,14 @@
 "use client"
 
-import { QuadraticBezierLine } from "@react-three/drei";
-import { useState } from "react";
+import { Line, QuadraticBezierLine } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
+import { useMemo, useState } from "react";
+import * as THREE from "three";
 
 type coords = [number, number, number];
 
 export default function ThreeLine ({ points }: { points: number[][]}) {
+    const { size, camera } = useThree();
     
     // const [drawLines, setDrawLines] = useState([]);
 
@@ -29,9 +32,18 @@ export default function ThreeLine ({ points }: { points: number[][]}) {
         // };
     // }, [points])
     
+    const worldPoints = useMemo(() => {
+    return points.map(([x, y]) => {
+      const ndcX = (x / size.width) * 2 - 1;
+      const ndcY = -(y / size.height) * 2 + 1;
+
+      const vector = new THREE.Vector3(ndcX, ndcY, 0.5).unproject(camera);
+      return [vector.x, vector.y, vector.z] as coords;
+    });
+  }, [points, size, camera]);
 
     return <>
-       { points.map((p,i,a)=>{
+       { worldPoints.map((p,i,a)=>{
             const startCoord: coords= [p[0], p[1],0];
             let endCoord: coords;
     
@@ -40,9 +52,10 @@ export default function ThreeLine ({ points }: { points: number[][]}) {
             }
     
             if(endCoord !== undefined){
-                console.log("start and end coord", startCoord, endCoord);
+                // console.log("start and end coord", startCoord, endCoord);
                 return <QuadraticBezierLine
                     key={i}
+                    // points={[startCoord, endCoord]}
                     start={startCoord}               // Starting point, can be an array or a vec3
                     end={endCoord}               // Ending point, can be an array or a vec3
                     // mid={[5, 0, 1]}                 // Optional control point, can be an array or a vec3
