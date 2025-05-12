@@ -29,20 +29,17 @@ const CanvasWrapper = styled.div`
     width: 100%;
     height: 100%;
 `;
-function Raycaster (){ 
-	const raycaster = useThree((state) => state.raycaster);
-	// console.log(raycaster);
-	return <></>
-} 
 
 export default function Home() {
 	// const [_document, set_document] = React.useState(null);
 	// const lastPos = useRef<number[] | null>(null);
-	const [lines, setLines] = useState<number[][]>([]);
+	const [lines, setLines] = useState<number[][]>([[455,407]]);
 
 	// React.useEffect(() => {
 	// 	set_document(document);
 	// }, []);
+	// const canvasHeight = 900;
+	// const canvasWidth = _document?.body.clientWidth;
 
 
 	const cursor: {x: number | null, y: number | null} = {
@@ -50,37 +47,32 @@ export default function Home() {
 		y: null,
 	};
 
-	// const canvasHeight = 900;
-	// const canvasWidth = _document?.body.clientWidth;
 
 	function mouseMove(e) {
 		cursor.x = e.clientX;
 		cursor.y = e.clientY +11;
+		if(lines)
 		setLines( [...lines, [e.clientX, e.clientY]]);
 	}
 
-	// function touchHandler(e) {
-	// 	e.preventDefault();
-	// 	cursor.x = e.touches[0].clientX;
-	// 	cursor.y = e.touches[0].clientY;
-	// }
+	function touchHandler(e) {
+		e.preventDefault();
+		cursor.x = e.touches[0].clientX;
+		cursor.y = e.touches[0].clientY;
+	}
+
 
 
 	return (
 			<WelcomeMain
 				onMouseMove={mouseMove}
-				// onTouchMove={touchHandler}
+				onTouchMove={touchHandler}
 			>
 				<IntroHeader style={permanentMarker.style} >I`m Richard <br/> a Creative Developer <br/> based in Hamburg</IntroHeader>
 				<ScribbleFigure/>
 				<CanvasWrapper>
 					<Canvas orthographic camera={{ zoom: 1, position: [0, 0, 100] }}>
-						<ThreeLine points={lines}/>
-						<mesh>
-							<planeGeometry args={[1000,1000,30,30]}/>
-							<meshBasicMaterial color="royalblue"/>
-						</mesh>
-						<Raycaster/>
+						{ lines ? <ThreeLine points={lines}/> : null}
 					</Canvas>
 				</CanvasWrapper>
 			</WelcomeMain>
