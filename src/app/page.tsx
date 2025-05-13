@@ -69,7 +69,7 @@ export default function Home() {
 				<IntroHeader style={permanentMarker.style} >I`m Richard <br/> a Creative Developer <br/> based in Hamburg</IntroHeader>
 				<ScribbleFigure/>
 				<CanvasWrapper>
-					<Canvas orthographic camera={{ zoom: 1, position: [0, 0, 100] }}>
+					<Canvas orthographic camera={{ zoom: 1, position: [0, 0, 100]}}>
 						{ lines ? <ThreeLine points={lines}/> : null}
 					</Canvas>
 				</CanvasWrapper>

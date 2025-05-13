@@ -4,6 +4,7 @@ import { Line } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import ThreeThoughts from "./threeThoughts";
 
 
 type coords = [number, number, number];
@@ -22,12 +23,20 @@ export default function ThreeLine ({ points }: { points: number[][]}) {
             });
         }
 
-}, [points, size, camera]);
+    }, [points, size, camera]);
 
-    return <Line
+    const thoughtPoints = ThreeThoughts();
+
+    return <>
+    <Line
     points={worldPoints}
     color="#F24150"
     lineWidth={2}
-    dashed={false}     
+    dashed={false}
     />
-}
+    <Line
+    points={thoughtPoints}
+    color="#F24150"
+    lineWidth={2}
+    dashed={false}/>
+    </>}
