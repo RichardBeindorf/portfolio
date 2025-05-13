@@ -2,13 +2,17 @@ import styled from "styled-components"
 
 const Figure = styled.svg`
     position: absolute;
+    top: 50%;
+    left: 50%;
     z-index: 6;
 `;
 
 const Thoughts = styled.svg`
     position: absolute;
+    top: 55%;
+    left: 52%;
     z-index: 6;
-    transform: translateY(-15px);
+    /* transform: translateY(-15px); */
     scale: 1.4;
 `;
 
