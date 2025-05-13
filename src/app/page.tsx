@@ -61,8 +61,6 @@ export default function Home() {
 		cursor.y = e.touches[0].clientY;
 	}
 
-
-
 	return (
 			<WelcomeMain
 				onMouseMove={mouseMove}
