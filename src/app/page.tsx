@@ -1,6 +1,6 @@
 "use client";
 import { permanentMarker } from "../styles/font";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import ScribbleFigure from "@/components/scribbleFigure";
 import styled from "styled-components";
 import { Canvas, useThree } from "@react-three/fiber";
@@ -33,7 +33,8 @@ const CanvasWrapper = styled.div`
 export default function Home() {
 	// const [_document, set_document] = React.useState(null);
 	// const lastPos = useRef<number[] | null>(null);
-	const [lines, setLines] = useState<number[][]>([[455,407]]);
+	// const [lines, setLines] = useState<number[][]>([[455,407]]);
+	const lines = useRef([[455,407]]);
 
 	// React.useEffect(() => {
 	// 	set_document(document);
@@ -51,8 +52,8 @@ export default function Home() {
 	function mouseMove(e) {
 		cursor.x = e.clientX;
 		cursor.y = e.clientY +11;
-		if(lines)
-		setLines( [...lines, [e.clientX, e.clientY]]);
+		if(lines.current)
+			lines.current = [...lines.current, [e.clientX, e.clientY]];
 	}
 
 	function touchHandler(e) {
@@ -70,7 +71,7 @@ export default function Home() {
 				<ScribbleFigure/>
 				<CanvasWrapper>
 					<Canvas orthographic camera={{ zoom: 1, position: [0, 0, 100]}}>
-						{ lines ? <ThreeLine points={lines}/> : null}
+						{ lines.current ? <ThreeLine points={lines.current}/> : null}
 					</Canvas>
 				</CanvasWrapper>
 			</WelcomeMain>
