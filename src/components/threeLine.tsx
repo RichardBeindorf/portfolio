@@ -20,6 +20,7 @@ export default function ThreeLine({ points }: lineProps) {
     const wavesRef = useRef<THREE.Vector3[]>([new THREE.Vector3(14,14,14)]);
   
     const [linePoints, setLinePoints] = useState<THREE.Vector3[]>([new THREE.Vector3(14,14,14)]);
+    // console.log(points.current[points.current.length -1]);
   
     useFrame(() => {
       if (points.current && points.current.length >= 1) {
@@ -33,36 +34,38 @@ export default function ThreeLine({ points }: lineProps) {
         for(let i = 0; i < worldPoints.length; i++){
             const xValue = worldPoints[i].x;
             const yValue = worldPoints[i].y;
-            const newY = yValue + Math.sin(xValue / 100) * 120;
+            const newY = yValue + Math.sin(xValue / 100) * 80;
             const vector = new THREE.Vector3(xValue, newY, -650);
             newWave.push([vector.x, vector.y, worldPoints[i].z]);
             if(newWave.length === worldPoints.length){
-                console.log("news")
                 wavesRef.current = newWave;
             };
         };
-        // console.log(worldPoints);
+        
+        // get the difference in height / velocity
+        const height = size.height;
+        const currentY = points.current[points.current.length - 1][1];
+        let pastY;
+        if(points.current.length - 10){
+            pastY = points.current[points.current.length - 5][1];
+        }
+        const percentNew = 100 / height * currentY; // higher === smaler value and lower === bigger value
+        const percentLast = 100 / height * pastY; 
+        const diff = Math.abs(percentNew - percentLast);
+        if ( diff > 3 ){
+            console.log("JUMP");
+        };
+
+
         setLinePoints(worldPoints);
       }
     });
-
-    useEffect(()=>{
-                // const now = Date.now();
-           
-
-        },[])
   
     return (
         <>
-        <Line
-        points={wavesRef.current}
-        color="#eeff00"
-        lineWidth={2}
-        dashed={false}
-      />
       <Line
-        points={linePoints}
-        color="#F24150"
+        points={wavesRef.current}
+        color="rgb(238, 49, 49)"
         lineWidth={2}
         dashed={false}
       />
