@@ -17,7 +17,7 @@ export default function ThreeLine({ points }: lineProps) {
     const thoughtPoints = ThreeThoughts(); // ← assuming this returns a valid coords[] array
     
     const lineRef = useRef<THREE.Line>(null!);
-    const wavesRef = useRef<coords[]>([]);
+    const wavesRef = useRef<THREE.Vector3[]>([new THREE.Vector3(14,14,14)]);
   
     const [linePoints, setLinePoints] = useState<THREE.Vector3[]>([new THREE.Vector3(14,14,14)]);
   
@@ -28,12 +28,38 @@ export default function ThreeLine({ points }: lineProps) {
           const newY = -(y / size.height) * 2 + 1;
           return new THREE.Vector3(newX, newY, 0.5).unproject(camera);
         });
+        // Creating two lines for now, but this one with a ref
+        const newWave = [];
+        for(let i = 0; i < worldPoints.length; i++){
+            const xValue = worldPoints[i].x;
+            const yValue = worldPoints[i].y;
+            const newY = yValue + Math.sin(xValue / 100) * 120;
+            const vector = new THREE.Vector3(xValue, newY, -650);
+            newWave.push([vector.x, vector.y, worldPoints[i].z]);
+            if(newWave.length === worldPoints.length){
+                console.log("news")
+                wavesRef.current = newWave;
+            };
+        };
+        // console.log(worldPoints);
         setLinePoints(worldPoints);
       }
     });
+
+    useEffect(()=>{
+                // const now = Date.now();
+           
+
+        },[])
   
     return (
         <>
+        <Line
+        points={wavesRef.current}
+        color="#eeff00"
+        lineWidth={2}
+        dashed={false}
+      />
       <Line
         points={linePoints}
         color="#F24150"
