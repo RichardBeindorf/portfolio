@@ -34,7 +34,7 @@ export default function Home() {
 	// const [_document, set_document] = React.useState(null);
 	// const lastPos = useRef<number[] | null>(null);
 	// const [lines, setLines] = useState<number[][]>([[455,407]]);
-	const lines = useRef([[455,407]]);
+	const lines = useRef<number[][]>([[455,407]]);
 
 	// React.useEffect(() => {
 	// 	set_document(document);
@@ -71,7 +71,7 @@ export default function Home() {
 				<ScribbleFigure/>
 				<CanvasWrapper>
 					<Canvas orthographic camera={{ zoom: 1, position: [0, 0, 100]}}>
-						{ lines.current ? <ThreeLine points={lines.current}/> : null}
+						{ lines ? <ThreeLine points={lines}/> : null}
 					</Canvas>
 				</CanvasWrapper>
 			</WelcomeMain>
