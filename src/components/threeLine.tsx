@@ -5,7 +5,6 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import ThreeThoughts from "./threeThoughts";
-import { LineSegments2 } from "three/examples/jsm/Addons.js";
 
 type lineProps = { points: React.RefObject<number[][]> }
 type coords = [number, number, number];
@@ -13,51 +12,100 @@ type Vector3 = [x: number, y: number, z: number][];
 type Vector2 = [x: number, y: number][];
 
 export default function ThreeLine({ points }: lineProps) {
-    const { size, camera } = useThree();
-    const thoughtPoints = ThreeThoughts(); // ← assuming this returns a valid coords[] array
-    
-    const lineRef = useRef<THREE.Line>(null!);
-    const wavesRef = useRef<THREE.Vector3[]>([new THREE.Vector3(14,14,14)]);
-  
     const [linePoints, setLinePoints] = useState<THREE.Vector3[]>([new THREE.Vector3(14,14,14)]);
-    // console.log(points.current[points.current.length -1]);
+    const { size, camera } = useThree();
+    const waveTrigger = useRef<{id: number, xValue: number}[]>([]);
+    const wavesRef = useRef<THREE.Vector3[]>([new THREE.Vector3(14,14,14)]);
+    const thoughtPoints = ThreeThoughts();
   
-    useFrame(() => {
+    const height = size.height;
+
+    // function adaptY(worldPoints){
+    //   const newWave = [];
+    //       for(let i = 0; i < worldPoints.length; i++){
+    //           const xValue = worldPoints[i].x;
+    //           const yValue = worldPoints[i].y;
+    //           const newY = yValue + Math.sin(xValue / 100) * 80;
+    //           newWave.push([xValue, newY, worldPoints[i].z]);
+    //           if(newWave.length === worldPoints.length){
+    //               wavesRef.current = newWave;
+    //           };
+    //       };
+    //       setLinePoints(worldPoints);
+    // }
+
+    function letWaveRoll(worldPoints, yDiff, currentX){
+      const arr = []
+      for(let i = 0; i < worldPoints.length; i++){
+        const xValue = currentX;
+        const yValue = worldPoints[i].y + yDiff;
+        arr.push(new THREE.Vector3(xValue, yValue, worldPoints[i].z));
+      }
+      return arr;
+    }
+  
+    useFrame((state) => {
       if (points.current && points.current.length >= 1) {
+        // calculating the 3d positions
         const worldPoints = points.current.map(([x, y]) => {
           const newX = (x / size.width) * 2 - 1;
           const newY = -(y / size.height) * 2 + 1;
           return new THREE.Vector3(newX, newY, 0.5).unproject(camera);
         });
-        // Creating two lines for now, but this one with a ref
-        const newWave = [];
-        for(let i = 0; i < worldPoints.length; i++){
-            const xValue = worldPoints[i].x;
-            const yValue = worldPoints[i].y;
-            const newY = yValue + Math.sin(xValue / 100) * 80;
-            const vector = new THREE.Vector3(xValue, newY, -650);
-            newWave.push([vector.x, vector.y, worldPoints[i].z]);
-            if(newWave.length === worldPoints.length){
-                wavesRef.current = newWave;
-            };
-        };
+        
         
         // get the difference in height / velocity
-        const height = size.height;
         const currentY = points.current[points.current.length - 1][1];
         let pastY;
-        if(points.current.length - 10){
-            pastY = points.current[points.current.length - 5][1];
+        if(points.current.length - 5 && points.current[points.current.length - 5] && points.current[points.current.length - 5][1]){
+          pastY = points.current[points.current.length - 5][1];
         }
         const percentNew = 100 / height * currentY; // higher === smaler value and lower === bigger value
         const percentLast = 100 / height * pastY; 
         const diff = Math.abs(percentNew - percentLast);
+
+        setLinePoints(worldPoints);
+
+        // console.log(waveTrigger.current.length > 0, waveTrigger.current);
+        // HERE I deduce the xValue every from in order to move the wave alone the line
+        if(waveTrigger.current.length > 0){
+          waveTrigger.current = waveTrigger.current.map((wave, i, a)=> ({
+            ...wave,
+            xValue: wave.xValue - 1,
+            }))
+            console.log(waveTrigger.current[0].xValue);
+        }
+
+        // If the cursor strikes high enough it will cause a wave!
+        // When we trigger the wave we want to remember the point where we started
+        // and then start counting down, traveling backwarts through the line
         if ( diff > 3 ){
-            console.log("JUMP");
+          // console.log("JUMP", points.current[points.current.length - 1]);
+
+          if(points.current[points.current.length - 1])
+          waveTrigger.current.push({ id: Number(state.clock.elapsedTime.toFixed(3)), xValue: points.current[points.current.length - 1][0]});
+          
+          // wavesRef.current = wavePoints;
+          // console.log("WAVE", wavePoints,"WORLD", worldPoints);
+        };
+        if( diff < 3 ){
+          // wavesRef.current = worldPoints;
+          setLinePoints(worldPoints);
         };
 
 
-        setLinePoints(worldPoints);
+        // Creating a new line that has a curve
+        // const newWave = [];
+        // for(let i = 0; i < worldPoints.length; i++){
+        //     const xValue = worldPoints[i].x;
+        //     const yValue = worldPoints[i].y;
+        //     const newY = yValue + Math.sin(xValue / 100) * 80;
+        //     newWave.push([xValue, newY, worldPoints[i].z]);
+        //     if(newWave.length === worldPoints.length){
+        //         wavesRef.current = newWave;
+        //     };
+        // };
+
       }
     });
   
@@ -69,12 +117,12 @@ export default function ThreeLine({ points }: lineProps) {
         lineWidth={2}
         dashed={false}
       />
-        {/* <Line
+        <Line
           points={thoughtPoints}
           color="#F24150"
           lineWidth={2}
           dashed={false}
-        /> */}
+        />
       </>
     );
   }
