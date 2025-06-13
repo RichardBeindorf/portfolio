@@ -1,116 +1,98 @@
-"use client"
+"use client";
 
+import React, { useRef, useMemo, useImperativeHandle } from "react";
+import { useThree, useFrame } from "@react-three/fiber";
 import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
-import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
-type LineProps = { points: React.RefObject<THREE.Vector3[]> }
+export interface ThreeLineMethods {
+  addPoint: (point: THREE.Vector3) => void;
+}
 
-export default function ThreeLine({ points }: LineProps) {
-  // Get canvas size for LineMaterial resolution
-  const { size } = useThree();
-  
-  // Ref to hold the Line2 object, which will be rendered as a primitive
+function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethods | null> }) {
+  const { size } = useThree(); 
   const line2Ref = useRef<Line2>(null);
-  
-  // State for the wave animation offset
+  const points = useRef<THREE.Vector3[]>([]); 
   const waveDist = useRef(0);
+  const MAX_POINTS = 5000; 
 
-  // Memoize the LineGeometry and LineMaterial to prevent unnecessary re-creations
-  // The LineGeometry will be updated directly in the useFrame hook.
   const line2Geometry = useMemo(() => {
-    // Start with an empty LineGeometry
     const geom = new LineGeometry();
+    geom.setPositions(new Float32Array(MAX_POINTS * 3));
     return geom;
-  }, []); // Only create once
+  }, []);
 
   const line2Material = useMemo(() => {
-    // LineMaterial requires a resolution for correct rendering of line width
     const mat = new LineMaterial({ 
-      color: "hotpink", 
-      linewidth: 5, // Width in pixels
-      resolution: new THREE.Vector2(size.width, size.height), // Set initial resolution
-      dashed: false, // You can set this to true for dashed lines
-      alphaToCoverage: true, // Recommended for better anti-aliasing with lines
+      color: "red",
+      linewidth: 3, 
+      resolution: new THREE.Vector2(size.width, size.height),
+      dashed: false,
+      alphaToCoverage: true,
+      transparent: true, 
+      depthWrite: false, 
     });
     return mat;
-  }, [size]); // Recreate if canvas size changes
+  }, [size]);
 
-  // Create the Line2 object once. Its geometry and material will be updated later.
   const line2 = useMemo(() => new Line2(line2Geometry, line2Material), [line2Geometry, line2Material]);
-  line2Ref.current = line2; // Assign to ref for rendering
+  line2Ref.current = line2;
+
+  useImperativeHandle(lineApiRef, () => ({
+    addPoint: (point: THREE.Vector3) => {
+      points.current.push(point);
+    }
+  }));
 
   useFrame((state) => { 
-    // Ensure points array exists.
-    if (!points.current) {
-      line2Geometry.setDrawRange(0, 0); // Hide the line if pointsRef is not ready
-      return;
-    }
-
-    const worldPoints = points.current;
-
-    // If there are less than 2 points, we cannot draw a line.
-    // Set draw range to 0 and return without attempting to update positions.
-    if (worldPoints.length < 2) {
+    if (points.current.length < 2) {
       line2Geometry.setDrawRange(0, 0); 
       return; 
     }
 
-    // --- Wave Animation Logic (unchanged from your original code) ---
-    // Compute distances for wave animation
-    const distances = [0];
-    for (let i = 1; i < worldPoints.length; i++) {
-      distances.push(distances[i - 1] + worldPoints[i].distanceTo(worldPoints[i - 1]));
-    }
+    const worldPoints = points.current;
 
-    // Apply animated wave
-    waveDist.current += 2;
-    const wavedPoints = worldPoints.map((p, i) => {
-      const distToWave = distances[i] - waveDist.current;
-      // The wave calculation depends on clock.elapsedTime for continuous animation
-      const wave = Math.cos(distToWave / 30 - state.clock.elapsedTime * 5) * 0.5 * Math.exp(-Math.abs(distToWave / 30));
+    const pointsToDraw = worldPoints.slice(Math.max(0, worldPoints.length - MAX_POINTS));
+
+
+    const distances = [0];
+    for (let i = 1; i < pointsToDraw.length; i++) {
+      distances.push(distances[i - 1] + pointsToDraw[i].distanceTo(pointsToDraw[i - 1]));
+    }
+    waveDist.current += 2; 
+
+    const wavedPoints = pointsToDraw.map((p, i) => {
+      const distToWave = distances[i] - waveDist.current; 
+      
+      const wave = Math.cos(distToWave / 30 - state.clock.elapsedTime * 5) * 50 * Math.exp(-Math.abs(distToWave / 30));
+      
       return p.clone().add(new THREE.Vector3(0, wave, 0));
     });
-    // --- End Wave Animation Logic ---
-
-    // Prepare the points for LineGeometry
-    // LineGeometry expects a flat array of numbers: [x1, y1, z1, x2, y2, z2, ...]
     const flatWavedPoints = wavedPoints.flatMap(p => p.toArray());
 
-    // console.log(flatWavedPoints);
-
-    // Update the positions in LineGeometry
-    // This method efficiently updates the internal buffers of LineGeometry
     line2Geometry.setPositions(flatWavedPoints);
     
-    // Explicitly set the draw range for the LineGeometry.
-    // The 'count' argument for setDrawRange corresponds to the number of vertices to draw.
-    // Since we now ensure wavedPoints.length >= 2 before this point, this is safe.
-    line2Geometry.setDrawRange(0, wavedPoints.length);
+    line2Geometry.setDrawRange(0, pointsToDraw.length); 
 
-    // Update bounding box and sphere after positions change.
-    // This helps with frustum culling and ensures the object is rendered correctly.
+    line2.computeLineDistances(); 
+
     line2Geometry.computeBoundingBox();
     line2Geometry.computeBoundingSphere();
     
-    // Update the LineMaterial's resolution if the canvas size has changed.
-    // This is crucial for Line2's width to scale correctly on resize.
     if (line2Material.resolution.x !== size.width || line2Material.resolution.y !== size.height) {
       line2Material.resolution.set(size.width, size.height);
-      // When resolution changes, the material needs to update its internal shaders
-      // so explicitly mark it as needing an update.
-      line2Material.needsUpdate = true;
+      line2Material.needsUpdate = true; 
     }
   });
 
-  // Render the Line2 object as a primitive
   return (
       <primitive object={line2Ref.current}/>
   );
 }
+
+export default ThreeLine;
 
 
 
