@@ -98,12 +98,8 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
    // Inside the useFrame loop
 
     if (waveDist.current.length > 0) {
-      // console.log(waveDist.current)
-      // --- 1. Animate wave positions (FIXED) ---
-      waveDist.current = waveDist.current.map(dist => dist - 2); // Use implicit return
-
-      // --- 2. Calculate point deformations (OPTIMIZED) ---
-      // This is more efficient than the nested .map()
+      waveDist.current = waveDist.current.map(dist => dist - 2).filter(dist => dist > -5);
+      
       wavedPoints = pointsToDraw.map((p, pointIndex) => {
         let totalWaveOffset = 0;
         const currentPointDistance = distances[pointIndex];
@@ -113,8 +109,8 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
           const distToWave = currentPointDistance - waveOriginDist;
 
           // Make the wave fade out and only affect a certain length of the line
-          if (distToWave > 0 && distToWave < 200) { // Tweak these values
-            const wavePower = Math.exp(-distToWave / 90); // Controls fade out
+          if (distToWave > 0 && distToWave < 100) { // Tweak these values
+            const wavePower = Math.exp(-distToWave / 15); // Controls fade out
             const waveShape = Math.cos(distToWave / 15 - state.clock.elapsedTime * 10);
             totalWaveOffset += waveShape * 15 * wavePower; // Add this wave's effect
           }
@@ -123,7 +119,6 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
         return p.clone().add(new THREE.Vector3(0, totalWaveOffset, 0));
       });
     }
-
 
     let flatWavedPoints;
     wavedPoints.length > 0 ? flatWavedPoints = wavedPoints.flatMap(p => p.toArray()) : flatWavedPoints = pointsToDraw.flatMap(p => p.toArray());
