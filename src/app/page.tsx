@@ -120,7 +120,7 @@ export default function Home() {
             </IntroHeader>
             <ScribbleFigure />
             <CanvasWrapper>
-                <Canvas orthographic antialias={true}> 
+                <Canvas orthographic antialias="true">
                     <CameraSetup />
                     <ThreeLine lineApiRef={threeLineRef} />
                     <InteractionHandler lineApiRef={threeLineRef} />

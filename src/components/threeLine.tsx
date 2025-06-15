@@ -14,8 +14,9 @@ export interface ThreeLineMethods {
 function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethods | null> }) {
   const { size } = useThree(); 
   const line2Ref = useRef<Line2>(null);
-  const points = useRef<THREE.Vector3[]>([]); 
-  const waveDist = useRef(0);
+  const points = useRef<THREE.Vector3[]>([]);
+  const triggerThreshold = useRef<number[]>([]);
+  const waveDist = useRef([]);
   const MAX_POINTS = 5000; 
 
   const line2Geometry = useMemo(() => {
@@ -49,35 +50,87 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
   useFrame((state) => { 
     if (points.current.length < 2) {
       line2Geometry.setDrawRange(0, 0); 
-      return; 
+      return;
     }
 
     const worldPoints = points.current;
-
     const pointsToDraw = worldPoints.slice(Math.max(0, worldPoints.length - MAX_POINTS));
-
-
     const distances = [0];
     for (let i = 1; i < pointsToDraw.length; i++) {
       distances.push(distances[i - 1] + pointsToDraw[i].distanceTo(pointsToDraw[i - 1]));
     }
-    waveDist.current += 2; 
 
-    const wavedPoints = pointsToDraw.map((p, i) => {
-      const distToWave = distances[i] - waveDist.current; 
-      
-      const wave = Math.cos(distToWave / 30 - state.clock.elapsedTime * 5) * 50 * Math.exp(-Math.abs(distToWave / 30));
-      
-      return p.clone().add(new THREE.Vector3(0, wave, 0));
-    });
-    const flatWavedPoints = wavedPoints.flatMap(p => p.toArray());
-
-    line2Geometry.setPositions(flatWavedPoints);
+    // get the difference in height / velocity
+    const height = size.height;
+    const currentY = worldPoints[worldPoints.length - 1].y;
+    let pastY = currentY; // Default to currentY to get a diff of 0
+    if (worldPoints.length >= 5) {
+      pastY = worldPoints[worldPoints.length - 5].y;
+    }
     
+    let diff = 0;
+    const percentNew = 100 / height * currentY; // higher === smaler value and lower === bigger value
+    const percentLast = 100 / height * pastY;
+    diff = Math.abs(percentNew - percentLast);
+
+    // If the cursor strikes high enough it will cause a wave!
+    // When we trigger the wave we want to remember the point where we started
+    // and then start counting down, traveling backwarts through the line
+    if ( diff > 3 ){
+      triggerThreshold.current = [];
+      // remembering when we had the first trigger
+      triggerThreshold.current.push(worldPoints.length);
+    };
+    if (triggerThreshold.current.length > 0){
+      const lastThreshold = triggerThreshold.current[triggerThreshold.current.length - 1];
+      
+      // Waiting until trigger is fully done
+      if(worldPoints.length >= lastThreshold + 5){
+        const lastPointDistance = distances[distances.length - 1] || 0;
+        waveDist.current.push(lastPointDistance);
+        //resetting the threshold after
+        triggerThreshold.current = [];
+      }
+    }
+    console.log(waveDist.current);
+
+    let wavedPoints = [];
+   // Inside the useFrame loop
+
+    if (waveDist.current.length > 0) {
+      // console.log(waveDist.current)
+      // --- 1. Animate wave positions (FIXED) ---
+      waveDist.current = waveDist.current.map(dist => dist - 2); // Use implicit return
+
+      // --- 2. Calculate point deformations (OPTIMIZED) ---
+      // This is more efficient than the nested .map()
+      wavedPoints = pointsToDraw.map((p, pointIndex) => {
+        let totalWaveOffset = 0;
+        const currentPointDistance = distances[pointIndex];
+
+        // For this single point, loop through all active waves and sum their effects
+        for (const waveOriginDist of waveDist.current) {
+          const distToWave = currentPointDistance - waveOriginDist;
+
+          // Make the wave fade out and only affect a certain length of the line
+          if (distToWave > 0 && distToWave < 200) { // Tweak these values
+            const wavePower = Math.exp(-distToWave / 90); // Controls fade out
+            const waveShape = Math.cos(distToWave / 15 - state.clock.elapsedTime * 10);
+            totalWaveOffset += waveShape * 15 * wavePower; // Add this wave's effect
+          }
+        }
+        // Apply the final summed offset to a clone of the original point
+        return p.clone().add(new THREE.Vector3(0, totalWaveOffset, 0));
+      });
+    }
+
+
+    let flatWavedPoints;
+    wavedPoints.length > 0 ? flatWavedPoints = wavedPoints.flatMap(p => p.toArray()) : flatWavedPoints = pointsToDraw.flatMap(p => p.toArray());
+  
+    line2Geometry.setPositions(flatWavedPoints);
     line2Geometry.setDrawRange(0, pointsToDraw.length); 
-
-    line2.computeLineDistances(); 
-
+    line2.computeLineDistances();
     line2Geometry.computeBoundingBox();
     line2Geometry.computeBoundingSphere();
     
@@ -93,44 +146,3 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
 }
 
 export default ThreeLine;
-
-
-
-
-          // get the difference in height / velocity
-        // const currentY = points.current[points.current.length - 1][1];
-        // let pastY;
-        // if(points.current.length - 5 && points.current[points.current.length - 5] && points.current[points.current.length - 5][1]){
-        //   pastY = points.current[points.current.length - 5][1];
-        // }
-        // const percentNew = 100 / height * currentY; // higher === smaler value and lower === bigger value
-        // const percentLast = 100 / height * pastY; 
-        // const diff = Math.abs(percentNew - percentLast);
-
-
-        // console.log(waveTrigger.current.length > 0, waveTrigger.current);
-        // HERE I deduce the xValue every from in order to move the wave alone the line
-        // if(waveTrigger.current.length > 0){
-        //   waveTrigger.current = waveTrigger.current.map((wave, i, a)=> ({
-        //     ...wave,
-        //     xValue: wave.xValue - 1,
-        //     }))
-        //     console.log(waveTrigger.current[0].xValue);
-        // }
-
-        // If the cursor strikes high enough it will cause a wave!
-        // When we trigger the wave we want to remember the point where we started
-        // and then start counting down, traveling backwarts through the line
-        // if ( diff > 3 ){
-        //   // console.log("JUMP", points.current[points.current.length - 1]);
-
-        //   if(points.current[points.current.length - 1])
-        //   waveTrigger.current.push({ id: Number(state.clock.elapsedTime.toFixed(3)), xValue: points.current[points.current.length - 1][0]});
-          
-        //   // wavesRef.current = wavePoints;
-        //   // console.log("WAVE", wavePoints,"WORLD", worldPoints);
-        // };
-        // if( diff < 3 ){
-        //   // wavesRef.current = worldPoints;
-        //   setLinePoints(worldPoints);
-        // };
