@@ -4,7 +4,7 @@ import "../styles/globals.css";
 
 export const metadata: Metadata = {
 	title: "RB Portfolio",
-	description: "Richards digital buisness card",
+	description: "Richard`s digital buisness card",
 };
 
 export default function RootLayout({

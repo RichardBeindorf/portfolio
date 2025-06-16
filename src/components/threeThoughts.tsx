@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export default function ThreeThoughts (){
 
     const thoughLineData = [
@@ -1013,19 +1015,6 @@ export default function ThreeThoughts (){
         ]
     ]
 
-
-    // Used this to clean up positional data, keeping it for any other cleanup job
-    // const cleanedUpData = thoughLineData.filter((vector, i, a) => { 
-    //     if(a[i + 1] && a[i + 1][0]){
-    //         return Math.floor(vector[0]) !== Math.floor(a[i + 1][0]);
-    //     }
-    // })
-
-    // const roundedData = cleanedUpData.map((vector) =>{
-    //     const roundedNumb = vector.map((number) => {return Math.ceil(number)});
-    //     console.log(roundedNumb);
-    //     return roundedNumb
-    // });
-
-    return thoughLineData
+    const transformedThoughts = thoughLineData.map(thought => new THREE.Vector3(thought[0], thought[1], thought[2]));
+    return transformedThoughts
 }

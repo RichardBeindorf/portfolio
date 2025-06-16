@@ -4,13 +4,15 @@ import React, { useRef, useEffect } from "react";
 import ScribbleFigure from "@/components/scribbleFigure"; 
 import styled from "styled-components";
 import { Canvas, useThree } from "@react-three/fiber";
-import ThreeLine, { ThreeLineMethods } from "@/components/threeLine"; 
+import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
+// import ThreeThoughts from "@/components/threeThoughts";
 import * as THREE from "three";
 
 const IntroHeader = styled.h1`
     position: absolute;
     top: 200px;
     left: 400px;
+    color: #F24150;
     z-index: 100;
     text-align: center;
     pointer-events: none;
@@ -23,6 +25,7 @@ const WelcomeMain = styled.main`
     width: 100vw; 
     height: 100vh; 
     overflow: hidden; 
+    background-color: #F2F1E9;
     pointer-events: none;
 `;
 const CanvasWrapper = styled.div`
@@ -63,25 +66,25 @@ function CameraSetup() {
   return null; 
 }
 
-function InteractionHandler({ lineApiRef }: { lineApiRef: React.MutableRefObject<ThreeLineMethods | null> }) {
+function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethods | null> }) {
     const { size, camera, gl } = useThree(); 
-    const isDrawing = useRef(false); 
+    // const isDrawing = useRef(false); 
 
     useEffect(() => {
         const canvas = gl.domElement; 
 
-        const handleMouseDown = (e: MouseEvent) => { 
-            isDrawing.current = true;
-            if (lineApiRef.current) {
-                const vector = new THREE.Vector3(
-                    (e.clientX / size.width) * 2 - 1, 
-                    -(e.clientY / size.height) * 2 + 1, 
-                    0
-                );
-                vector.unproject(camera);
-                lineApiRef.current.addPoint(vector);
-            }
-        };
+        // const handleMouseDown = (e: MouseEvent) => { 
+        //     isDrawing.current = true;
+        //     if (lineApiRef.current) {
+        //         const vector = new THREE.Vector3(
+        //             (e.clientX / size.width) * 2 - 1, 
+        //             -(e.clientY / size.height) * 2 + 1, 
+        //             0
+        //         );
+        //         vector.unproject(camera);
+        //         lineApiRef.current.addPoint(vector);
+        //     }
+        // };
 
         // const handleMouseUp = () => {
         //     isDrawing.current = false;
@@ -118,11 +121,11 @@ export default function Home() {
     return (
         <WelcomeMain>
             <IntroHeader style={permanentMarker.style}>
-                I`m Richard <br /> a Creative Developer <br /> based in Hamburg
+                Hi i`m Richard <br /> a Hamburg based <br /> &lt; Creative Developer /&gt;
             </IntroHeader>
             <ScribbleFigure />
             <CanvasWrapper>
-                <Canvas orthographic antialias="true">
+                <Canvas orthographic>
                     <CameraSetup />
                     <ThreeLine lineApiRef={threeLineRef} />
                     <InteractionHandler lineApiRef={threeLineRef} />

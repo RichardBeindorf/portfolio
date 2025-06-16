@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useRef, useMemo, useImperativeHandle } from "react";
+import React, { useRef, useMemo, useImperativeHandle, useEffect } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import * as THREE from "three";
+import ThreeThoughts from "./threeThoughts";
 
 export interface ThreeLineMethods {
   addPoint: (point: THREE.Vector3) => void;
@@ -17,7 +18,15 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
   const points = useRef<THREE.Vector3[]>([]);
   const triggerThreshold = useRef<number[]>([]);
   const waveDist = useRef([]);
-  const MAX_POINTS = 5000; 
+  const MAX_POINTS = 5000;
+
+  useEffect(()=>{
+    const thoughtData = ThreeThoughts();
+    thoughtData.forEach(thought => {
+        if(thought){
+            points.current.push(thought)
+        }});
+  },[]);
 
   const line2Geometry = useMemo(() => {
     const geom = new LineGeometry();
@@ -27,8 +36,8 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
 
   const line2Material = useMemo(() => {
     const mat = new LineMaterial({ 
-      color: "red",
-      linewidth: 3, 
+      color: "#F24150",
+      linewidth: 2.5, 
       resolution: new THREE.Vector2(size.width, size.height),
       dashed: false,
       alphaToCoverage: true,
@@ -52,24 +61,24 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
       line2Geometry.setDrawRange(0, 0); 
       return;
     }
-
     const worldPoints = points.current;
     const pointsToDraw = worldPoints.slice(Math.max(0, worldPoints.length - MAX_POINTS));
     const distances = [0];
+    const height = size.height;
+    const currentY = worldPoints[worldPoints.length - 1].y;
+    const percentNew = 100 / height * currentY; // higher === smaler value and lower === bigger value
+    let diff = 0;
+
     for (let i = 1; i < pointsToDraw.length; i++) {
       distances.push(distances[i - 1] + pointsToDraw[i].distanceTo(pointsToDraw[i - 1]));
     }
 
     // get the difference in height / velocity
-    const height = size.height;
-    const currentY = worldPoints[worldPoints.length - 1].y;
     let pastY = currentY; // Default to currentY to get a diff of 0
     if (worldPoints.length >= 5) {
       pastY = worldPoints[worldPoints.length - 5].y;
     }
-    
-    let diff = 0;
-    const percentNew = 100 / height * currentY; // higher === smaler value and lower === bigger value
+
     const percentLast = 100 / height * pastY;
     diff = Math.abs(percentNew - percentLast);
 
@@ -81,6 +90,7 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
       // remembering when we had the first trigger
       triggerThreshold.current.push(worldPoints.length);
     };
+
     if (triggerThreshold.current.length > 0){
       const lastThreshold = triggerThreshold.current[triggerThreshold.current.length - 1];
       
@@ -91,7 +101,7 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
         //resetting the threshold after
         triggerThreshold.current = [];
       }
-    }
+    };
 
     let wavedPoints = [];
     if (waveDist.current.length > 0) {
@@ -111,11 +121,11 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
             const waveShape = Math.cos(distToWave / 15 - state.clock.elapsedTime * 10);
             totalWaveOffset += waveShape * 15 * wavePower; // Add this wave's effect
           }
-        }
+        };
         // Apply the final summed offset to a clone of the original point
         return p.clone().add(new THREE.Vector3(0, totalWaveOffset, 0));
       });
-    }
+    };
 
     let flatWavedPoints;
     wavedPoints.length > 0 ? flatWavedPoints = wavedPoints.flatMap(p => p.toArray()) : flatWavedPoints = pointsToDraw.flatMap(p => p.toArray());
