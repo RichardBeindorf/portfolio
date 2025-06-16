@@ -7,8 +7,9 @@ import { Canvas, useThree } from "@react-three/fiber";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
 // import ThreeThoughts from "@/components/threeThoughts";
 import * as THREE from "three";
+import Link from "next/link";
 
-const IntroHeader = styled.h1`
+const Title = styled.h1`
     position: absolute;
     top: 200px;
     left: 400px;
@@ -16,6 +17,21 @@ const IntroHeader = styled.h1`
     z-index: 100;
     text-align: center;
     pointer-events: none;
+`;
+
+const Work = styled(Title)`
+    top: 800px;
+    left: 200px;
+`;
+
+const Passion = styled(Title)`
+    top: 1000px;
+    left: 500px;
+`;
+
+const Story = styled(Title)`
+    top: 1000px;
+    left: 800px;
 `;
 
 const WelcomeMain = styled.main`
@@ -34,6 +50,11 @@ const CanvasWrapper = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
+`;
+
+const TestLink = styled(Link)`
+    position: relative;
+    z-index: 10000;
 `;
 
 function CameraSetup() {
@@ -120,9 +141,9 @@ export default function Home() {
 
     return (
         <WelcomeMain>
-            <IntroHeader style={permanentMarker.style}>
+            <Title style={permanentMarker.style}>
                 Hi i`m Richard <br /> a Hamburg based <br /> &lt; Creative Developer /&gt;
-            </IntroHeader>
+            </Title>
             <ScribbleFigure />
             <CanvasWrapper>
                 <Canvas orthographic>
@@ -131,6 +152,9 @@ export default function Home() {
                     <InteractionHandler lineApiRef={threeLineRef} />
                 </Canvas>
             </CanvasWrapper>
+            <Story> Story </Story>
+            <Work> Work </Work>
+            <Passion> Passion </Passion>
         </WelcomeMain>
     );
 }
