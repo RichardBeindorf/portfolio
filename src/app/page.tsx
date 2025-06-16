@@ -13,6 +13,7 @@ const IntroHeader = styled.h1`
     left: 400px;
     z-index: 100;
     text-align: center;
+    pointer-events: none;
 `;
 
 const WelcomeMain = styled.main`
@@ -22,6 +23,7 @@ const WelcomeMain = styled.main`
     width: 100vw; 
     height: 100vh; 
     overflow: hidden; 
+    pointer-events: none;
 `;
 const CanvasWrapper = styled.div`
     position: fixed;

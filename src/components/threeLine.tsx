@@ -32,8 +32,8 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
       resolution: new THREE.Vector2(size.width, size.height),
       dashed: false,
       alphaToCoverage: true,
-      transparent: true, 
-      depthWrite: false, 
+      transparent: true,
+      depthWrite: false,
     });
     return mat;
   }, [size]);
@@ -92,11 +92,8 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
         triggerThreshold.current = [];
       }
     }
-    console.log(waveDist.current);
 
     let wavedPoints = [];
-   // Inside the useFrame loop
-
     if (waveDist.current.length > 0) {
       waveDist.current = waveDist.current.map(dist => dist - 2).filter(dist => dist > -5);
       
