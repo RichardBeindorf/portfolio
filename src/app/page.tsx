@@ -5,57 +5,57 @@ import ScribbleFigure from "@/components/scribbleFigure";
 import styled from "styled-components";
 import { Canvas, useThree } from "@react-three/fiber";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
-// import ThreeThoughts from "@/components/threeThoughts";
 import * as THREE from "three";
 import Link from "next/link";
-
-const Title = styled.h1`
-    position: absolute;
-    top: 200px;
-    left: 400px;
-    color: #F24150;
-    z-index: 100;
-    text-align: center;
-    pointer-events: none;
-`;
-
-const Work = styled(Title)`
-    top: 800px;
-    left: 200px;
-`;
-
-const Passion = styled(Title)`
-    top: 1000px;
-    left: 500px;
-`;
-
-const Story = styled(Title)`
-    top: 1000px;
-    left: 800px;
-`;
 
 const WelcomeMain = styled.main`
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100vw; 
-    height: 100vh; 
-    overflow: hidden; 
+    height: calc(100vh * 2);
+    /* overflow: hidden; */
     background-color: #F2F1E9;
-    pointer-events: none;
+    /* pointer-events: none; */
 `;
 const CanvasWrapper = styled.div`
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100vh * 2);
 `;
 
-const TestLink = styled(Link)`
-    position: relative;
-    z-index: 10000;
+const StyledFigure = styled(ScribbleFigure)`
+    position: sticky;
 `;
+
+const Title = styled.h1`
+    position: fixed;
+    top: 200px;
+    left: 400px;
+    color: #F24150;
+    z-index: 100;
+    text-align: center;
+    /* pointer-events: none; */
+`;
+
+const Work = styled(Title)`
+    position: sticky;
+`;
+
+const Passion = styled(Title)`
+    position: sticky;
+`;
+
+const Story = styled(Title)`
+    position: sticky;
+`;
+
+// const TestLink = styled(Link)`
+//     position: relative;
+//     z-index: 10000;
+// `;
 
 function CameraSetup() {
   const { camera, size } = useThree();
@@ -88,7 +88,7 @@ function CameraSetup() {
 }
 
 function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethods | null> }) {
-    const { size, camera, gl } = useThree(); 
+    const { size, camera, gl } = useThree();
     // const isDrawing = useRef(false); 
 
     useEffect(() => {
@@ -137,14 +137,22 @@ function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeL
 }
 
 export default function Home() { 
-    const threeLineRef = useRef<ThreeLineMethods | null>(null); 
+    const threeLineRef = useRef<ThreeLineMethods | null>(null);
+    const mainRef = useRef(null);
+
+    function scroller (){
+        const mainHeight = mainRef.current.scrollHeight;
+        // 1868
+        mainRef.current.scrollTo({top: mainHeight, behavior: "smooth"});
+        console.log("trigger");
+    }
 
     return (
-        <WelcomeMain>
+        <WelcomeMain ref={mainRef} onClick={() => scroller()}>
             <Title style={permanentMarker.style}>
                 Hi i`m Richard <br /> a Hamburg based <br /> &lt; Creative Developer /&gt;
             </Title>
-            <ScribbleFigure />
+            <StyledFigure />
             <CanvasWrapper>
                 <Canvas orthographic>
                     <CameraSetup />
