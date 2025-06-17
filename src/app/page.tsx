@@ -6,7 +6,9 @@ import styled from "styled-components";
 import { Canvas, useThree } from "@react-three/fiber";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
 import * as THREE from "three";
-import Link from "next/link";
+import { useGSAP } from "@gsap/react";
+import { Observer } from "gsap/Observer";
+import gsap from "gsap";
 
 const WelcomeMain = styled.main`
     display: flex;
@@ -14,12 +16,11 @@ const WelcomeMain = styled.main`
     align-items: center;
     width: 100vw; 
     height: calc(100vh * 2);
-    /* overflow: hidden; */
     background-color: #F2F1E9;
     /* pointer-events: none; */
 `;
 const CanvasWrapper = styled.div`
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     width: 100%;
@@ -37,19 +38,21 @@ const Title = styled.h1`
     color: #F24150;
     z-index: 100;
     text-align: center;
-    /* pointer-events: none; */
 `;
 
 const Work = styled(Title)`
-    position: sticky;
+    position: absolute;
+    color: var(--foreground);
 `;
 
 const Passion = styled(Title)`
-    position: sticky;
+    position: absolute;
+    color: var(--foreground);
 `;
 
 const Story = styled(Title)`
-    position: sticky;
+    position: absolute;
+    color: var(--foreground);
 `;
 
 // const TestLink = styled(Link)`
@@ -126,7 +129,7 @@ function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeL
         // canvas.addEventListener("mousedown", handleMouseDown);
         // canvas.addEventListener("mouseup", handleMouseUp);
         canvas.addEventListener("mousemove", handleMouseMove);
-
+        
         return () => {
             // canvas.removeEventListener("mousedown", handleMouseDown);
             // canvas.removeEventListener("mouseup", handleMouseUp);
@@ -140,15 +143,19 @@ export default function Home() {
     const threeLineRef = useRef<ThreeLineMethods | null>(null);
     const mainRef = useRef(null);
 
-    function scroller (){
-        const mainHeight = mainRef.current.scrollHeight;
-        // 1868
-        mainRef.current.scrollTo({top: mainHeight, behavior: "smooth"});
-        console.log("trigger");
-    }
+    useGSAP(()=> {
+
+        gsap.registerPlugin(Observer);
+
+        Observer.create({
+            target: window,
+            type: "wheel, scroll",
+            onWheel: () => {console.log("thats it weirdo!")},
+        });
+    });
 
     return (
-        <WelcomeMain ref={mainRef} onClick={() => scroller()}>
+        <WelcomeMain ref={mainRef}>
             <Title style={permanentMarker.style}>
                 Hi i`m Richard <br /> a Hamburg based <br /> &lt; Creative Developer /&gt;
             </Title>
