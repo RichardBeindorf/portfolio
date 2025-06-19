@@ -14,51 +14,63 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-direction: column;
         width: 100vw; 
         height: calc(100vh * 2);
         background-color: #F2F1E9;
         /* pointer-events: none; */
     `;
+
     const CanvasWrapper = styled.div`
-        position: sticky;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: calc(100vh * 2);
     `;
 
+    const TopHalf = styled.div`
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+    `;
+
+    const LowerHalf = styled(TopHalf)`
+    `;
+
     const StyledFigure = styled(ScribbleFigure)`
-        position: sticky;
+        position: relative;
     `;
 
     const Title = styled.h1`
-        position: fixed;
-        top: 200px;
-        left: 400px;
         color: #F24150;
-        z-index: 100;
+        font-size: clamp(1vw, 2rem, 5vw);
         text-align: center;
+        z-index: 2;
     `;
 
     const Work = styled(Title)`
         position: absolute;
+        top: 1400px;
+        left: 200px;
         color: var(--foreground);
     `;
 
     const Passion = styled(Title)`
         position: absolute;
+        top: 140%;
+        left: 80%;
         color: var(--foreground);
     `;
 
     const Story = styled(Title)`
         position: absolute;
+        top: 170%;
+        left: 50%;
         color: var(--foreground);
     `;
-
-    // const TestLink = styled(Link)`
-    //     position: relative;
-    //     z-index: 10000;
-    // `;
 
     function CameraSetup() {
     const { camera, size } = useThree();
@@ -95,7 +107,7 @@ function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeL
     // Use a ref to store the last known pointer position.
     const lastPointerPosition = useRef({ x: 0, y: 0 });
 
-    useEffect(() => {
+    useGSAP(() => {
         if (!lineApiRef.current) return;
 
         const canvas = gl.domElement;
@@ -156,20 +168,24 @@ function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeL
 
         return (
             <WelcomeMain>
-                <Title style={permanentMarker.style}>
-                    Hi i`m Richard <br /> a Hamburg based <br /> &lt; Creative Developer /&gt;
-                </Title>
-                <StyledFigure />
                 <CanvasWrapper>
                     <Canvas orthographic>
                         <CameraSetup />
-                        <ThreeLine lineApiRef={threeLineRef} />
-                        <InteractionHandler lineApiRef={threeLineRef} />
+                        {/* <ThreeLine lineApiRef={threeLineRef} /> */}
+                        {/* <InteractionHandler lineApiRef={threeLineRef} /> */}
                     </Canvas>
                 </CanvasWrapper>
-                <Story> Story </Story>
-                <Work> Work </Work>
-                <Passion> Passion </Passion>
+                <TopHalf>
+                    <Title style={permanentMarker.style}>
+                        Hi, i`m Richard <br /> a Hamburg based <br /> &lt; Creative Developer /&gt;
+                    </Title>
+                    <StyledFigure />
+                </TopHalf>
+                <LowerHalf>
+                    <Story style={permanentMarker.style}> Story </Story>
+                    <Work style={permanentMarker.style}> Work </Work>
+                    <Passion style={permanentMarker.style}> Passion </Passion>
+                </LowerHalf>
             </WelcomeMain>
         );
     }
