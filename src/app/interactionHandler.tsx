@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { useGSAP } from "@gsap/react";
 import { Observer } from "gsap/Observer";
 import { useThree } from "@react-three/fiber";
+import { pointerDataRef } from "./interactionRef";
 import { ThreeLineMethods } from "@/components/threeLine";
 
 export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethods | null> }) {
@@ -23,8 +24,6 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
         const addPointAt = (clientX: number, clientY: number) => {
             if (!lineApiRef.current) return;
 
-            // --- THE FIX ---
-            // 1. Calculate the pointer's position relative to the entire page/canvas.
             const pointerXOnCanvas = clientX;
             const pointerYOnCanvas = clientY + window.scrollY;
 
@@ -48,10 +47,20 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
                 const viewportHeight = size.height / 2;
                 const lowestQuarter = viewportHeight - ((size.height / 2) / 4); // full viewport - 3 quarter
                 // console.log(self.y, lowestQuarter);
-                if(self.velocityY > 2000 && self.y > lowestQuarter){
-                    console.log("high velocity!!!", self.velocityY, size.height / 2);
+                pointerDataRef.current = { velocity: self.velocityY, yPos: self.y, lowestQuarter: lowestQuarter };
+
+                if(pointerDataRef.current.velocity > 2000 && pointerDataRef.current.yPos > lowestQuarter){
+                    // console.log("high velocity!!!", self.velocityY, size.height / 2);
+                
+                    gsap.to(window, {
+                        duration: 2,
+                        scrollTo: 800,
+                    });
                 }
+
                 lastPointerPosition.current = { x: self.x, y: self.y };
+                // setPointerData({ x: self.x, y: self.y, velocityY: self.velocityY });
+                
                 // Add a point at the new position
                 addPointAt(self.x, self.y);
             },
@@ -60,7 +69,9 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
             onWheel: () => {
                 // When scrolling, draw a point at the LAST known pointer position.
                 // This creates the effect of the line continuing while the page moves.
-                addPointAt(lastPointerPosition.current.x, lastPointerPosition.current.y);
+                const { x, y } = lastPointerPosition.current;
+                // setPointerData({ x, y, velocityY: 0 }); // or carry over last velocityY
+                addPointAt(x, y);
             },
         });
 

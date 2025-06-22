@@ -3,52 +3,52 @@
     import { useGSAP } from "@gsap/react";
     import styled from "styled-components";
     import CameraSetup from "./cameraSetup";
-    import { useSyncExternalStore } from "react";
     import { permanentMarker } from "../styles/font"; 
     import React, { useRef } from "react";
     import { InertiaPlugin } from "gsap/InertiaPlugin";
     import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-    import { Canvas, useThree } from "@react-three/fiber";
+    import { Canvas } from "@react-three/fiber";
     import InteractionHandler from "./interactionHandler";
     import ScribbleFigure from "@/components/scribbleFigure"; 
     import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
-    import { subscribe, getSnapshot } from "./interactionStore";
+    import { pointerDataRef } from "./interactionRef";
 
     export default function Home() { 
         const threeLineRef = useRef<ThreeLineMethods | null>(null);
         const top = useRef(null);
         const bottom = useRef(null);
-        const FALLBACK_POINTER = { x: 0, y: 0, velocityY: 0 };
-        const pointerData = useSyncExternalStore(
-        subscribe,
-        getSnapshot,
-        () => FALLBACK_POINTER
-        );
-        // gsap.registerPlugin(ScrollTrigger);
-        // Ich brauche keinen Scroll Tigger, weil ich nicht das scrollen beobachten möchte, sonder das scrollen das Ergebnis meienr Beobachtung ist.
 
         gsap.registerPlugin(ScrollToPlugin);
         gsap.registerPlugin(InertiaPlugin);
-
+ 
         useGSAP(() => {
             // const halfes = gsap.utils.toArray(".halfes");
-            console.log(threeLineRef);
-            gsap.to(window, {
-                duration: 2,
-                scrollTo: 800,
-                // scrollTrigger: {
-                //     trigger: ".bottom",
-                //     start: "-30px 80%", // trigger & viewport
-                //     end: "top top",// ersteres ist das trigger element, zweites der scroller - hier viewport, also aktuell ist das Ende erreicht wenn die Kopfseite vom trigger die Kopfseite vom Viewport erreicht
-                //     // toggleActions: "play reset play restart",
-                //     toggleActions: "play none reverse none",
-                //     markers: true,
-                //     onchange: () => {
-                //         console.log("changechangechange")
-                //     }
-                // }
-            });
-        }, {dependencies: [threeLineRef]});
+
+            if(pointerDataRef.current.velocity > 0){
+
+                console.log(pointerDataRef.current.velocity, pointerDataRef.current.yPos, pointerDataRef.current.lowestQuarter);
+            }
+        
+            if(pointerDataRef.current.velocity > 2000 && pointerDataRef.current.yPos > pointerDataRef.current.lowestQuarter){
+            // console.log("high velocity!!!", self.velocityY, size.height / 2);
+                    console.log("jeeeeze louise");
+            }
+            // gsap.to(window, {
+            //     duration: 2,
+            //     scrollTo: 800,
+            //     // scrollTrigger: {
+            //     //     trigger: ".bottom",
+            //     //     start: "-30px 80%", // trigger & viewport
+            //     //     end: "top top",// ersteres ist das trigger element, zweites der scroller - hier viewport, also aktuell ist das Ende erreicht wenn die Kopfseite vom trigger die Kopfseite vom Viewport erreicht
+            //     //     // toggleActions: "play reset play restart",
+            //     //     toggleActions: "play none reverse none",
+            //     //     markers: true,
+            //     //     onchange: () => {
+            //     //         console.log("changechangechange")
+            //     //     }
+            //     // }
+            // });
+        });
 
         return (
             <WelcomeMain className="container">
