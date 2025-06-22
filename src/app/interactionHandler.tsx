@@ -6,20 +6,28 @@ import * as THREE from "three";
 import { useGSAP } from "@gsap/react";
 import { Observer } from "gsap/Observer";
 import { useThree } from "@react-three/fiber";
-import { pointerDataRef } from "./interactionRef";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ThreeLineMethods } from "@/components/threeLine";
+
+
+interface scrollRefObj {
+    velocity: number,
+    yPos: number,
+    lowestQuarter: number,
+}
 
 export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethods | null> }) {
     const { size, camera, gl } = useThree();
     // Use a ref to store the last known pointer position.
     const lastPointerPosition = useRef({ x: 0, y: 0 });
+    const pointerDataRef = useRef<scrollRefObj>({velocity: 0, yPos: 0, lowestQuarter: 0});
 
     useGSAP(() => {
         if (!lineApiRef.current) return;
-        const canvas = gl.domElement;
         gsap.registerPlugin(Observer);
+        gsap.registerPlugin(ScrollToPlugin);
 
-        // This is our single, corrected function to add a point to the line.
+        // This is our function to add a point to the line.
         // It takes viewport coordinates and correctly converts them to 3D world space.
         const addPointAt = (clientX: number, clientY: number) => {
             if (!lineApiRef.current) return;
@@ -27,11 +35,9 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
             const pointerXOnCanvas = clientX;
             const pointerYOnCanvas = clientY + window.scrollY;
 
-            // 2. Normalize these page-relative coordinates to the -1 to +1 range (NDC).
             const ndcX = (pointerXOnCanvas / size.width) * 2 - 1;
             const ndcY = -(pointerYOnCanvas / size.height) * 2 + 1;
 
-            // 3. Unproject the 2D NDC coordinates into your 3D orthographic world.
             const vector = new THREE.Vector3(ndcX, ndcY, 0);
             vector.unproject(camera);
             lineApiRef.current.addPoint(vector);
@@ -43,11 +49,13 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
 
             // onPointerMove handles mouse and touch movement
             onMove: (self) => {
-                // Store the latest position
                 const viewportHeight = size.height / 2;
                 const lowestQuarter = viewportHeight - ((size.height / 2) / 4); // full viewport - 3 quarter
-                // console.log(self.y, lowestQuarter);
                 pointerDataRef.current = { velocity: self.velocityY, yPos: self.y, lowestQuarter: lowestQuarter };
+
+                let currentHalf: "top" | "bottom";
+                const eventFix = self.event as PointerEvent;
+                console.log(eventFix.pageY);
 
                 if(pointerDataRef.current.velocity > 2000 && pointerDataRef.current.yPos > lowestQuarter){
                     // console.log("high velocity!!!", self.velocityY, size.height / 2);
@@ -59,9 +67,6 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
                 }
 
                 lastPointerPosition.current = { x: self.x, y: self.y };
-                // setPointerData({ x: self.x, y: self.y, velocityY: self.velocityY });
-                
-                // Add a point at the new position
                 addPointAt(self.x, self.y);
             },
             
@@ -70,7 +75,6 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
                 // When scrolling, draw a point at the LAST known pointer position.
                 // This creates the effect of the line continuing while the page moves.
                 const { x, y } = lastPointerPosition.current;
-                // setPointerData({ x, y, velocityY: 0 }); // or carry over last velocityY
                 addPointAt(x, y);
             },
         });

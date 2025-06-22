@@ -1,57 +1,17 @@
     "use client";
-    import gsap from "gsap";
-    import { useGSAP } from "@gsap/react";
     import styled from "styled-components";
     import CameraSetup from "./cameraSetup";
     import { permanentMarker } from "../styles/font"; 
     import React, { useRef } from "react";
-    import { InertiaPlugin } from "gsap/InertiaPlugin";
-    import { ScrollToPlugin } from "gsap/ScrollToPlugin";
     import { Canvas } from "@react-three/fiber";
     import InteractionHandler from "./interactionHandler";
     import ScribbleFigure from "@/components/scribbleFigure"; 
     import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
-    import { pointerDataRef } from "./interactionRef";
 
     export default function Home() { 
         const threeLineRef = useRef<ThreeLineMethods | null>(null);
-        const top = useRef(null);
-        const bottom = useRef(null);
-
-        gsap.registerPlugin(ScrollToPlugin);
-        gsap.registerPlugin(InertiaPlugin);
- 
-        useGSAP(() => {
-            // const halfes = gsap.utils.toArray(".halfes");
-
-            if(pointerDataRef.current.velocity > 0){
-
-                console.log(pointerDataRef.current.velocity, pointerDataRef.current.yPos, pointerDataRef.current.lowestQuarter);
-            }
-        
-            if(pointerDataRef.current.velocity > 2000 && pointerDataRef.current.yPos > pointerDataRef.current.lowestQuarter){
-            // console.log("high velocity!!!", self.velocityY, size.height / 2);
-                    console.log("jeeeeze louise");
-            }
-            // gsap.to(window, {
-            //     duration: 2,
-            //     scrollTo: 800,
-            //     // scrollTrigger: {
-            //     //     trigger: ".bottom",
-            //     //     start: "-30px 80%", // trigger & viewport
-            //     //     end: "top top",// ersteres ist das trigger element, zweites der scroller - hier viewport, also aktuell ist das Ende erreicht wenn die Kopfseite vom trigger die Kopfseite vom Viewport erreicht
-            //     //     // toggleActions: "play reset play restart",
-            //     //     toggleActions: "play none reverse none",
-            //     //     markers: true,
-            //     //     onchange: () => {
-            //     //         console.log("changechangechange")
-            //     //     }
-            //     // }
-            // });
-        });
-
         return (
-            <WelcomeMain className="container">
+            <WelcomeMain>
                 <CanvasWrapper>
                     <Canvas orthographic>
                         <CameraSetup />
@@ -59,13 +19,13 @@
                         <InteractionHandler lineApiRef={threeLineRef} />
                     </Canvas>
                 </CanvasWrapper>
-                <TopHalf className="halfes" ref={top}>
-                    <Title style={permanentMarker.style} className="title">
+                <TopHalf>
+                    <Title style={permanentMarker.style}>
                         Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based in Hamburg
                     </Title>
                     <ScribbleFigure />
                 </TopHalf>
-                <LowerHalf className="halfes bottom" ref={bottom}>
+                <LowerHalf>
                     <Story style={permanentMarker.style}> Story </Story>
                     <Work style={permanentMarker.style}> Work </Work>
                     <Passion style={permanentMarker.style}> Passion </Passion>
