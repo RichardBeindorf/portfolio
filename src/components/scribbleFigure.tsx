@@ -1,10 +1,8 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 const Figure = styled.svg`
     position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 6;
+    z-index: 2;
 `;
 
 export default function ScribbleFigure () {

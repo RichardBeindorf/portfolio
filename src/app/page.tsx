@@ -1,24 +1,90 @@
     "use client";
-    import { permanentMarker } from "../styles/font"; 
-    import React, { useRef, useEffect } from "react";
-    import ScribbleFigure from "@/components/scribbleFigure"; 
-    import styled from "styled-components";
-    import { Canvas, useThree } from "@react-three/fiber";
-    import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
-    import * as THREE from "three";
-    import { useGSAP } from "@gsap/react";
-    import { Observer } from "gsap/Observer";
     import gsap from "gsap";
+    import { useGSAP } from "@gsap/react";
+    import styled from "styled-components";
+    import CameraSetup from "./cameraSetup";
+    import { useSyncExternalStore } from "react";
+    import { permanentMarker } from "../styles/font"; 
+    import React, { useRef } from "react";
+    import { InertiaPlugin } from "gsap/InertiaPlugin";
+    import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+    import { Canvas, useThree } from "@react-three/fiber";
+    import InteractionHandler from "./interactionHandler";
+    import ScribbleFigure from "@/components/scribbleFigure"; 
+    import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
+    import { subscribe, getSnapshot } from "./interactionStore";
+
+    export default function Home() { 
+        const threeLineRef = useRef<ThreeLineMethods | null>(null);
+        const top = useRef(null);
+        const bottom = useRef(null);
+        const FALLBACK_POINTER = { x: 0, y: 0, velocityY: 0 };
+        const pointerData = useSyncExternalStore(
+        subscribe,
+        getSnapshot,
+        () => FALLBACK_POINTER
+        );
+        // gsap.registerPlugin(ScrollTrigger);
+        // Ich brauche keinen Scroll Tigger, weil ich nicht das scrollen beobachten möchte, sonder das scrollen das Ergebnis meienr Beobachtung ist.
+
+        gsap.registerPlugin(ScrollToPlugin);
+        gsap.registerPlugin(InertiaPlugin);
+
+        useGSAP(() => {
+            // const halfes = gsap.utils.toArray(".halfes");
+            console.log(threeLineRef);
+            gsap.to(window, {
+                duration: 2,
+                scrollTo: 800,
+                // scrollTrigger: {
+                //     trigger: ".bottom",
+                //     start: "-30px 80%", // trigger & viewport
+                //     end: "top top",// ersteres ist das trigger element, zweites der scroller - hier viewport, also aktuell ist das Ende erreicht wenn die Kopfseite vom trigger die Kopfseite vom Viewport erreicht
+                //     // toggleActions: "play reset play restart",
+                //     toggleActions: "play none reverse none",
+                //     markers: true,
+                //     onchange: () => {
+                //         console.log("changechangechange")
+                //     }
+                // }
+            });
+        }, {dependencies: [threeLineRef]});
+
+        return (
+            <WelcomeMain className="container">
+                <CanvasWrapper>
+                    <Canvas orthographic>
+                        <CameraSetup />
+                        <ThreeLine lineApiRef={threeLineRef} />
+                        <InteractionHandler lineApiRef={threeLineRef} />
+                    </Canvas>
+                </CanvasWrapper>
+                <TopHalf className="halfes" ref={top}>
+                    <Title style={permanentMarker.style} className="title">
+                        Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based in Hamburg
+                    </Title>
+                    <ScribbleFigure />
+                </TopHalf>
+                <LowerHalf className="halfes bottom" ref={bottom}>
+                    <Story style={permanentMarker.style}> Story </Story>
+                    <Work style={permanentMarker.style}> Work </Work>
+                    <Passion style={permanentMarker.style}> Passion </Passion>
+                </LowerHalf>
+            </WelcomeMain>
+        );
+    }
 
     const WelcomeMain = styled.main`
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        width: 100vw; 
+        width: 100vw;
         height: calc(100vh * 2);
         background-color: #F2F1E9;
-        /* pointer-events: none; */
+        overflow-y: hidden; // debatable
+
+        /* pointer-events: none; */ /* causes a lot of bugs! use with care */
     `;
 
     const CanvasWrapper = styled.div`
@@ -40,15 +106,11 @@
     const LowerHalf = styled(TopHalf)`
     `;
 
-    const StyledFigure = styled(ScribbleFigure)`
-        position: relative;
-    `;
-
     const Title = styled.h1`
         color: #F24150;
-        font-size: clamp(1vw, 2rem, 5vw);
+        font-size: clamp(2vw, 3rem, 4.5vw);
         text-align: center;
-        z-index: 2;
+        z-index: 3;
     `;
 
     const Work = styled(Title)`
@@ -71,121 +133,3 @@
         left: 50%;
         color: var(--foreground);
     `;
-
-    function CameraSetup() {
-    const { camera, size } = useThree();
-
-    useEffect(() => {
-        const orthoCamera = camera as THREE.OrthographicCamera;
-        orthoCamera.left = -size.width / 2;
-        orthoCamera.right = size.width / 2;
-        orthoCamera.top = size.height / 2;
-        orthoCamera.bottom = -size.height / 2;
-        orthoCamera.near = 0.1;
-        orthoCamera.far = 1000;
-        orthoCamera.position.set(0, 0, 100); 
-        orthoCamera.lookAt(0, 0, 0);
-        orthoCamera.updateProjectionMatrix();
-
-        const handleResize = () => {
-        orthoCamera.left = -size.width / 2;
-        orthoCamera.right = size.width / 2;
-        orthoCamera.top = size.height / 2;
-        orthoCamera.bottom = -size.height / 2;
-        orthoCamera.updateProjectionMatrix();
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, [camera, size.width, size.height]);
-
-    return null; 
-    }
-
-function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethods | null> }) {
-    const { size, camera, gl } = useThree();
-    // Use a ref to store the last known pointer position.
-    const lastPointerPosition = useRef({ x: 0, y: 0 });
-
-    useGSAP(() => {
-        if (!lineApiRef.current) return;
-
-        const canvas = gl.domElement;
-        gsap.registerPlugin(Observer);
-
-        // This is our single, corrected function to add a point to the line.
-        // It takes viewport coordinates and correctly converts them to 3D world space.
-        const addPointAt = (clientX: number, clientY: number) => {
-            if (!lineApiRef.current) return;
-
-            // --- THE FIX ---
-            // 1. Calculate the pointer's position relative to the entire page/canvas.
-            const pointerXOnCanvas = clientX;
-            const pointerYOnCanvas = clientY + window.scrollY;
-
-            // 2. Normalize these page-relative coordinates to the -1 to +1 range (NDC).
-            const ndcX = (pointerXOnCanvas / size.width) * 2 - 1;
-            const ndcY = -(pointerYOnCanvas / size.height) * 2 + 1;
-
-            // 3. Unproject the 2D NDC coordinates into your 3D orthographic world.
-            const vector = new THREE.Vector3(ndcX, ndcY, 0);
-            vector.unproject(camera);
-            lineApiRef.current.addPoint(vector);
-        };
-
-
-        const observer = Observer.create({
-            target: window,
-            type: "scroll, pointer, wheel", // We only need to listen to scroll and pointer events
-
-            // onPointerMove handles mouse and touch movement
-            onMove: (self) => {
-                // Store the latest position
-                lastPointerPosition.current = { x: self.x, y: self.y };
-                // Add a point at the new position
-                addPointAt(self.x, self.y);
-            },
-            
-            // onScroll handles mouse wheel and touch-drag scrolling
-            onWheel: () => {
-                // When scrolling, draw a point at the LAST known pointer position.
-                // This creates the effect of the line continuing while the page moves.
-                addPointAt(lastPointerPosition.current.x, lastPointerPosition.current.y);
-            },
-        });
-
-        return () => {
-            // Cleanup the observer when the component unmounts
-            observer.kill();
-        };
-    }, [camera, size, lineApiRef, gl]);
-
-    return null;
-}
-
-    export default function Home() { 
-        const threeLineRef = useRef<ThreeLineMethods | null>(null);
-
-        return (
-            <WelcomeMain>
-                <CanvasWrapper>
-                    <Canvas orthographic>
-                        <CameraSetup />
-                        {/* <ThreeLine lineApiRef={threeLineRef} /> */}
-                        {/* <InteractionHandler lineApiRef={threeLineRef} /> */}
-                    </Canvas>
-                </CanvasWrapper>
-                <TopHalf>
-                    <Title style={permanentMarker.style}>
-                        Hi, i`m Richard <br /> a Hamburg based <br /> &lt; Creative Developer /&gt;
-                    </Title>
-                    <StyledFigure />
-                </TopHalf>
-                <LowerHalf>
-                    <Story style={permanentMarker.style}> Story </Story>
-                    <Work style={permanentMarker.style}> Work </Work>
-                    <Passion style={permanentMarker.style}> Passion </Passion>
-                </LowerHalf>
-            </WelcomeMain>
-        );
-    }

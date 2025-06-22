@@ -13,6 +13,7 @@ body,
 	height: 100%;
 	/* HIER NICHT OVERFLOW EINFÜGEN, sonst buggy scrolling */
 	scrollbar-width: none;
+	/* overflow-y: hidden; */
 }
 
 body {
