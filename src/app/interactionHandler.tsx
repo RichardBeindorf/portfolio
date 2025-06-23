@@ -9,7 +9,6 @@ import { useThree } from "@react-three/fiber";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ThreeLineMethods } from "@/components/threeLine";
 
-
 interface scrollRefObj {
     velocity: number,
     yPos: number,
@@ -21,6 +20,7 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
     // Use a ref to store the last known pointer position.
     const lastPointerPosition = useRef({ x: 0, y: 0 });
     const pointerDataRef = useRef<scrollRefObj>({velocity: 0, yPos: 0, lowestQuarter: 0});
+    const currentHalf = useRef< "top" | "bottom" >(null);
 
     useGSAP(() => {
         if (!lineApiRef.current) return;
@@ -50,32 +50,67 @@ export default function InteractionHandler({ lineApiRef }: { lineApiRef: React.R
             // onPointerMove handles mouse and touch movement
             onMove: (self) => {
                 const viewportHeight = size.height / 2;
-                const lowestQuarter = viewportHeight - ((size.height / 2) / 4); // full viewport - 3 quarter
-                pointerDataRef.current = { velocity: self.velocityY, yPos: self.y, lowestQuarter: lowestQuarter };
-
-                let currentHalf: "top" | "bottom";
                 const eventFix = self.event as PointerEvent;
-                console.log(eventFix.pageY);
+                const lowestQuarter = viewportHeight - (viewportHeight / 4); // full viewport - 1 quarter
+                const currentPercLong = (100 / viewportHeight) * self.y; // full viewport - 1 quarter
+                const currentPercent = Number(currentPercLong.toFixed(0));
+                const upperQuarter = size.height - (viewportHeight / 4) * 3;
 
-                if(pointerDataRef.current.velocity > 2000 && pointerDataRef.current.yPos > lowestQuarter){
-                    // console.log("high velocity!!!", self.velocityY, size.height / 2);
                 
-                    gsap.to(window, {
-                        duration: 2,
-                        scrollTo: 800,
-                    });
-                }
+                pointerDataRef.current = { velocity: self.velocityY, yPos: self.y, lowestQuarter: lowestQuarter };
+                const pagePosition = eventFix.pageY;
+                
+                // below is the cursor y position on the overall page, not the viewport
+                // console.log(size.height, size.height / 2,upperQuarter, self.y);
+                
+                // i have to first, make sure that the viewport is positioned at the very bottom so the animation wont trigger while we are scrolling down from the top pos
+                if (window.scrollY === 0){
+                    currentHalf.current = "top";
+                    
+                    if( pointerDataRef.current.velocity > 2000 && currentHalf.current === "top" && currentPercent > 90 ){
+                        console.log(currentPercent);
+                        // gsap.to(window, {
+                        //     duration: 2,
+                        //     scrollTo: 1000,
+                        // });
+                    }
+                };
+                
+                if (window.scrollY === viewportHeight){
+                    // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
+                    currentHalf.current = "bottom";
+                    
+                    if( pointerDataRef.current.velocity > 2000 && currentHalf.current === "bottom" && currentPercent < 10 ){
+                        console.log(currentPercent); 
+                        
+                        // gsap.to(window, {
+                        //     duration: 2,
+                        //     scrollTo: -900,
+                        // });
+                    };
+                };
+
 
                 lastPointerPosition.current = { x: self.x, y: self.y };
                 addPointAt(self.x, self.y);
             },
-            
+
             // onScroll handles mouse wheel and touch-drag scrolling
             onWheel: () => {
+                const viewportHeight = size.height / 2;
                 // When scrolling, draw a point at the LAST known pointer position.
                 // This creates the effect of the line continuing while the page moves.
                 const { x, y } = lastPointerPosition.current;
                 addPointAt(x, y);
+
+                if (window.scrollY === 0){
+                    currentHalf.current = "top";
+                };
+
+                if (window.scrollY === viewportHeight){ 
+                    // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
+                    currentHalf.current = "bottom";
+                };
             },
         });
 
