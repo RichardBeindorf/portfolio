@@ -61,6 +61,7 @@ function ThreeLine({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethod
       line2Geometry.setDrawRange(0, 0); 
       return;
     }
+    
     const worldPoints = points.current;
     const pointsToDraw = worldPoints.slice(Math.max(0, worldPoints.length - MAX_POINTS));
     const distances = [0];

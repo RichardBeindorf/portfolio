@@ -1,136 +1,101 @@
 "use client";
-import { permanentMarker } from "../styles/font"; 
-import React, { useRef, useEffect } from "react";
-import ScribbleFigure from "@/components/scribbleFigure"; 
+import React, { useRef } from "react";
 import styled from "styled-components";
-import { Canvas, useThree } from "@react-three/fiber";
+import CameraSetup from "./cameraSetup";
+import { permanentMarker } from "../styles/font";
+import { Canvas } from "@react-three/fiber";
+import InteractionHandler from "./interactionHandler";
+import ScribbleFigure from "@/components/scribbleFigure";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
-// import ThreeThoughts from "@/components/threeThoughts";
-import * as THREE from "three";
 
-const IntroHeader = styled.h1`
-    position: absolute;
-    top: 200px;
-    left: 400px;
-    color: #F24150;
-    z-index: 100;
-    text-align: center;
-    pointer-events: none;
+export default function Home() {
+  const threeLineRef = useRef<ThreeLineMethods | null>(null);
+  return (
+    <WelcomeMain id="smooth-wrapper">
+      <SmoothWrapper id="smooth-content">
+        <CanvasWrapper>
+          <Canvas orthographic>
+            <CameraSetup />
+            <ThreeLine lineApiRef={threeLineRef} />
+            <InteractionHandler lineApiRef={threeLineRef} />
+          </Canvas>
+        </CanvasWrapper>
+        <TopHalf>
+          <Title style={permanentMarker.style}>
+            Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based
+            in Hamburg
+          </Title>
+          <ScribbleFigure />
+        </TopHalf>
+        <LowerHalf>
+          <Story style={permanentMarker.style}> Story </Story>
+          <Work style={permanentMarker.style}> Work </Work>
+          <Passion style={permanentMarker.style}> Passion </Passion>
+        </LowerHalf>
+      </SmoothWrapper>
+    </WelcomeMain>
+  );
+}
+
+const WelcomeMain = styled.main``;
+
+const SmoothWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100vw;
+  height: calc(100vh * 2);
+  background-color: #f2f1e9;
+  overflow-y: hidden; // debatable
+  isolation: isolate; // needed for a color blend setting to work
+
+  /* pointer-events: none; */ /* causes a lot of bugs! use with care */
 `;
 
-const WelcomeMain = styled.main`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100vw; 
-    height: 100vh; 
-    overflow: hidden; 
-    background-color: #F2F1E9;
-    pointer-events: none;
-`;
 const CanvasWrapper = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100vh * 2);
 `;
 
-function CameraSetup() {
-  const { camera, size } = useThree();
+const TopHalf = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+`;
 
-  useEffect(() => {
-    const orthoCamera = camera as THREE.OrthographicCamera;
-    orthoCamera.left = -size.width / 2;
-    orthoCamera.right = size.width / 2;
-    orthoCamera.top = size.height / 2;
-    orthoCamera.bottom = -size.height / 2;
-    orthoCamera.near = 0.1;
-    orthoCamera.far = 1000;
-    orthoCamera.position.set(0, 0, 100); 
-    orthoCamera.lookAt(0, 0, 0);
-    orthoCamera.updateProjectionMatrix();
+const LowerHalf = styled(TopHalf)``;
 
-    const handleResize = () => {
-      orthoCamera.left = -size.width / 2;
-      orthoCamera.right = size.width / 2;
-      orthoCamera.top = size.height / 2;
-      orthoCamera.bottom = -size.height / 2;
-      orthoCamera.updateProjectionMatrix();
-    };
+const Title = styled.h1`
+  color: #f24150;
+  mix-blend-mode: normal;
+  font-size: clamp(2vw, 3rem, 4.5vw);
+  text-align: center;
+  z-index: 3;
+`;
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [camera, size.width, size.height]);
+const Work = styled(Title)`
+  position: absolute;
+  top: 70%;
+  left: 20%;
+  color: var(--foreground);
+`;
 
-  return null; 
-}
+const Passion = styled(Title)`
+  position: absolute;
+  top: 70%;
+  left: 80%;
+  color: var(--foreground);
+`;
 
-function InteractionHandler({ lineApiRef }: { lineApiRef: React.RefObject<ThreeLineMethods | null> }) {
-    const { size, camera, gl } = useThree(); 
-    // const isDrawing = useRef(false); 
-
-    useEffect(() => {
-        const canvas = gl.domElement; 
-
-        // const handleMouseDown = (e: MouseEvent) => { 
-        //     isDrawing.current = true;
-        //     if (lineApiRef.current) {
-        //         const vector = new THREE.Vector3(
-        //             (e.clientX / size.width) * 2 - 1, 
-        //             -(e.clientY / size.height) * 2 + 1, 
-        //             0
-        //         );
-        //         vector.unproject(camera);
-        //         lineApiRef.current.addPoint(vector);
-        //     }
-        // };
-
-        // const handleMouseUp = () => {
-        //     isDrawing.current = false;
-        // };
-
-        const handleMouseMove = (e: MouseEvent) => {
-            // if (!isDrawing.current || !lineApiRef.current) {
-            //     return; 
-            // }
-            const newX = (e.clientX / size.width) * 2 - 1;
-            const newY = -(e.clientY / size.height) * 2 + 1;
-
-            const vector = new THREE.Vector3(newX, newY, 0);
-            vector.unproject(camera);
-            lineApiRef.current.addPoint(vector);
-        };
-
-        // canvas.addEventListener("mousedown", handleMouseDown);
-        // canvas.addEventListener("mouseup", handleMouseUp);
-        canvas.addEventListener("mousemove", handleMouseMove);
-
-        return () => {
-            // canvas.removeEventListener("mousedown", handleMouseDown);
-            // canvas.removeEventListener("mouseup", handleMouseUp);
-            canvas.removeEventListener("mousemove", handleMouseMove);
-        };
-    }, [camera, size, lineApiRef, gl]); 
-    return null; 
-}
-
-export default function Home() { 
-    const threeLineRef = useRef<ThreeLineMethods | null>(null); 
-
-    return (
-        <WelcomeMain>
-            <IntroHeader style={permanentMarker.style}>
-                Hi i`m Richard <br /> a Hamburg based <br /> &lt; Creative Developer /&gt;
-            </IntroHeader>
-            <ScribbleFigure />
-            <CanvasWrapper>
-                <Canvas orthographic>
-                    <CameraSetup />
-                    <ThreeLine lineApiRef={threeLineRef} />
-                    <InteractionHandler lineApiRef={threeLineRef} />
-                </Canvas>
-            </CanvasWrapper>
-        </WelcomeMain>
-    );
-}
+const Story = styled(Title)`
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  color: var(--foreground);
+`;
