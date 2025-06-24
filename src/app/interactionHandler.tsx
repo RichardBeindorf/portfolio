@@ -71,20 +71,6 @@ export default function InteractionHandler({
         const pushBackPointBottom = viewportHeight - viewportHeight / 8; // CHANGE THE PUSHBACK POINT TO ADJUST BOUNCE
         const breakPointCheck = bouncyMovement.current + viewportHeight; // this is the Bottom of current scrolled position container
 
-        // console.log(pageScrollGuard.current, currentHalf.current);
-        // console.log(breakPointCheck - viewportHeight > pushBackPointBottom);
-        console
-          .log
-          // currentPercent > 15 &&
-          //   breakPointCheck < pushBackPointTop &&
-
-          // Math.round(self.y),
-          // Math.round(breakPointCheck),
-          // Math.round(pushBackPointBottom),
-          // Math.round(pushBackPointTop)
-          // Math.min(pushBackPointTop, Math.round(bouncyMovement.current))
-          ();
-
         // TOP BOUNCE
         if (
           // first we have to check if there is any scroll effect ongoing
@@ -98,13 +84,11 @@ export default function InteractionHandler({
             0,
             Math.min(pushBackPointTop, self.y / 2 - viewportHeight / 3) // dont want it to be negative or to be higher than our push back point
           );
-
           if (
             currentPercent > 15 &&
             currentPercent < 90 &&
             breakPointCheck < pushBackPointTop
           ) {
-            console.log("WHYYYYY THE FUCKKK 1");
             smoother.scrollTo(
               Math.min(pushBackPointTop, bouncyMovement.current),
               true
@@ -117,7 +101,6 @@ export default function InteractionHandler({
             !pageScrollGuard.current &&
             smoother.scrollTop() + viewportHeight < pushBackPointTop
           ) {
-            console.log("WHYYYYY THE FUCKKK 2");
             smoother.scrollTo(
               Math.min(pushBackPointTop, bouncyMovement.current), // checking again that we are below the push back point....
               true
@@ -129,13 +112,14 @@ export default function InteractionHandler({
         if (
           currentHalf.current === "bottom" &&
           !pageScrollGuard.current &&
+          currentPercent > 15 &&
           smoother.scrollTop() > pushBackPointBottom
         ) {
           bouncyMovement.current = Math.max(
             0,
             Math.max(
               pushBackPointBottom,
-              self.y + viewportHeight - viewportHeight / 4
+              self.y + viewportHeight - viewportHeight / 4.5
             )
           );
 
@@ -178,7 +162,6 @@ export default function InteractionHandler({
         ) {
           // i have to first, make sure that the viewport is positioned at the very bottom or top so the animation wont trigger while we are scrolling down from the top pos
           currentHalf.current = "top";
-
           if (
             self.velocityY > 2000 &&
             currentHalf.current === "top" &&
@@ -186,7 +169,7 @@ export default function InteractionHandler({
           ) {
             // this helps me seperate the bouncy animation off the page transition
             pageScrollGuard.current = true;
-            gsap.delayedCall(5.5, () => (pageScrollGuard.current = false));
+            gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
 
             currentHalf.current = "bottom";
             bouncyMovement.current = viewportHeight;
@@ -200,24 +183,19 @@ export default function InteractionHandler({
         }
         // My BOTTOM area guard
         if (
-          smoother.scrollTop() === viewportHeight &&
           smoother.scrollTop() > pushBackPointBottom && // reading the top side viewport scrollY against the bottom breakpoint -> has to be lower or else currenthalf ist top!!
           pageScrollGuard.current === false
         ) {
           // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
           currentHalf.current = "bottom";
 
-          console.log("BIG Bottom FIRE");
-
           if (
-            self.velocityY > 2000 &&
+            self.velocityY > 1900 &&
             currentHalf.current === "bottom" &&
             currentPercent < 15
           ) {
-            console.log("BOTTOM PAGE SCROLL");
-
             pageScrollGuard.current = true;
-            gsap.delayedCall(5.5, () => (pageScrollGuard.current = false));
+            gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
 
             currentHalf.current = "top";
             bouncyMovement.current = 0;
@@ -276,12 +254,10 @@ export default function InteractionHandler({
 //     const upperTl = gsap.timeline();
 //     // const bounceOutDistance = viewportHeight + (viewportHeight / 100) * 20; // 20 % of the viewport added to the bottom;
 //     const bounceOutDistance = (viewportHeight / 100) * 20; // 20 % of the viewport added to the bottom;
-//     console.log(self.velocityY);
 
 //     // here we set a flag so the event doesnt not get fired too much
 
 //     if( pointerDataRef.current.velocity > 2000 && currentHalf.current === "top" && currentPercent > 90 ){
-//         console.log(currentPercent);
 //         gsap.to(window, {
 //             duration: 4,
 //             ease: "power4.out",
@@ -305,10 +281,7 @@ export default function InteractionHandler({
 //     const lowerTl = gsap.timeline();
 //     const bounceInDistance = viewportHeight - (viewportHeight / 100) * 20; // 20 % of the viewport substracted of the top;
 
-//     console.log(bounceInDistance);
-
 //     if( pointerDataRef.current.velocity > 2000 && currentHalf.current === "bottom" && currentPercent < 10 ){
-//         console.log(currentPercent);
 //         gsap.to(window, {
 //             duration: 4,
 //             ease: "power4.out",
