@@ -6,10 +6,10 @@ import * as THREE from "three";
 import { useGSAP } from "@gsap/react";
 import { Observer } from "gsap/Observer";
 import { useThree } from "@react-three/fiber";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ThreeLineMethods } from "@/components/threeLine";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function InteractionHandler({
   lineApiRef,
@@ -38,7 +38,7 @@ export default function InteractionHandler({
       if (!lineApiRef.current) return;
 
       const pointerXOnCanvas = clientX;
-      const pointerYOnCanvas = clientY + window.scrollY;
+      const pointerYOnCanvas = clientY + smoother.scrollTop();
 
       const ndcX = (pointerXOnCanvas / size.width) * 2 - 1;
       const ndcY = -(pointerYOnCanvas / size.height) * 2 + 1;
@@ -64,49 +64,121 @@ export default function InteractionHandler({
         // const eventFix = self.event as PointerEvent;
         // const pagePosition = eventFix.pageY;
         const viewportHeight = size.height / 2;
-        const lowestQuarter = viewportHeight - viewportHeight / 4; // full viewport - 1 quarter
-
         const currentPercLong = (100 / viewportHeight) * self.y; // Position in percent relative to viewport
         const currentPercent = Number(currentPercLong.toFixed(0));
 
-        const currentPercScroll = (100 / viewportHeight) * self.y; // Position in percent relative to viewport
-        const currentScrollPerc = Number(currentPercScroll.toFixed(0));
+        const pushBackPointTop = viewportHeight + viewportHeight / 8 - 1; // CHANGE THE PUSHBACK POINT TO ADJUST BOUNCE
+        const pushBackPointBottom = viewportHeight - viewportHeight / 8; // CHANGE THE PUSHBACK POINT TO ADJUST BOUNCE
+        const breakPointCheck = bouncyMovement.current + viewportHeight; // this is the Bottom of current scrolled position container
 
-        const pushBackPoint = viewportHeight + viewportHeight / 8; // CHANGE THE PUSHBACK POINT TO ADJUST BOUNCE
-        const breakPointCheck = window.scrollY + viewportHeight;
+        // console.log(pageScrollGuard.current, currentHalf.current);
+        // console.log(breakPointCheck - viewportHeight > pushBackPointBottom);
+        console
+          .log
+          // currentPercent > 15 &&
+          //   breakPointCheck < pushBackPointTop &&
 
-        console.log(pageScrollGuard.current);
+          // Math.round(self.y),
+          // Math.round(breakPointCheck),
+          // Math.round(pushBackPointBottom),
+          // Math.round(pushBackPointTop)
+          // Math.min(pushBackPointTop, Math.round(bouncyMovement.current))
+          ();
 
         if (
+          // first we have to check if there is any scroll effect ongoing
           currentHalf.current === "top" &&
-          pageScrollGuard.current === false
+          !pageScrollGuard.current &&
+          smoother.scrollTop() + viewportHeight < pushBackPointTop
         ) {
-          if (bouncyMovement.current >= 0) {
-            bouncyMovement.current = Math.max(
-              0,
-              self.y / 2 - viewportHeight / 4
+          //
+          // then im setting the amount we want to move based on the cursor position but reduce it a bit
+          bouncyMovement.current = Math.max(
+            0,
+            Math.min(pushBackPointTop, self.y / 2 - viewportHeight / 3) // dont want it to be negative or to be higher than our push back pointß
+          );
+
+          if (
+            currentPercent > 15 &&
+            currentPercent < 90 &&
+            breakPointCheck < pushBackPointTop
+          ) {
+            smoother.scrollTo(
+              Math.min(pushBackPointTop, bouncyMovement.current),
+              true
             );
           }
 
-          if (currentPercent > 15 && breakPointCheck < pushBackPoint) {
-            smoother.scrollTo(bouncyMovement.current, true);
-          }
-
-          // as long as we are at the push back point or just have scrolled down + delta is negative -> we scroll down
+          // as long as we are at the push back point or just have scrolled down + delta is negative -> we scroll up
           if (
-            breakPointCheck >= pushBackPoint &&
-            window.scrollY > 0 &&
+            breakPointCheck >= pushBackPointTop &&
+            smoother.scrollTop() > 0 &&
             bouncyMovement.current + viewportHeight < breakPointCheck
           ) {
-            smoother.scrollTo(bouncyMovement.current, true);
+            smoother.scrollTo(
+              Math.min(pushBackPointTop, bouncyMovement.current), // checking again that we are below the push back point....
+              true
+            );
           }
+        } else {
+          // if we went too far, we nudge it back a little
+          if (!pageScrollGuard.current)
+            smoother.scrollTo(
+              Math.min(pushBackPointTop - 20, bouncyMovement.current), // checking again that we are below the push back point....
+              true
+            );
         }
 
+        // if (
+        //   currentHalf.current === "bottom" &&
+        //   pageScrollGuard.current === false
+        // ) {
+        //   bouncyMovement.current = Math.max(
+        //     0,
+        //     self.y + viewportHeight - viewportHeight / 4
+        //   );
+
+        //   // when the viewport is in a low position below the pushback value, we are alowed to scroll up
+        //   if (
+        //     currentPercent > 15 &&
+        //     smoother.scrollTop() > pushBackPointBottom
+        //   ) {
+        //     // console.log("TRIGGER BOUNCE", bouncyMovement.current);
+        //     smoother.scrollTo(
+        //       Math.min(pushBackPointBottom, bouncyMovement.current),
+        //       true
+        //     );
+        //   }
+
+        //   // when the viewport is too high scrolled - we scroll down!
+        //   if (
+        //     smoother.scrollTop() <= pushBackPointBottom &&
+        //     smoother.scrollTop() < size.height &&
+        //     bouncyMovement.current > smoother.scrollTop() //
+        //   ) {
+        //     console.log("TRIGGER BOUNCE TWO", bouncyMovement.current);
+        //     smoother.scrollTo(bouncyMovement.current, true);
+        //   }
+        // }
+
+        /** */
+        /* PAGE SCROLL PART */
+        /** */
+
+        // smoother.scrollTop() === 0 ||
+        //   (breakPointCheck < pushBackPointTop && // we have to make sure this is precise so we are able to fire the page scroll but also not stack animations
+        //     pageScrollGuard.current === false)
+
         // My top area guard
-        if (window.scrollY === 0 || window.scrollY < pushBackPoint) {
+        if (
+          (smoother.scrollTop() === 0 && // we have to make sure this is precise so we are able to fire the page scroll but also not stack animations
+            pageScrollGuard.current === false) ||
+          smoother.scrollTop() + viewportHeight < pushBackPointTop
+        ) {
           // i have to first, make sure that the viewport is positioned at the very bottom or top so the animation wont trigger while we are scrolling down from the top pos
           currentHalf.current = "top";
 
+          console.log("BIG TOP FIRE");
           if (
             self.velocityY > 2000 &&
             currentHalf.current === "top" &&
@@ -114,7 +186,9 @@ export default function InteractionHandler({
           ) {
             // this helps me seperate the bouncy animation off the page transition
             pageScrollGuard.current = true;
-            gsap.delayedCall(6, () => (pageScrollGuard.current = false));
+            gsap.delayedCall(5.5, () => (pageScrollGuard.current = false));
+
+            currentHalf.current = "bottom";
 
             gsap.to(window, {
               duration: 4,
@@ -123,16 +197,29 @@ export default function InteractionHandler({
             });
           }
         }
-        if (window.scrollY === viewportHeight) {
+        // My BOTTOM area guard
+        if (
+          smoother.scrollTop() === viewportHeight &&
+          smoother.scrollTop() > pushBackPointBottom && // reading the top side viewport scrollY against the bottom breakpoint -> has to be lower or else currenthalf ist top!!
+          pageScrollGuard.current === false
+        ) {
           // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
           currentHalf.current = "bottom";
+
+          console.log("BIG Bottom FIRE");
 
           if (
             self.velocityY > 2000 &&
             currentHalf.current === "bottom" &&
             currentPercent < 10
           ) {
-            console.log(currentPercent);
+            // console.log("MIN");
+
+            pageScrollGuard.current = true;
+            gsap.delayedCall(5.5, () => (pageScrollGuard.current = false));
+
+            currentHalf.current = "top";
+
             gsap.to(window, {
               duration: 4,
               ease: "power4.out",
@@ -154,11 +241,11 @@ export default function InteractionHandler({
         const { x, y } = lastPointerPosition.current;
         addPointAt(x, y);
 
-        if (window.scrollY === 0) {
+        if (smoother.scrollTop() === 0) {
           currentHalf.current = "top";
         }
 
-        if (window.scrollY === viewportHeight) {
+        if (smoother.scrollTop() === viewportHeight) {
           // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
           currentHalf.current = "bottom";
         }
@@ -177,7 +264,7 @@ export default function InteractionHandler({
 // old border scroll code:
 
 // i have to first, make sure that the viewport is positioned at the very bottom so the animation wont trigger while we are scrolling down from the top pos
-// if (window.scrollY === 0){
+// if (smoother.scrollTop() === 0){
 //     currentHalf.current = "top";
 //     const upperTl = gsap.timeline();
 //     // const bounceOutDistance = viewportHeight + (viewportHeight / 100) * 20; // 20 % of the viewport added to the bottom;
@@ -205,7 +292,7 @@ export default function InteractionHandler({
 //         });
 //     }
 // }
-// if (window.scrollY === viewportHeight){
+// if (smoother.scrollTop() === viewportHeight){
 //     // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
 //     currentHalf.current = "bottom";
 //     const lowerTl = gsap.timeline();
