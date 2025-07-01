@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import CameraSetup from "./cameraSetup";
 import { permanentMarker } from "../styles/font";
@@ -7,9 +7,11 @@ import { Canvas } from "@react-three/fiber";
 import InteractionHandler from "./interactionHandler";
 import ScribbleFigure from "@/components/scribbleFigure";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
+import LowerHalf from "./lowerHalf";
 
 export default function Home() {
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
+
   return (
     <WelcomeMain id="smooth-wrapper">
       <SmoothWrapper id="smooth-content">
@@ -27,11 +29,7 @@ export default function Home() {
           </Title>
           <ScribbleFigure />
         </TopHalf>
-        <LowerHalf>
-          <Story style={permanentMarker.style}> Story </Story>
-          <Work style={permanentMarker.style}> Work </Work>
-          <Passion style={permanentMarker.style}> Passion </Passion>
-        </LowerHalf>
+        <LowerHalf />
       </SmoothWrapper>
     </WelcomeMain>
   );
@@ -61,7 +59,7 @@ const CanvasWrapper = styled.div`
   height: calc(100vh * 2);
 `;
 
-const TopHalf = styled.div`
+export const TopHalf = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -69,33 +67,10 @@ const TopHalf = styled.div`
   width: 100%;
 `;
 
-const LowerHalf = styled(TopHalf)``;
-
 const Title = styled.h1`
   color: #f24150;
   mix-blend-mode: normal;
   font-size: clamp(2vw, 3rem, 4.5vw);
   text-align: center;
   z-index: 3;
-`;
-
-const Work = styled(Title)`
-  position: absolute;
-  top: 70%;
-  left: 20%;
-  color: var(--foreground);
-`;
-
-const Passion = styled(Title)`
-  position: absolute;
-  top: 70%;
-  left: 80%;
-  color: var(--foreground);
-`;
-
-const Story = styled(Title)`
-  position: absolute;
-  top: 85%;
-  left: 50%;
-  color: var(--foreground);
 `;
