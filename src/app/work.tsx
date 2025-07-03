@@ -69,8 +69,7 @@ export default function Work({
       const pullDuration = 0.5;
 
       const onPullMid = contextSafe(() => {
-        // console.log("MID");
-        gsap.to(tainer.current, {
+        const minIn = gsap.to(tainer.current, {
           scale: 0.1,
           rotate: 30,
           left: "50%",
@@ -78,11 +77,12 @@ export default function Work({
           duration: pullDuration,
           ease: "power4.out",
         });
+
+        return minIn;
       });
 
       const onPullLeft = contextSafe(() => {
-        // console.log("LEFT");
-        gsap.to(tainer.current, {
+        const leftIn = gsap.to(tainer.current, {
           scale: 0.1,
           rotate: -30,
           left: "10%",
@@ -90,6 +90,8 @@ export default function Work({
           duration: pullDuration,
           ease: "power4.out",
         });
+
+        return leftIn;
       });
 
       // const backToStart = contextSafe(() => {
@@ -99,21 +101,20 @@ export default function Work({
       //   });
       // });
 
-      if (currentWindow[0] === 1) {
+      if (currentWindow[0] === 1 && !currentState.current) {
         currentState.current = onPullLeft();
-        // console.log("LEFT CALL");
-      } else if (currentWindow[1] === 1) {
+      }
+      if (currentWindow[1] === 1 && !currentState.current) {
         currentState.current = onPullMid();
-        // console.log("MID CALL", clicked, currentWindow);
-      } else if (
-        currentWindow.every(defaultPositionTest) &&
-        currentState.current
-      ) {
+      }
+
+      // console.log("hello", currentState.current, currentWindow);
+
+      if (currentState.current && currentWindow.every(defaultPositionTest)) {
         currentState.current.reverse();
         setTimeout(() => {
           currentState.current = null;
-        }, 2000);
-        // console.log("NO CALL");
+        }, 501);
       }
     },
     {
