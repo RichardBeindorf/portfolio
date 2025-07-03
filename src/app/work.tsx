@@ -94,21 +94,13 @@ export default function Work({
         return leftIn;
       });
 
-      // const backToStart = contextSafe(() => {
-      //   gsap.to(tainer.current, {
-      //     left: "90%",
-      //     top: "70%",
-      //   });
-      // });
-
       if (currentWindow[0] === 1 && !currentState.current) {
         currentState.current = onPullLeft();
       }
+
       if (currentWindow[1] === 1 && !currentState.current) {
         currentState.current = onPullMid();
       }
-
-      // console.log("hello", currentState.current, currentWindow);
 
       if (currentState.current && currentWindow.every(defaultPositionTest)) {
         currentState.current.reverse();

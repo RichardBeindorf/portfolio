@@ -101,6 +101,7 @@ export default function Story({
   const title = useRef(null);
   const tainer = useRef(null);
   const storyTimeline = useRef(null);
+  const currentState = useRef(null);
   const defaultPositionTest = (pos: number) => pos === 0;
 
   const entryData = [
@@ -163,6 +164,49 @@ export default function Story({
       //**//
       /* ---- END ---- */
       //**//
+
+      const pullDuration = 0.5;
+
+      const onPullRight = contextSafe(() => {
+        const minIn = gsap.to(tainer.current, {
+          scale: 0.1,
+          rotate: 30,
+          left: "90%",
+          top: "70%",
+          duration: pullDuration,
+          ease: "power4.out",
+        });
+
+        return minIn;
+      });
+
+      const onPullLeft = contextSafe(() => {
+        const leftIn = gsap.to(tainer.current, {
+          scale: 0.1,
+          rotate: -30,
+          left: "10%",
+          top: "85%",
+          duration: pullDuration,
+          ease: "power4.out",
+        });
+
+        return leftIn;
+      });
+
+      if (currentWindow[0] === 1 && !currentState.current) {
+        currentState.current = onPullLeft();
+      }
+
+      if (currentWindow[2] === 1 && !currentState.current) {
+        currentState.current = onPullRight();
+      }
+
+      if (currentState.current && currentWindow.every(defaultPositionTest)) {
+        currentState.current.reverse();
+        setTimeout(() => {
+          currentState.current = null;
+        }, 501);
+      }
     },
     {
       scope: tainer,
