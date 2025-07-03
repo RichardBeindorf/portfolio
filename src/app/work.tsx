@@ -21,41 +21,52 @@ export default function Work({
   const tainer = useRef(null);
   const title = useRef(null);
   const [clicked, setClicked] = useState(false);
+  const workTimeline = useRef(null);
+  const currentState = useRef(null);
+  const defaultPositionTest = (pos: number) => pos === 0;
 
   const { contextSafe } = useGSAP(
     () => {
-      const onClickIn = contextSafe(() => {
-        gsap.to(tainer.current, {
+      //**//
+      /* MAIN TITLE ANIMATION */
+      //**//
+
+      const titleTL = contextSafe(() => {
+        const newTL = gsap.timeline({ paused: true, ease: "power4.out" });
+        newTL.to(tainer.current, {
           top: "60%",
           duration: 2,
-          //   backgroundColor: "rgba(242, 241, 233, 0.8)",
-          ease: "power4.out",
         });
-        gsap.to(title.current, {
-          fontSize: "clamp(8vw, 6rem, 11vw)",
-          color: "#F24150",
-          duration: 2,
-          ease: "power4.out",
-        });
+        newTL.to(
+          title.current,
+          {
+            fontSize: "clamp(8vw, 6rem, 11vw)",
+            color: "#F24150",
+            duration: 2,
+          },
+          "<"
+        );
+        return newTL;
       });
 
-      const onClickOut = contextSafe(() => {
-        console.log("OUT");
-        gsap.to(tainer.current, {
-          top: "85%",
-          left: "90%",
-          scale: 1,
-          duration: 2,
-          ease: "power4.out",
-          //   backgroundColor: "rgba(242, 241, 233, 0)",
-        });
-        gsap.to(title.current, {
-          fontSize: "clamp(2vw, 3rem, 4.5vw)",
-          color: "#262626",
-          duration: 2,
-          ease: "power4.out",
-        });
-      });
+      if (!workTimeline.current) {
+        workTimeline.current = titleTL();
+      }
+
+      if (workTimeline.current) {
+        if (clicked) {
+          workTimeline.current.play();
+        }
+        if (!clicked || currentWindow.every(defaultPositionTest)) {
+          workTimeline.current.reverse();
+        }
+      }
+
+      //**//
+      /* ---- END ---- */
+      //**//
+
+      const pullDuration = 0.5;
 
       const onPullMid = contextSafe(() => {
         // console.log("MID");
@@ -64,7 +75,7 @@ export default function Work({
           rotate: 30,
           left: "50%",
           top: "85%",
-          duration: 0.5,
+          duration: pullDuration,
           ease: "power4.out",
         });
       });
@@ -76,28 +87,32 @@ export default function Work({
           rotate: -30,
           left: "10%",
           top: "85%",
-          duration: 0.5,
+          duration: pullDuration,
           ease: "power4.out",
         });
       });
 
-      const defaultPositionTest = (pos: number) => pos === 0;
-      if (clicked) {
-        onClickIn();
-      }
-      console.log(currentWindow, currentWindow.every(defaultPositionTest));
-      if (!clicked && currentWindow.every(defaultPositionTest)) {
-        onClickOut();
-      }
+      // const backToStart = contextSafe(() => {
+      //   gsap.to(tainer.current, {
+      //     left: "90%",
+      //     top: "70%",
+      //   });
+      // });
 
       if (currentWindow[0] === 1) {
-        onPullLeft();
+        currentState.current = onPullLeft();
         // console.log("LEFT CALL");
       } else if (currentWindow[1] === 1) {
-        onPullMid();
+        currentState.current = onPullMid();
         // console.log("MID CALL", clicked, currentWindow);
-      } else if (currentWindow.every(defaultPositionTest)) {
-        onClickOut();
+      } else if (
+        currentWindow.every(defaultPositionTest) &&
+        currentState.current
+      ) {
+        currentState.current.reverse();
+        setTimeout(() => {
+          currentState.current = null;
+        }, 2000);
         // console.log("NO CALL");
       }
     },

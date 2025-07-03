@@ -19,40 +19,44 @@ export default function Passion({
   const tainer = useRef(null);
   const title = useRef(null);
   const [clicked, setClicked] = useState(false);
+  const passionTL = useRef(null);
+  const defaultPositionTest = (pos: number) => pos === 0;
 
   const { contextSafe } = useGSAP(
     () => {
-      const onClickIn = contextSafe(() => {
-        gsap.to(tainer.current, {
+      const titleTL = contextSafe(() => {
+        const newTL = gsap.timeline({
+          paused: true,
+          ease: "power4.out",
+        });
+        newTL.to(tainer.current, {
           top: "60%",
           duration: 2,
-          //   backgroundColor: "rgba(242, 241, 233, 0.8)",
-          ease: "power4.out",
         });
-        gsap.to(title.current, {
-          fontSize: "clamp(8vw, 6rem, 11vw)",
-          color: "#F24150",
-          duration: 2,
-          ease: "power4.out",
-        });
+        newTL.to(
+          title.current,
+          {
+            fontSize: "clamp(8vw, 6rem, 11vw)",
+            color: "#F24150",
+            duration: 2,
+          },
+          "<"
+        );
+        return newTL;
       });
 
-      const onClickOut = contextSafe(() => {
-        gsap.to(tainer.current, {
-          top: "85%",
-          duration: 2,
-          ease: "power4.out",
-          //   backgroundColor: "rgba(242, 241, 233, 0)",
-        });
-        gsap.to(title.current, {
-          fontSize: "clamp(2vw, 3rem, 4.5vw)",
-          color: "#262626",
-          duration: 2,
-          ease: "power4.out",
-        });
-      });
+      if (!passionTL.current) {
+        passionTL.current = titleTL();
+      }
 
-      clicked ? onClickIn() : onClickOut();
+      if (passionTL.current) {
+        if (clicked) {
+          passionTL.current.play();
+        }
+        if (!clicked || currentWindow.every(defaultPositionTest)) {
+          passionTL.current.reverse();
+        }
+      }
     },
     {
       scope: tainer,

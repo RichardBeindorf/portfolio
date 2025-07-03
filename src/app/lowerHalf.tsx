@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import Story from "./story";
 import Passion from "./passion";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import Work from "./work";
 
 const Container = styled.div`
@@ -22,14 +22,17 @@ export default function LowerHalf() {
       <Story
         currentWindow={currentWindow}
         setCurrentWindow={(arr) => setCurrentWindow(arr)}
+        // masterTL={masterTL}
       />
       <Passion
         currentWindow={currentWindow}
         setCurrentWindow={(arr) => setCurrentWindow(arr)}
+        // masterTL={masterTL}
       />
       <Work
         currentWindow={currentWindow}
         setCurrentWindow={(arr) => setCurrentWindow(arr)}
+        // masterTL={masterTL}
       />
     </Container>
   );
