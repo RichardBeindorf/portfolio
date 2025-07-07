@@ -141,8 +141,6 @@ export default function Story({
         const newTL = gsap.timeline({
           paused: true,
           ease: "power4.out",
-          delay: animationTime,
-
           // making sure the animation state is preserved all the way so we can disable any click animation while its on
           onComplete: () => {
             isAnimating.current = false;
@@ -155,17 +153,34 @@ export default function Story({
         newTL.to(tainer.current, {
           top: "60%",
           duration: titleDuration,
+          delay: animationTime,
         });
         newTL.to(
           title.current,
           {
             fontSize: "clamp(8vw, 6rem, 11vw)",
             color: "#F24150",
+            delay: animationTime,
             duration: titleDuration,
           },
           "<"
         );
         return newTL;
+      });
+
+      const onStartBounce = contextSafe(() => {
+        // basically i have to create this rigth after starting the current timeline, but outside of it so i doesnt happen when reversing
+        const animation = gsap.to(title.current, {
+          delay: 0.5,
+          ease: "sine.in",
+          keyframes: {
+            scaleX: ["100%", "80%", "100%"],
+            left: ["50%", "48%", "50%"],
+            rotate: [0, -10, 0],
+          },
+          easeEach: "none",
+        });
+        return animation;
       });
 
       if (!storyTimeline.current) {
@@ -175,6 +190,7 @@ export default function Story({
       if (storyTimeline.current) {
         if (clicked) {
           storyTimeline.current.play();
+          onStartBounce();
         }
         if (!clicked || currentWindow.every(defaultPositionTest)) {
           storyTimeline.current.reverse();
