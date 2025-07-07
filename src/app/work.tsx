@@ -6,11 +6,10 @@ import { permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 
 const PassionContainer = styled(ChapterContainer)`
-  left: 90%;
   top: 70%;
+  left: 90%;
 `;
 
 const Title = styled(ChapterTitle)``;
@@ -85,13 +84,19 @@ export default function Work({
 
       const onPullMid = contextSafe(() => {
         const midIn = gsap.to(tainer.current, {
-          scale: 0.1,
-          rotate: 30,
-          left: "50%",
-          top: "85%",
           display: "none",
-          duration: pullDuration,
+          duration: 3,
           ease: "power4.out",
+          keyframes: {
+            // 8 different phases maximum currently
+            rotate: [0, 30, 30, 30, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            // first is start position
+            top: ["70%", "70%", "85%", "85%"],
+            left: ["90%", "89%", "88%", "50%", "50%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
         });
 
         return midIn;

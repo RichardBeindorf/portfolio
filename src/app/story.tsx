@@ -33,6 +33,7 @@ export const ChapterTitle = styled.h1`
   mix-blend-mode: normal;
   font-size: clamp(2vw, 3rem, 4.5vw);
   text-align: center;
+  user-select: none;
 
   &:hover {
     cursor: pointer;
