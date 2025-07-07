@@ -274,13 +274,6 @@ export default function Story({
         }, 501);
       }
 
-      // Entry display
-      // if (clicked && !isAnimating) {
-      //   setTimeout(() => {
-      //     setDelayedEntry(true);
-      //     console.log("sucess", delayedEntry);
-      //   }, 2);
-      // }
       if (!clicked && !isAnimating) {
         setDelayedEntry(false);
         console.log("falsy", delayedEntry);
