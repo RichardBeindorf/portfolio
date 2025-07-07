@@ -7,7 +7,15 @@ import {
   oswald400,
   oswald500,
 } from "../styles/font";
-import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
+import {
+  Dispatch,
+  ReactNode,
+  RefObject,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
@@ -82,16 +90,28 @@ const Year = styled.span`
   font-size: 1.2rem;
 `;
 
-function Entry(body, year, id, hover) {
+function Entry(
+  body: string,
+  year: number | string,
+  id: number
+  // clicked: boolean
+) {
+  // const handleDelay = useRef(false);
+  // if (clicked) {
+  //   setTimeout(() => {
+  //     handleDelay.current = true;
+  //   }, 2);
+  // }
+  // if (!clicked) {
+  //   handleDelay.current = false;
+  // }
   return (
     <div key={id}>
-      {hover ? (
-        <EntryWrapper>
-          <Bullet>//</Bullet>
-          <EntryText style={oswald300.style}>{body}</EntryText>
-          <Year style={permanentMarker.style}>{year}</Year>
-        </EntryWrapper>
-      ) : null}
+      <EntryWrapper>
+        <Bullet>//</Bullet>
+        <EntryText style={oswald300.style}>{body}</EntryText>
+        <Year style={permanentMarker.style}>{year}</Year>
+      </EntryWrapper>
     </div>
   );
 }
@@ -103,6 +123,7 @@ export default function Story({
   isAnimating,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
+  const [delayedEntry, setDelayedEntry] = useState(false);
   const title = useRef(null);
   const tainer = useRef(null);
   const storyTimeline = useRef(null); // saving our current title transform animation
@@ -111,6 +132,7 @@ export default function Story({
   const pullDuration = 1;
   const titleDuration = 2;
   const duration = pullDuration + titleDuration; // needed for??
+  const entriesRef = useRef<HTMLDivElement>(null);
 
   const entryData = [
     [
@@ -144,6 +166,7 @@ export default function Story({
           // making sure the animation state is preserved all the way so we can disable any click animation while its on
           onComplete: () => {
             isAnimating.current = false;
+            setDelayedEntry(true); // Move this here instead
           },
           onReverseComplete: () => {
             isAnimating.current = false;
@@ -168,6 +191,10 @@ export default function Story({
         return newTL;
       });
 
+      //**//
+      /* ONLY ONCE PER CYCLE */
+      //**//
+
       const onStartBounce = contextSafe(() => {
         // basically i have to create this rigth after starting the current timeline, but outside of it so i doesnt happen when reversing
         const animation = gsap.to(title.current, {
@@ -177,8 +204,8 @@ export default function Story({
             scaleX: ["100%", "80%", "100%"],
             left: ["50%", "48%", "50%"],
             rotate: [0, -10, 0],
+            easeEach: "none",
           },
-          easeEach: "none",
         });
         return animation;
       });
@@ -200,6 +227,10 @@ export default function Story({
 
       //**//
       /* ---- END ---- */
+      //**//
+
+      //**//
+      /* Secondary Title Animation */
       //**//
 
       const onPullRight = contextSafe(() => {
@@ -242,13 +273,39 @@ export default function Story({
           currentState.current = null;
         }, 501);
       }
+
+      // Entry display
+      // if (clicked && !isAnimating) {
+      //   setTimeout(() => {
+      //     setDelayedEntry(true);
+      //     console.log("sucess", delayedEntry);
+      //   }, 2);
+      // }
+      if (!clicked && !isAnimating) {
+        setDelayedEntry(false);
+        console.log("falsy", delayedEntry);
+      }
     },
     {
       scope: tainer,
-      dependencies: [clicked, currentWindow],
+      dependencies: [clicked, currentWindow, isAnimating],
       revertOnUpdate: false,
     }
   );
+
+  useEffect(() => {
+    if (delayedEntry && entriesRef.current) {
+      const items = entriesRef.current.querySelectorAll("div");
+
+      gsap.from(items, {
+        opacity: 0,
+        y: 20,
+        stagger: 0.3,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+    }
+  }, [delayedEntry]);
 
   return (
     <ChapterContainer ref={tainer}>
@@ -273,11 +330,11 @@ export default function Story({
             in the <em style={oswald500.style}>end</em> it all makes sense”
           </Intro>
         ) : null}
-        <EntryList>
-          {entryData.map((entry, i) => {
-            return Entry(entry[0], entry[1], i, clicked);
-          })}
-        </EntryList>
+        {delayedEntry ? (
+          <EntryList ref={entriesRef}>
+            {entryData.map((entry, i) => Entry(entry[0], entry[1], i))}
+          </EntryList>
+        ) : null}
       </div>
     </ChapterContainer>
   );
