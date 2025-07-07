@@ -7,13 +7,15 @@ import {
   oswald400,
   oswald500,
 } from "../styles/font";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
-export type CurrentWindow = {
+export type TitleProps = {
   currentWindow: number[];
   setCurrentWindow: Dispatch<SetStateAction<number[]>>;
+  animationTime: number;
+  isAnimating: RefObject<boolean>;
 };
 
 export const ChapterContainer = styled.section`
@@ -96,13 +98,18 @@ function Entry(body, year, id, hover) {
 export default function Story({
   currentWindow,
   setCurrentWindow,
-}: CurrentWindow) {
+  animationTime,
+  isAnimating,
+}: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const title = useRef(null);
   const tainer = useRef(null);
-  const storyTimeline = useRef(null);
-  const currentState = useRef(null);
+  const storyTimeline = useRef(null); // saving our current title transform animation
+  const currentState = useRef(null); // saving our current pull animation
   const defaultPositionTest = (pos: number) => pos === 0;
+  const pullDuration = 1;
+  const titleDuration = 2;
+  const duration = pullDuration + titleDuration; // needed for??
 
   const entryData = [
     [
@@ -129,19 +136,31 @@ export default function Story({
       //**//
       /* MAIN TITLE ANIMATION */
       //**//
-
       const titleTL = contextSafe(() => {
-        const newTL = gsap.timeline({ paused: true, ease: "power4.out" });
+        const newTL = gsap.timeline({
+          paused: true,
+          ease: "power4.out",
+          delay: animationTime,
+
+          // making sure the animation state is preserved all the way so we can disable any click animation while its on
+          onComplete: () => {
+            isAnimating.current = false;
+          },
+          onReverseComplete: () => {
+            isAnimating.current = false;
+            storyTimeline.current = null;
+          },
+        });
         newTL.to(tainer.current, {
           top: "60%",
-          duration: 2,
+          duration: titleDuration,
         });
         newTL.to(
           title.current,
           {
             fontSize: "clamp(8vw, 6rem, 11vw)",
             color: "#F24150",
-            duration: 2,
+            duration: titleDuration,
           },
           "<"
         );
@@ -158,14 +177,13 @@ export default function Story({
         }
         if (!clicked || currentWindow.every(defaultPositionTest)) {
           storyTimeline.current.reverse();
+          storyTimeline.current = null;
         }
       }
 
       //**//
       /* ---- END ---- */
       //**//
-
-      const pullDuration = 0.5;
 
       const onPullRight = contextSafe(() => {
         const minIn = gsap.to(tainer.current, {
@@ -174,7 +192,7 @@ export default function Story({
           left: "90%",
           top: "70%",
           duration: pullDuration,
-          ease: "power4.out",
+          ease: "power4.in",
         });
 
         return minIn;
@@ -220,9 +238,12 @@ export default function Story({
       <ChapterTitle
         style={permanentMarker.style}
         onClick={() => {
-          const next = !clicked;
-          setClicked(next);
-          setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
+          if (isAnimating.current === false) {
+            const next = !clicked;
+            setClicked(next);
+            setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
+            isAnimating.current = true;
+          }
         }}
         ref={title}
       >

@@ -16,23 +16,27 @@ const Container = styled.div`
 
 export default function LowerHalf() {
   const [currentWindow, setCurrentWindow] = useState<number[]>([]);
-
+  const pullDurationOrDelay = 1;
+  const isAnimating = useRef(false);
   return (
     <Container>
       <Story
         currentWindow={currentWindow}
+        animationTime={pullDurationOrDelay}
+        isAnimating={isAnimating}
         setCurrentWindow={(arr) => setCurrentWindow(arr)}
-        // masterTL={masterTL}
       />
       <Passion
         currentWindow={currentWindow}
+        animationTime={pullDurationOrDelay}
         setCurrentWindow={(arr) => setCurrentWindow(arr)}
-        // masterTL={masterTL}
+        isAnimating={isAnimating}
       />
       <Work
         currentWindow={currentWindow}
+        animationTime={pullDurationOrDelay}
         setCurrentWindow={(arr) => setCurrentWindow(arr)}
-        // masterTL={masterTL}
+        isAnimating={isAnimating}
       />
     </Container>
   );

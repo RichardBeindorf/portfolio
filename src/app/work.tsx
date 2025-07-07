@@ -1,11 +1,12 @@
 "use client";
 
 import styled from "styled-components";
-import { ChapterContainer, ChapterTitle, CurrentWindow } from "./story";
+import { ChapterContainer, ChapterTitle, TitleProps } from "./story";
 import { permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 
 const PassionContainer = styled(ChapterContainer)`
   left: 90%;
@@ -17,11 +18,13 @@ const Title = styled(ChapterTitle)``;
 export default function Work({
   currentWindow,
   setCurrentWindow,
-}: CurrentWindow) {
+  animationTime,
+  isAnimating,
+}: TitleProps) {
   const tainer = useRef(null);
   const title = useRef(null);
   const [clicked, setClicked] = useState(false);
-  const workTimeline = useRef(null);
+  const workTL = useRef(null);
   const currentState = useRef(null);
   const defaultPositionTest = (pos: number) => pos === 0;
 
@@ -30,9 +33,20 @@ export default function Work({
       //**//
       /* MAIN TITLE ANIMATION */
       //**//
-
       const titleTL = contextSafe(() => {
-        const newTL = gsap.timeline({ paused: true, ease: "power4.out" });
+        const newTL = gsap.timeline({
+          paused: true,
+          ease: "power4.out",
+          delay: animationTime,
+          // making sure the animation state is preserved all the way so we can disable any click animation while its on
+          onComplete: () => {
+            isAnimating.current = false;
+          },
+          onReverseComplete: () => {
+            isAnimating.current = false;
+            workTL.current = null;
+          },
+        });
         newTL.to(tainer.current, {
           top: "60%",
           duration: 2,
@@ -49,16 +63,17 @@ export default function Work({
         return newTL;
       });
 
-      if (!workTimeline.current) {
-        workTimeline.current = titleTL();
+      if (!workTL.current) {
+        // remembering each timeline or we will just creat a new one everytime and cant play or reverse
+        workTL.current = titleTL();
       }
 
-      if (workTimeline.current) {
+      if (workTL.current) {
         if (clicked) {
-          workTimeline.current.play();
+          workTL.current.play();
         }
         if (!clicked || currentWindow.every(defaultPositionTest)) {
-          workTimeline.current.reverse();
+          workTL.current.reverse();
         }
       }
 
@@ -66,19 +81,20 @@ export default function Work({
       /* ---- END ---- */
       //**//
 
-      const pullDuration = 0.5;
+      const pullDuration = 1;
 
       const onPullMid = contextSafe(() => {
-        const minIn = gsap.to(tainer.current, {
+        const midIn = gsap.to(tainer.current, {
           scale: 0.1,
           rotate: 30,
           left: "50%",
           top: "85%",
+          display: "none",
           duration: pullDuration,
           ease: "power4.out",
         });
 
-        return minIn;
+        return midIn;
       });
 
       const onPullLeft = contextSafe(() => {
@@ -104,6 +120,7 @@ export default function Work({
 
       if (currentState.current && currentWindow.every(defaultPositionTest)) {
         currentState.current.reverse();
+        // clearing the timeline shortly after giving the command to revers to prevent errors
         setTimeout(() => {
           currentState.current = null;
         }, 501);
@@ -119,9 +136,12 @@ export default function Work({
   return (
     <PassionContainer
       onClick={() => {
-        const next = !clicked;
-        setClicked(next);
-        setCurrentWindow(next ? [0, 0, 1] : [0, 0, 0]);
+        if (isAnimating.current === false) {
+          const next = !clicked;
+          setClicked(next);
+          setCurrentWindow(next ? [0, 0, 1] : [0, 0, 0]);
+          isAnimating.current = true;
+        }
       }}
       ref={tainer}
     >

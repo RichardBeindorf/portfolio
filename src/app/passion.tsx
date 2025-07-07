@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ChapterContainer, ChapterTitle, CurrentWindow } from "./story";
+import { ChapterContainer, ChapterTitle, TitleProps } from "./story";
 import { permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
@@ -15,7 +15,9 @@ const Title = styled(ChapterTitle)``;
 export default function Passion({
   currentWindow,
   setCurrentWindow,
-}: CurrentWindow) {
+  animationTime,
+  isAnimating,
+}: TitleProps) {
   const tainer = useRef(null);
   const title = useRef(null);
   const [clicked, setClicked] = useState(false);
@@ -29,6 +31,15 @@ export default function Passion({
         const newTL = gsap.timeline({
           paused: true,
           ease: "power4.out",
+          delay: animationTime,
+          // making sure the animation state is preserved all the way so we can disable any click animation while its on
+          onComplete: () => {
+            isAnimating.current = false;
+          },
+          onReverseComplete: () => {
+            isAnimating.current = false;
+            passionTL.current = null;
+          },
         });
         newTL.to(tainer.current, {
           top: "60%",
@@ -56,6 +67,7 @@ export default function Passion({
         }
         if (!clicked || currentWindow.every(defaultPositionTest)) {
           passionTL.current.reverse();
+          passionTL.current = null;
         }
       }
 
@@ -116,9 +128,12 @@ export default function Passion({
   return (
     <PassionContainer
       onClick={() => {
-        const next = !clicked;
-        setClicked(next);
-        setCurrentWindow(next ? [1, 0, 0] : [0, 0, 0]);
+        if (isAnimating.current === false) {
+          const next = !clicked;
+          setClicked(next);
+          setCurrentWindow(next ? [1, 0, 0] : [0, 0, 0]);
+          isAnimating.current = true;
+        }
       }}
       ref={tainer}
     >
