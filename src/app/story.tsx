@@ -56,6 +56,7 @@ export default function Story({
   const tainer = useRef(null);
   const storyTimeline = useRef<gsap.core.Timeline | null>(null);
   const currentState = useRef<gsap.core.Tween | null>(null);
+  const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
   const defaultPositionTest = (pos: number) => pos === 0;
   const pullDuration = 1;
@@ -141,31 +142,20 @@ export default function Story({
         isAnimating.current
       ) {
         // Only reverse if not clicked AND back to default window position
-        storyTimeline.current = gsap.timeline({
-          // paused: true,
+        gsap.to(tainer.current, {
+          top: "85%",
+          duration: titleDuration,
           ease: "power4.out",
           onStart: () => {
             isAnimating.current = false;
             storyTimeline.current = null;
           },
-          onComplete: () => {
-            setShowEntries(false);
-          },
         });
-        storyTimeline.current
-          .to(tainer.current, {
-            top: "85%",
-            duration: titleDuration,
-          })
-          .to(
-            title.current,
-            {
-              fontSize: "clamp(2vw, 3rem, 4.5vw)",
-              color: "var(--foreground)",
-              duration: titleDuration,
-            },
-            "<"
-          );
+        gsap.to(title.current, {
+          fontSize: "clamp(2vw, 3rem, 4.5vw)",
+          color: "var(--foreground)",
+          duration: titleDuration,
+        });
       }
 
       //**//
@@ -235,37 +225,43 @@ export default function Story({
         ? entriesRef.current.querySelectorAll("div")
         : [];
 
+      let shift;
+
       if (!entryStaggerAnimation.current && items.length > 0) {
         entryStaggerAnimation.current = gsap.from(items, {
           opacity: 0,
           y: 20,
-          stagger: 0.1,
-          duration: 0.4,
+          stagger: 0.03,
+          duration: 0.2,
           ease: "power2.out",
           paused: true,
+          onReverseComplete: () => {
+            setShowEntries(false);
+          },
         });
       }
       if (showEntries && entryStaggerAnimation.current) {
         entryStaggerAnimation.current.play();
-      } else if (!showEntries && entryStaggerAnimation.current) {
-        console.log("TRIGGER", entryStaggerAnimation.current);
+      }
+      if (!clicked && isAnimating.current === true) {
         entryStaggerAnimation.current.reverse();
+        entryStaggerAnimation.current = null;
         // Animate the contentWrapper back up when entries are reversing out
-        gsap.to(".contentWrapper", {
+        shift = gsap.to(".contentWrapper", {
           y: -60,
           ease: "power2.out",
           duration: 0.4,
         });
+        shift.play();
+        shift.reverse();
       }
     },
     {
-      scope: tainer, // You can scope it to tainer or entriesRef if preferred
-      dependencies: [showEntries, isAnimating], // Only re-run when showEntries changes
+      scope: tainer,
+      dependencies: [showEntries, clicked],
       revertOnUpdate: false,
     }
   );
-
-  const entriesRef = useRef<HTMLDivElement>(null);
 
   return (
     <ChapterContainer ref={tainer}>
@@ -284,16 +280,17 @@ export default function Story({
         Story
       </ChapterTitle>
       <div className="contentWrapper">
-        {clicked ? (
-          <Intro style={oswald300.style}>
-            ”Lets say it seems <em style={oswald500.style}>complicated</em>, but
-            in the <em style={oswald500.style}>end</em> it all makes sense”
-          </Intro>
-        ) : null}
         {showEntries ? ( // Use showEntries here
-          <EntryList ref={entriesRef}>
-            {entryData.map((entry, i) => Entry(entry[0], entry[1], i))}
-          </EntryList>
+          <>
+            <Intro style={oswald300.style}>
+              ”Lets say it seems <em style={oswald500.style}>complicated</em>,
+              but in the <em style={oswald500.style}>end</em> it all makes
+              sense”
+            </Intro>
+            <EntryList ref={entriesRef}>
+              {entryData.map((entry, i) => Entry(entry[0], entry[1], i))}
+            </EntryList>
+          </>
         ) : null}
       </div>
     </ChapterContainer>
