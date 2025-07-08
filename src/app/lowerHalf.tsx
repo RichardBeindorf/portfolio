@@ -16,7 +16,7 @@ const Container = styled.div`
 
 export default function LowerHalf() {
   const [currentWindow, setCurrentWindow] = useState<number[]>([]);
-  const pullDurationOrDelay = 2;
+  const pullDurationOrDelay = 1.2;
   const isAnimating = useRef(false);
   return (
     <Container>

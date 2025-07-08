@@ -1,23 +1,11 @@
 "use client";
 
 import styled from "styled-components";
-import {
-  permanentMarker,
-  oswald300,
-  oswald400,
-  oswald500,
-} from "../styles/font";
-import {
-  Dispatch,
-  ReactNode,
-  RefObject,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { permanentMarker, oswald300, oswald500 } from "../styles/font";
+import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import Entry from "./Entry";
 
 export type TitleProps = {
   currentWindow: number[];
@@ -52,69 +40,9 @@ const Intro = styled.h2`
   min-width: max-content;
 `;
 
-const Bullet = styled.span`
-  color: var(--textAccent);
-  font-size: 2rem;
-`;
-
-const EntryWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: start;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  padding: 0px;
-  background-color: rgba(242, 241, 233, 0);
-  transition: padding 1s ease-in, background-color 1s ease-in,
-    font-size 1s ease-in;
-
-  &:hover {
-    padding: 5px;
-    background-color: rgba(242, 241, 233, 1);
-    font-size: clamp(1vw, 1.1rem, 2vw);
-    transition: padding 0.5s ease-out, background-color 0.5s ease-out,
-      font-size 0.5s ease-out;
-  }
-`;
-
 const EntryList = styled.div`
   margin-top: 30px;
 `;
-
-const EntryText = styled.p`
-  width: max-content;
-`;
-
-const Year = styled.span`
-  font-size: 1.2rem;
-`;
-
-function Entry(
-  body: string,
-  year: number | string,
-  id: number
-  // clicked: boolean
-) {
-  // const handleDelay = useRef(false);
-  // if (clicked) {
-  //   setTimeout(() => {
-  //     handleDelay.current = true;
-  //   }, 2);
-  // }
-  // if (!clicked) {
-  //   handleDelay.current = false;
-  // }
-  return (
-    <div key={id}>
-      <EntryWrapper>
-        <Bullet>//</Bullet>
-        <EntryText style={oswald300.style}>{body}</EntryText>
-        <Year style={permanentMarker.style}>{year}</Year>
-      </EntryWrapper>
-    </div>
-  );
-}
 
 export default function Story({
   currentWindow,
@@ -123,16 +51,15 @@ export default function Story({
   isAnimating,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
-  const [delayedEntry, setDelayedEntry] = useState(false);
+  const [showEntries, setShowEntries] = useState(false);
   const title = useRef(null);
   const tainer = useRef(null);
-  const storyTimeline = useRef(null); // saving our current title transform animation
-  const currentState = useRef(null); // saving our current pull animation
+  const storyTimeline = useRef<gsap.core.Timeline | null>(null);
+  const currentState = useRef<gsap.core.Tween | null>(null);
+  const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
   const defaultPositionTest = (pos: number) => pos === 0;
   const pullDuration = 1;
-  const titleDuration = 2;
-  const duration = pullDuration + titleDuration; // needed for??
-  const entriesRef = useRef<HTMLDivElement>(null);
+  const titleDuration = 1;
 
   const entryData = [
     [
@@ -159,45 +86,37 @@ export default function Story({
       //**//
       /* MAIN TITLE ANIMATION */
       //**//
-      const titleTL = contextSafe(() => {
-        const newTL = gsap.timeline({
+      if (!storyTimeline.current) {
+        storyTimeline.current = gsap.timeline({
           paused: true,
           ease: "power4.out",
-          // making sure the animation state is preserved all the way so we can disable any click animation while its on
           onComplete: () => {
             isAnimating.current = false;
-            setDelayedEntry(true); // Move this here instead
-          },
-          onReverseComplete: () => {
-            isAnimating.current = false;
-            storyTimeline.current = null;
+            setShowEntries(true); // Toggle entries when main animation is done
           },
         });
-        newTL.to(tainer.current, {
-          top: "60%",
-          duration: titleDuration,
-          delay: animationTime,
-        });
-        newTL.to(
-          title.current,
-          {
-            fontSize: "clamp(8vw, 6rem, 11vw)",
-            color: "#F24150",
-            delay: animationTime,
+        storyTimeline.current
+          .to(tainer.current, {
+            top: "60%",
             duration: titleDuration,
-          },
-          "<"
-        );
-        return newTL;
-      });
+            delay: animationTime,
+          })
+          .to(
+            title.current,
+            {
+              fontSize: "clamp(8vw, 6rem, 11vw)",
+              color: "#F24150",
+              duration: titleDuration,
+            },
+            "<"
+          );
+      }
 
       //**//
-      /* ONLY ONCE PER CYCLE */
+      /* ONLY ONCE PER CYCLE (Bounce animation) */
       //**//
-
       const onStartBounce = contextSafe(() => {
-        // basically i have to create this rigth after starting the current timeline, but outside of it so i doesnt happen when reversing
-        const animation = gsap.to(title.current, {
+        gsap.to(title.current, {
           delay: 0.5,
           ease: "sine.in",
           keyframes: {
@@ -207,76 +126,97 @@ export default function Story({
             easeEach: "none",
           },
         });
-        return animation;
       });
 
-      if (!storyTimeline.current) {
-        storyTimeline.current = titleTL();
-      }
-
-      if (storyTimeline.current) {
-        if (clicked) {
-          storyTimeline.current.play();
+      // CONTROLL LOGIC
+      if (clicked) {
+        storyTimeline.current.play();
+        if (isAnimating.current) {
+          // Only trigger bounce if an animation is truly in progress
           onStartBounce();
         }
-        if (!clicked || currentWindow.every(defaultPositionTest)) {
-          storyTimeline.current.reverse();
-          storyTimeline.current = null;
-        }
+      } else if (
+        !clicked &&
+        currentWindow.every(defaultPositionTest) &&
+        isAnimating.current
+      ) {
+        // Only reverse if not clicked AND back to default window position
+        storyTimeline.current = gsap.timeline({
+          // paused: true,
+          ease: "power4.out",
+          onStart: () => {
+            isAnimating.current = false;
+            storyTimeline.current = null;
+          },
+          onComplete: () => {
+            setShowEntries(false);
+          },
+        });
+        storyTimeline.current
+          .to(tainer.current, {
+            top: "85%",
+            duration: titleDuration,
+          })
+          .to(
+            title.current,
+            {
+              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              color: "var(--foreground)",
+              duration: titleDuration,
+            },
+            "<"
+          );
       }
 
       //**//
-      /* ---- END ---- */
+      /* Secondary Title Animation (Pull Left/Right) */
       //**//
-
-      //**//
-      /* Secondary Title Animation */
-      //**//
-
-      const onPullRight = contextSafe(() => {
-        const minIn = gsap.to(tainer.current, {
-          scale: 0.1,
-          rotate: 30,
-          left: "90%",
-          top: "70%",
-          duration: pullDuration,
-          ease: "power4.in",
-        });
-
-        return minIn;
-      });
 
       const onPullLeft = contextSafe(() => {
-        const leftIn = gsap.to(tainer.current, {
-          scale: 0.1,
-          rotate: -30,
-          left: "10%",
-          top: "85%",
-          duration: pullDuration,
-          ease: "power4.out",
-        });
-
-        return leftIn;
+        if (!currentState.current) {
+          currentState.current = gsap.to(tainer.current, {
+            scale: 0.1,
+            rotate: -30,
+            left: "10%",
+            top: "85%",
+            duration: pullDuration,
+            ease: "power4.out",
+            onReverseComplete: () => {
+              currentState.current = null; // Clear ref when animation reverses
+            },
+          });
+        } else {
+          currentState.current.play();
+        }
       });
 
-      if (currentWindow[0] === 1 && !currentState.current) {
-        currentState.current = onPullLeft();
-      }
+      const onPullRight = contextSafe(() => {
+        if (!currentState.current) {
+          currentState.current = gsap.to(tainer.current, {
+            scale: 0.1,
+            rotate: 30,
+            left: "90%",
+            top: "70%",
+            duration: pullDuration,
+            ease: "power4.in",
+            onReverseComplete: () => {
+              currentState.current = null; // Clear ref when animation reverses
+            },
+          });
+        } else {
+          currentState.current.play();
+        }
+      });
 
-      if (currentWindow[2] === 1 && !currentState.current) {
-        currentState.current = onPullRight();
-      }
-
-      if (currentState.current && currentWindow.every(defaultPositionTest)) {
+      if (currentWindow[0] === 1) {
+        onPullLeft();
+      } else if (currentWindow[2] === 1) {
+        onPullRight();
+      } else if (
+        currentState.current &&
+        currentWindow.every(defaultPositionTest)
+      ) {
         currentState.current.reverse();
-        setTimeout(() => {
-          currentState.current = null;
-        }, 501);
-      }
-
-      if (!clicked && !isAnimating) {
-        setDelayedEntry(false);
-        console.log("falsy", delayedEntry);
       }
     },
     {
@@ -286,19 +226,46 @@ export default function Story({
     }
   );
 
-  useEffect(() => {
-    if (delayedEntry && entriesRef.current) {
-      const items = entriesRef.current.querySelectorAll("div");
+  //**//
+  /* Staggered Animation of the Entries - Managed outside main GSAP context for clarity */
+  //**//
+  useGSAP(
+    () => {
+      const items = entriesRef.current
+        ? entriesRef.current.querySelectorAll("div")
+        : [];
 
-      gsap.from(items, {
-        opacity: 0,
-        y: 20,
-        stagger: 0.3,
-        duration: 0.6,
-        ease: "power2.out",
-      });
+      if (!entryStaggerAnimation.current && items.length > 0) {
+        entryStaggerAnimation.current = gsap.from(items, {
+          opacity: 0,
+          y: 20,
+          stagger: 0.1,
+          duration: 0.4,
+          ease: "power2.out",
+          paused: true,
+        });
+      }
+      if (showEntries && entryStaggerAnimation.current) {
+        entryStaggerAnimation.current.play();
+      } else if (!showEntries && entryStaggerAnimation.current) {
+        console.log("TRIGGER", entryStaggerAnimation.current);
+        entryStaggerAnimation.current.reverse();
+        // Animate the contentWrapper back up when entries are reversing out
+        gsap.to(".contentWrapper", {
+          y: -60,
+          ease: "power2.out",
+          duration: 0.4,
+        });
+      }
+    },
+    {
+      scope: tainer, // You can scope it to tainer or entriesRef if preferred
+      dependencies: [showEntries, isAnimating], // Only re-run when showEntries changes
+      revertOnUpdate: false,
     }
-  }, [delayedEntry]);
+  );
+
+  const entriesRef = useRef<HTMLDivElement>(null);
 
   return (
     <ChapterContainer ref={tainer}>
@@ -323,7 +290,7 @@ export default function Story({
             in the <em style={oswald500.style}>end</em> it all makes sense”
           </Intro>
         ) : null}
-        {delayedEntry ? (
+        {showEntries ? ( // Use showEntries here
           <EntryList ref={entriesRef}>
             {entryData.map((entry, i) => Entry(entry[0], entry[1], i))}
           </EntryList>
