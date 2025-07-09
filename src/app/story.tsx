@@ -108,6 +108,9 @@ export default function Story({
               fontSize: "clamp(8vw, 6rem, 11vw)",
               color: "#F24150",
               duration: titleDuration,
+              keyframes: {
+                color: ["#262626", "#F24150"],
+              },
             },
             "<"
           );

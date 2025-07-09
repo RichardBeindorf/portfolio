@@ -24,7 +24,7 @@ export default function Work({
   const title = useRef(null);
   const [clicked, setClicked] = useState(false);
   const workTL = useRef(null);
-  const currentState = useRef(null);
+  const pullDirection = useRef(null);
   const defaultPositionTest = (pos: number) => pos === 0;
 
   const { contextSafe } = useGSAP(
@@ -84,26 +84,41 @@ export default function Work({
 
       const onPullMid = contextSafe(() => {
         const midIn = gsap.to(tainer.current, {
+          id: "midIn",
           display: "none",
-          duration: 3,
+          duration: animationTime + 1,
           ease: "power4.out",
           keyframes: {
             // 8 different phases maximum currently
-            rotate: [0, 30, 30, 30, 0, 0, -15, 0],
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
             // first is start position
             top: ["70%", "70%", "85%", "85%"],
-            left: ["90%", "89%", "88%", "50%", "50%"],
+            left: ["90%", "89%", "88%", "75%", "50%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
         });
-
         return midIn;
+      });
+
+      const onPullMidOut = contextSafe(() => {
+        const midOut = gsap.to(tainer.current, {
+          display: "block",
+          duration: animationTime + 1,
+          ease: "power4.out",
+          scale: 1,
+          top: "70%",
+          left: "90%",
+          opacity: 1,
+        });
+
+        return midOut;
       });
 
       const onPullLeft = contextSafe(() => {
         const leftIn = gsap.to(tainer.current, {
+          id: "leftIn",
           scale: 0.1,
           rotate: -30,
           left: "10%",
@@ -115,20 +130,21 @@ export default function Work({
         return leftIn;
       });
 
-      if (currentWindow[0] === 1 && !currentState.current) {
-        currentState.current = onPullLeft();
+      if (currentWindow[0] === 1 && !pullDirection.current) {
+        pullDirection.current = onPullLeft();
       }
 
-      if (currentWindow[1] === 1 && !currentState.current) {
-        currentState.current = onPullMid();
+      if (currentWindow[1] === 1 && !pullDirection.current) {
+        pullDirection.current = onPullMid();
       }
 
-      if (currentState.current && currentWindow.every(defaultPositionTest)) {
-        currentState.current.reverse();
+      if (pullDirection.current && currentWindow.every(defaultPositionTest)) {
+        if (pullDirection.current.vars.id === "midIn") {
+          onPullMidOut();
+          console.log(pullDirection.current);
+        }
         // clearing the timeline shortly after giving the command to revers to prevent errors
-        setTimeout(() => {
-          currentState.current = null;
-        }, 501);
+        pullDirection.current = null;
       }
     },
     {

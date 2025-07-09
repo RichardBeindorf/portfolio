@@ -113,9 +113,7 @@ export default function Passion({
 
       if (currentState.current && currentWindow.every(defaultPositionTest)) {
         currentState.current.reverse();
-        setTimeout(() => {
-          currentState.current = null;
-        }, 501);
+        currentState.current = null;
       }
     },
     {
