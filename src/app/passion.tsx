@@ -21,99 +21,134 @@ export default function Passion({
   const tainer = useRef(null);
   const title = useRef(null);
   const [clicked, setClicked] = useState(false);
-  const passionTL = useRef(null);
   const currentState = useRef(null);
   const defaultPositionTest = (pos: number) => pos === 0;
+  const titleDelay = 1;
+  const pullDuration = 1;
 
   const { contextSafe } = useGSAP(
     () => {
-      const titleTL = contextSafe(() => {
-        const newTL = gsap.timeline({
-          paused: true,
+      //**//
+      /* MAIN TITLE ANIMATION */
+      //**//
+
+      //**//
+      /* ONLY ONCE PER CYCLE (Bounce animation to illustrate the impact of other title crasing into it) */
+      //**//
+      const onStartBounce = contextSafe(() => {
+        gsap.to(title.current, {
+          delay: 0.5,
+          ease: "sine.in",
+          duration: 0.5,
+          keyframes: {
+            scaleX: ["100%", "80%", "100%"],
+            left: ["50%", "48%", "50%"],
+            rotate: [0, -10, 0],
+            easeEach: "none",
+          },
+        });
+      });
+
+      // controll logic
+
+      if (clicked) {
+        if (isAnimating.current) {
+          // Only trigger bounce if an animation is truly in progress
+          onStartBounce();
+        }
+
+        gsap.to(tainer.current, {
+          top: "60%",
           ease: "power4.out",
-          delay: animationTime,
-          // making sure the animation state is preserved all the way so we can disable any click animation while its on
           onComplete: () => {
             isAnimating.current = false;
           },
-          onReverseComplete: () => {
+          duration: titleDelay,
+          delay: animationTime,
+        });
+        gsap.to(title.current, {
+          duration: titleDelay,
+          delay: animationTime,
+          fontSize: "clamp(8vw, 6rem, 11vw)",
+          ease: "power4.out",
+          onComplete: () => {
             isAnimating.current = false;
-            passionTL.current = null;
+          },
+          keyframes: {
+            color: ["#262626", "#F24150"],
           },
         });
-        newTL.to(tainer.current, {
-          top: "60%",
-          duration: 2,
-        });
-        newTL.to(
-          title.current,
-          {
-            fontSize: "clamp(8vw, 6rem, 11vw)",
-            color: "#F24150",
-            duration: 2,
+      } else if (
+        !clicked &&
+        currentWindow.every(defaultPositionTest) &&
+        isAnimating.current
+      ) {
+        // Only reverse if we unclicked AND go back to default window position
+        gsap.to(tainer.current, {
+          left: "10%",
+          top: "70%",
+          duration: titleDelay,
+          ease: "power4.out",
+          onStart: () => {
+            isAnimating.current = false;
           },
-          "<"
-        );
-        return newTL;
-      });
-
-      if (!passionTL.current) {
-        passionTL.current = titleTL();
-      }
-
-      if (passionTL.current) {
-        if (clicked) {
-          passionTL.current.play();
-        }
-        if (!clicked || currentWindow.every(defaultPositionTest)) {
-          passionTL.current.reverse();
-          passionTL.current = null;
-        }
+        });
+        gsap.to(title.current, {
+          fontSize: "clamp(2vw, 3rem, 4.5vw)",
+          color: "var(--foreground)",
+          duration: titleDelay,
+        });
       }
 
       //**//
       /* ---- END ---- */
       //**//
 
-      const pullDuration = 0.5;
-
       const onPullMid = contextSafe(() => {
-        const minIn = gsap.to(tainer.current, {
-          scale: 0.1,
-          rotate: 30,
-          left: "50%",
-          top: "85%",
-          duration: pullDuration,
-          ease: "power4.out",
-        });
-
-        return minIn;
+        if (!currentState.current) {
+          currentState.current = gsap.to(tainer.current, {
+            scale: 0.1,
+            rotate: 30,
+            left: "50%",
+            top: "85%",
+            duration: pullDuration,
+            ease: "power4.in",
+            onReverseComplete: () => {
+              currentState.current = null; // Clear ref when animation reverses
+            },
+          });
+        } else {
+          currentState.current.play();
+        }
       });
 
-      const onPullLeft = contextSafe(() => {
-        const leftIn = gsap.to(tainer.current, {
-          scale: 0.1,
-          rotate: -30,
-          left: "90%",
-          top: "70%",
-          duration: pullDuration,
-          ease: "power4.out",
-        });
-
-        return leftIn;
+      const onPullRight = contextSafe(() => {
+        if (!currentState.current) {
+          currentState.current = gsap.to(tainer.current, {
+            scale: 0.1,
+            rotate: 30,
+            left: "90%",
+            top: "70%",
+            duration: pullDuration,
+            ease: "power4.in",
+            onReverseComplete: () => {
+              currentState.current = null; // Clear ref when animation reverses
+            },
+          });
+        } else {
+          currentState.current.play();
+        }
       });
 
-      if (currentWindow[2] === 1 && !currentState.current) {
-        currentState.current = onPullLeft();
-      }
-
-      if (currentWindow[1] === 1 && !currentState.current) {
-        currentState.current = onPullMid();
-      }
-
-      if (currentState.current && currentWindow.every(defaultPositionTest)) {
+      if (currentWindow[1] === 1) {
+        onPullMid();
+      } else if (currentWindow[2] === 1) {
+        onPullRight();
+      } else if (
+        currentState.current &&
+        currentWindow.every(defaultPositionTest)
+      ) {
         currentState.current.reverse();
-        currentState.current = null;
       }
     },
     {
@@ -124,18 +159,19 @@ export default function Passion({
   );
 
   return (
-    <PassionContainer
-      onClick={() => {
-        if (isAnimating.current === false) {
-          const next = !clicked;
-          setClicked(next);
-          setCurrentWindow(next ? [1, 0, 0] : [0, 0, 0]);
-          isAnimating.current = true;
-        }
-      }}
-      ref={tainer}
-    >
-      <Title style={permanentMarker.style} ref={title}>
+    <PassionContainer ref={tainer}>
+      <Title
+        style={permanentMarker.style}
+        onClick={() => {
+          if (isAnimating.current === false) {
+            const next = !clicked;
+            setClicked(next);
+            setCurrentWindow(next ? [1, 0, 0] : [0, 0, 0]);
+            isAnimating.current = true;
+          }
+        }}
+        ref={title}
+      >
         Passion
       </Title>
     </PassionContainer>

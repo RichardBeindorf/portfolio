@@ -122,7 +122,7 @@ export default function Work({
           scale: 0.1,
           rotate: -30,
           left: "10%",
-          top: "85%",
+          top: "70%",
           duration: pullDuration,
           ease: "power4.out",
         });

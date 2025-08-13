@@ -106,7 +106,6 @@ export default function Story({
             title.current,
             {
               fontSize: "clamp(8vw, 6rem, 11vw)",
-              color: "#F24150",
               duration: titleDuration,
               keyframes: {
                 color: ["#262626", "#F24150"],
@@ -171,7 +170,7 @@ export default function Story({
             scale: 0.1,
             rotate: -30,
             left: "10%",
-            top: "85%",
+            top: "70%",
             duration: pullDuration,
             ease: "power4.out",
             onReverseComplete: () => {
@@ -276,6 +275,7 @@ export default function Story({
             setClicked(next);
             setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
             isAnimating.current = true;
+            console.log(isAnimating.current, currentWindow);
           }
         }}
         ref={title}
