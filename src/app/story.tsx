@@ -198,7 +198,7 @@ export default function Story({
         });
       });
 
-      const onPullMidOut = contextSafe(() => {
+      const onPullBack = contextSafe(() => {
         const midOut = gsap.to(tainer.current, {
           display: "block",
           duration: animationTime + 1,
@@ -209,7 +209,6 @@ export default function Story({
           opacity: 1,
           rotate: 0,
         });
-
         return midOut;
       });
 
@@ -217,11 +216,8 @@ export default function Story({
         onPullLeft();
       } else if (currentWindow[2] === 1) {
         onPullRight();
-      } else if (
-        currentState.current &&
-        currentWindow.every(defaultPositionTest)
-      ) {
-        onPullMidOut();
+      } else if (currentWindow.every(defaultPositionTest)) {
+        onPullBack();
       }
     },
     {
