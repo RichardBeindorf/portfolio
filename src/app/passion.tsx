@@ -25,13 +25,12 @@ export default function Passion({
   const defaultPositionTest = (pos: number) => pos === 0;
   const titleDelay = 1;
   const pullDuration = 1;
+  const topDistanceTitle = "54%";
+  const leftDistanceTitle = "24%";
+  const titleDuration = 1;
 
   const { contextSafe } = useGSAP(
     () => {
-      //**//
-      /* MAIN TITLE ANIMATION */
-      //**//
-
       //**//
       /* ONLY ONCE PER CYCLE (Bounce animation to illustrate the impact of other title crasing into it) */
       //**//
@@ -39,7 +38,7 @@ export default function Passion({
         gsap.to(title.current, {
           delay: 0.5,
           ease: "sine.in",
-          duration: 0.5,
+          duration: titleDuration,
           keyframes: {
             scaleX: ["100%", "80%", "100%"],
             left: ["50%", "48%", "50%"],
@@ -49,7 +48,9 @@ export default function Passion({
         });
       });
 
-      // controll logic
+      //**//
+      /* MAIN TITLE ANIMATION */
+      //**//
 
       if (clicked) {
         if (isAnimating.current) {
@@ -58,7 +59,8 @@ export default function Passion({
         }
 
         gsap.to(tainer.current, {
-          top: "60%",
+          top: topDistanceTitle,
+          left: leftDistanceTitle,
           ease: "power4.out",
           onComplete: () => {
             isAnimating.current = false;

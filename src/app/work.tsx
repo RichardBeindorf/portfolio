@@ -24,8 +24,11 @@ export default function Work({
   const title = useRef(null);
   const [clicked, setClicked] = useState(false);
   const workTL = useRef(null);
-  const pullDirection = useRef(null);
+  const currentState = useRef(null);
   const defaultPositionTest = (pos: number) => pos === 0;
+  const topDistanceTitle = "54%";
+  const leftDistanceTitle = "24%";
+  const titleDuration = 1;
 
   const { contextSafe } = useGSAP(
     () => {
@@ -47,8 +50,9 @@ export default function Work({
           },
         });
         newTL.to(tainer.current, {
-          top: "60%",
-          duration: 2,
+          top: topDistanceTitle,
+          left: leftDistanceTitle,
+          duration: titleDuration,
         });
         newTL.to(
           title.current,
@@ -83,7 +87,7 @@ export default function Work({
       const pullDuration = 1;
 
       const onPullMid = contextSafe(() => {
-        const midIn = gsap.to(tainer.current, {
+        gsap.to(tainer.current, {
           id: "midIn",
           display: "none",
           duration: animationTime + 1,
@@ -99,7 +103,6 @@ export default function Work({
             easeEach: "none",
           },
         });
-        return midIn;
       });
 
       const onPullMidOut = contextSafe(() => {
@@ -111,6 +114,7 @@ export default function Work({
           top: "70%",
           left: "90%",
           opacity: 1,
+          rotate: 0,
         });
 
         return midOut;
@@ -119,10 +123,21 @@ export default function Work({
       const onPullLeft = contextSafe(() => {
         const leftIn = gsap.to(tainer.current, {
           id: "leftIn",
-          scale: 0.1,
-          rotate: -30,
-          left: "10%",
+          display: "none",
+          // scale: 0.1,
+          // rotate: -30,
+          // left: "10%",
           top: "70%",
+          keyframes: {
+            // 8 different phases maximum currently
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            // first is start position
+            // top: ["70%", "70%", "85%", "85%"],
+            left: ["90%", "89%", "88%", "75%", "10%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
           duration: pullDuration,
           ease: "power4.out",
         });
@@ -130,22 +145,20 @@ export default function Work({
         return leftIn;
       });
 
-      if (currentWindow[0] === 1 && !pullDirection.current) {
-        pullDirection.current = onPullLeft();
+      if (currentWindow[0] === 1) {
+        onPullLeft();
       }
 
-      if (currentWindow[1] === 1 && !pullDirection.current) {
-        pullDirection.current = onPullMid();
+      if (currentWindow[1] === 1) {
+        onPullMid();
+        currentState.current = null;
       }
 
-      if (pullDirection.current && currentWindow.every(defaultPositionTest)) {
-        if (pullDirection.current.vars.id === "midIn") {
-          onPullMidOut();
-          console.log(pullDirection.current);
-        }
-        // clearing the timeline shortly after giving the command to revers to prevent errors
-        pullDirection.current = null;
+      if (currentWindow.every(defaultPositionTest)) {
+        onPullMidOut();
       }
+      // clearing the timeline shortly after giving the command to revers to prevent errors
+      currentState.current = null;
     },
     {
       scope: tainer,

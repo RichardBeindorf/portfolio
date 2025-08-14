@@ -5,7 +5,7 @@ import { permanentMarker, oswald300, oswald500 } from "../styles/font";
 import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import Entry from "./Entry";
+import Entry from "./entry";
 
 export type TitleProps = {
   currentWindow: number[];
@@ -61,6 +61,8 @@ export default function Story({
   const defaultPositionTest = (pos: number) => pos === 0;
   const pullDuration = 1;
   const titleDuration = 1;
+  const topDistanceTitle = "54%";
+  const leftDistanceTitle = "24%";
 
   const entryData = [
     [
@@ -98,7 +100,8 @@ export default function Story({
         });
         storyTimeline.current
           .to(tainer.current, {
-            top: "60%",
+            top: topDistanceTitle,
+            left: leftDistanceTitle,
             duration: titleDuration,
             delay: animationTime,
           })
@@ -146,6 +149,7 @@ export default function Story({
         // Only reverse if not clicked AND back to default window position
         gsap.to(tainer.current, {
           top: "85%",
+          left: "50%",
           duration: titleDuration,
           ease: "power4.out",
           onStart: () => {
@@ -168,6 +172,7 @@ export default function Story({
         if (!currentState.current) {
           currentState.current = gsap.to(tainer.current, {
             scale: 0.1,
+            display: "none",
             rotate: -30,
             left: "10%",
             top: "70%",
@@ -187,6 +192,7 @@ export default function Story({
           currentState.current = gsap.to(tainer.current, {
             scale: 0.1,
             rotate: 30,
+            display: "none",
             left: "90%",
             top: "70%",
             duration: pullDuration,
@@ -200,6 +206,21 @@ export default function Story({
         }
       });
 
+      const onPullMidOut = contextSafe(() => {
+        const midOut = gsap.to(tainer.current, {
+          display: "block",
+          duration: animationTime + 1,
+          ease: "power4.out",
+          scale: 1,
+          top: "85%",
+          left: "50%",
+          opacity: 1,
+          rotate: 0,
+        });
+
+        return midOut;
+      });
+
       if (currentWindow[0] === 1) {
         onPullLeft();
       } else if (currentWindow[2] === 1) {
@@ -208,7 +229,8 @@ export default function Story({
         currentState.current &&
         currentWindow.every(defaultPositionTest)
       ) {
-        currentState.current.reverse();
+        console.log("HELLO?");
+        onPullMidOut;
       }
     },
     {
