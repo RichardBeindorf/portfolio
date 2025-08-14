@@ -169,41 +169,33 @@ export default function Story({
       //**//
 
       const onPullLeft = contextSafe(() => {
-        if (!currentState.current) {
-          currentState.current = gsap.to(tainer.current, {
-            scale: 0.1,
-            display: "none",
-            rotate: -30,
-            left: "10%",
-            top: "70%",
-            duration: pullDuration,
-            ease: "power4.out",
-            onReverseComplete: () => {
-              currentState.current = null; // Clear ref when animation reverses
-            },
-          });
-        } else {
-          currentState.current.play();
-        }
+        gsap.to(tainer.current, {
+          scale: 0.1,
+          display: "none",
+          rotate: -30,
+          left: "10%",
+          top: "70%",
+          duration: pullDuration,
+          ease: "power4.out",
+          onReverseComplete: () => {
+            currentState.current = null; // Clear ref when animation reverses
+          },
+        });
       });
 
       const onPullRight = contextSafe(() => {
-        if (!currentState.current) {
-          currentState.current = gsap.to(tainer.current, {
-            scale: 0.1,
-            rotate: 30,
-            display: "none",
-            left: "90%",
-            top: "70%",
-            duration: pullDuration,
-            ease: "power4.in",
-            onReverseComplete: () => {
-              currentState.current = null; // Clear ref when animation reverses
-            },
-          });
-        } else {
-          currentState.current.play();
-        }
+        gsap.to(tainer.current, {
+          scale: 0.1,
+          rotate: 30,
+          display: "none",
+          left: "90%",
+          top: "70%",
+          duration: pullDuration,
+          ease: "power4.in",
+          onReverseComplete: () => {
+            currentState.current = null; // Clear ref when animation reverses
+          },
+        });
       });
 
       const onPullMidOut = contextSafe(() => {
@@ -229,8 +221,7 @@ export default function Story({
         currentState.current &&
         currentWindow.every(defaultPositionTest)
       ) {
-        console.log("HELLO?");
-        onPullMidOut;
+        onPullMidOut();
       }
     },
     {
