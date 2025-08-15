@@ -284,7 +284,6 @@ export default function Story({
             setClicked(next);
             setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
             isAnimating.current = true;
-            console.log(isAnimating.current, currentWindow);
           }
         }}
         ref={title}

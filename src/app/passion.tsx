@@ -111,11 +111,12 @@ export default function Passion({
           currentState.current = gsap.to(tainer.current, {
             scale: 0.1,
             rotate: 30,
+            display: "none",
             left: "50%",
             top: "85%",
             duration: pullDuration,
             ease: "power4.in",
-            onReverseComplete: () => {
+            onComplete: () => {
               currentState.current = null; // Clear ref when animation reverses
             },
           });
@@ -129,11 +130,12 @@ export default function Passion({
           currentState.current = gsap.to(tainer.current, {
             scale: 0.1,
             rotate: 30,
+            display: "none",
             left: "90%",
             top: "70%",
             duration: pullDuration,
             ease: "power4.in",
-            onReverseComplete: () => {
+            onComplete: () => {
               currentState.current = null; // Clear ref when animation reverses
             },
           });
@@ -142,15 +144,26 @@ export default function Passion({
         }
       });
 
+      const onPullBack = contextSafe(() => {
+        const midOut = gsap.to(tainer.current, {
+          display: "block",
+          duration: animationTime + 1,
+          ease: "power4.out",
+          scale: 1,
+          top: "70%",
+          left: "10%",
+          opacity: 1,
+          rotate: 0,
+        });
+        return midOut;
+      });
+
       if (currentWindow[1] === 1) {
         onPullMid();
       } else if (currentWindow[2] === 1) {
         onPullRight();
-      } else if (
-        currentState.current &&
-        currentWindow.every(defaultPositionTest)
-      ) {
-        currentState.current.reverse();
+      } else if (currentWindow.every(defaultPositionTest)) {
+        onPullBack();
       }
     },
     {

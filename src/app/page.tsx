@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { ReactElement, useEffect, useRef } from "react";
 import styled from "styled-components";
 import CameraSetup from "./cameraSetup";
 import { permanentMarker } from "../styles/font";
@@ -11,6 +11,14 @@ import LowerHalf from "./lowerHalf";
 
 export default function Home() {
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
+  const titleRef = useRef(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      titleRef.current.style.transition = "opacity 1s ease-out";
+      titleRef.current.style.opacity = "0";
+    }, 3000);
+  }, []);
 
   return (
     <WelcomeMain id="smooth-wrapper">
@@ -23,7 +31,7 @@ export default function Home() {
           </Canvas>
         </CanvasWrapper>
         <TopHalf>
-          <Title style={permanentMarker.style}>
+          <Title ref={titleRef} style={permanentMarker.style}>
             Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based
             in Hamburg
           </Title>
