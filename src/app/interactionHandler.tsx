@@ -10,7 +10,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ThreeLineMethods } from "@/components/threeLine";
-import { screenData } from "@/components/newThought";
 
 export default function InteractionHandler({
   lineApiRef,
@@ -23,7 +22,6 @@ export default function InteractionHandler({
   const currentHalf = useRef<"top" | "bottom">(null);
   const bouncyMovement = useRef(0);
   const pageScrollGuard = useRef(false);
-  // const thoughtRef = useRef([]);
 
   useGSAP(() => {
     if (!lineApiRef.current) return;
@@ -33,14 +31,6 @@ export default function InteractionHandler({
       ScrollTrigger,
       ScrollSmoother
     );
-
-    let smoother = ScrollSmoother.create({
-      wrapper: "#smooth-wrapper",
-      content: "#smooth-content",
-      smooth: 1,
-      effects: false,
-      smoothTouch: 0.1,
-    });
 
     // This is our function to add a point to the line.
     // It takes viewport coordinates and correctly converts them to 3D world space.
@@ -58,24 +48,13 @@ export default function InteractionHandler({
       lineApiRef.current.addPoint(vector);
     };
 
-    screenData.forEach((coord) => {
-      addPointAt(coord[0], coord[1]);
+    let smoother = ScrollSmoother.create({
+      wrapper: "#smooth-wrapper",
+      content: "#smooth-content",
+      smooth: 1,
+      effects: false,
+      smoothTouch: 0.1,
     });
-
-    // DELETE WHEN DONE
-    // const addthoughts = (clientX: number, clientY: number) => {
-    //   const pointerXOnCanvas = clientX;
-    //   const pointerYOnCanvas = clientY;
-
-    //   const ndcX = (pointerXOnCanvas / size.width) * 2 - 1;
-    //   const ndcY = -(pointerYOnCanvas / size.height) * 2 + 1;
-
-    //   const vector = new THREE.Vector3(ndcX, ndcY, 0);
-    //   vector.unproject(camera);
-    //   thoughtRef.current.push(vector);
-    // };
-
-    // console.log(thoughtRef.current);
 
     const observer = Observer.create({
       target: window,

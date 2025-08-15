@@ -1,3 +1,27 @@
+import { useRef } from "react";
+
+type Coords = [number, number][];
+
+export function ThoughtSVG(coords: Coords) {
+  const counter = useRef<number>(0);
+  return (
+    <svg>
+      {coords.map((coord, i) => {
+        counter.current++;
+        if (counter.current % 2 !== 1 || coords[i + 1] === undefined) return;
+        return (
+          <line
+            x1={coord[0]}
+            x2={coords[i + 1][0]}
+            y1={coord[1]}
+            y2={coords[i + 1][1]}
+          ></line>
+        );
+      })}
+    </svg>
+  );
+}
+
 export const screenData = [
   [559.0364990234375, 439.748291015625],
   [559.73095703125, 441.83160400390625],
