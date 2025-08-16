@@ -1,15 +1,45 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import styled from "styled-components";
+
+const StyledThoughts = styled.svg`
+  position: absolute;
+  top: 23%;
+  opacity: 0;
+
+  @media only screen and (max-height: 830px) {
+    transform: translateY(-15%);
+  }
+
+  @media only screen and (max-height: 530px) {
+    transform: translateY(-40%);
+  }
+`;
 
 export function ThoughtSVG() {
-  const counter = useRef<number>(0);
+  const thoughtRef = useRef<SVGSVGElement | null>(null);
+  useEffect(() => {
+    setTimeout(() => {
+      thoughtRef.current.style.transition = "opacity 1s ease-out";
+      thoughtRef.current.style.opacity = "1";
+    }, 3000);
+  }, []);
+
   return (
-    <svg>
+    <StyledThoughts
+      ref={thoughtRef}
+      width="75"
+      height="47"
+      viewBox="498 416 84 56"
+      style={{
+        position: "absolute",
+        top: "23%",
+      }}
+    >
       {screenData.map((coord, i) => {
-        counter.current++;
-        if (counter.current % 2 !== 1 || screenData[i + 1] === undefined)
-          return;
+        // counter++;
+        if (screenData[i + 1] === undefined) return null;
         return (
           <line
             key={i}
@@ -17,10 +47,14 @@ export function ThoughtSVG() {
             x2={screenData[i + 1][0]}
             y1={coord[1]}
             y2={screenData[i + 1][1]}
+            stroke="#F24150"
+            fill="none"
+            strokeWidth={2.5}
+            strokeLinecap="round"
           />
         );
       })}
-    </svg>
+    </StyledThoughts>
   );
 }
 
@@ -661,11 +695,6 @@ export const screenData = [
   [533.2595825195312, 453.5981140136719],
   [533.2595825195312, 453.88458251953125],
   [532.990478515625, 453.88458251953125],
-  [532.990478515625, 454.1406555175781],
-  [587.9080200195312, 443.8020935058594],
-  [703.5938110351562, 429.2274475097656],
-  [835.5729370117188, 422.9383850097656],
-  [963.1771240234375, 416.857666015625],
 ];
 
 const worldData = [

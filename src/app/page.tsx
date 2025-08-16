@@ -13,6 +13,7 @@ import { ThoughtSVG } from "@/components/newThought";
 export default function Home() {
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const titleRef = useRef(null);
+  // const thoughtRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
     setTimeout(() => {

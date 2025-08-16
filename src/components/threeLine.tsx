@@ -24,14 +24,14 @@ function ThreeLine({
   const waveDist = useRef([]);
   const MAX_POINTS = 5000;
 
-  useEffect(() => {
-    const thoughtData = ThreeThoughts();
-    thoughtData.forEach((thought) => {
-      if (thought) {
-        points.current.push(thought);
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   const thoughtData = ThreeThoughts();
+  //   thoughtData.forEach((thought) => {
+  //     if (thought) {
+  //       points.current.push(thought);
+  //     }
+  //   });
+  // }, []);
 
   const line2Geometry = useMemo(() => {
     const geom = new LineGeometry();
