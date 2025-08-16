@@ -1,21 +1,23 @@
+"use client";
+
 import { useRef } from "react";
 
-type Coords = [number, number][];
-
-export function ThoughtSVG(coords: Coords) {
+export function ThoughtSVG() {
   const counter = useRef<number>(0);
   return (
     <svg>
-      {coords.map((coord, i) => {
+      {screenData.map((coord, i) => {
         counter.current++;
-        if (counter.current % 2 !== 1 || coords[i + 1] === undefined) return;
+        if (counter.current % 2 !== 1 || screenData[i + 1] === undefined)
+          return;
         return (
           <line
+            key={i}
             x1={coord[0]}
-            x2={coords[i + 1][0]}
+            x2={screenData[i + 1][0]}
             y1={coord[1]}
-            y2={coords[i + 1][1]}
-          ></line>
+            y2={screenData[i + 1][1]}
+          />
         );
       })}
     </svg>

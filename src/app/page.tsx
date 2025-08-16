@@ -1,5 +1,5 @@
 "use client";
-import React, { ReactElement, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import CameraSetup from "./cameraSetup";
 import { permanentMarker } from "../styles/font";
@@ -8,6 +8,7 @@ import InteractionHandler from "./interactionHandler";
 import ScribbleFigure from "@/components/scribbleFigure";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
 import LowerHalf from "./lowerHalf";
+import { ThoughtSVG } from "@/components/newThought";
 
 export default function Home() {
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
@@ -35,6 +36,7 @@ export default function Home() {
             Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based
             in Hamburg
           </Title>
+          <ThoughtSVG />
           <ScribbleFigure />
         </TopHalf>
         <LowerHalf />
