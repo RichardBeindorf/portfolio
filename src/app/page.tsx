@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import CameraSetup from "./cameraSetup";
 import { permanentMarker } from "../styles/font";
@@ -8,9 +8,20 @@ import InteractionHandler from "./interactionHandler";
 import ScribbleFigure from "@/components/scribbleFigure";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
 import LowerHalf from "./lowerHalf";
+import { ThoughtSVG } from "@/components/thoughtSVG";
 
 export default function Home() {
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
+  const titleRef = useRef(null);
+  const drawDelay = 3000;
+  // const thoughtRef = useRef<SVGSVGElement | null>(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      titleRef.current.style.transition = "opacity 1s ease-out";
+      titleRef.current.style.opacity = "0";
+    }, drawDelay);
+  }, []);
 
   return (
     <WelcomeMain id="smooth-wrapper">
@@ -18,16 +29,20 @@ export default function Home() {
         <CanvasWrapper>
           <Canvas orthographic>
             <CameraSetup />
-            <ThreeLine lineApiRef={threeLineRef} />
-            <InteractionHandler lineApiRef={threeLineRef} />
+            <ThreeLine lineApiRef={threeLineRef} drawDelay={drawDelay} />
+            <InteractionHandler
+              lineApiRef={threeLineRef}
+              drawDelay={drawDelay}
+            />
           </Canvas>
         </CanvasWrapper>
         <TopHalf>
-          <Title style={permanentMarker.style}>
+          <Title ref={titleRef} style={permanentMarker.style}>
             Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based
             in Hamburg
           </Title>
-          <ScribbleFigure />
+          <ThoughtSVG drawDelay={drawDelay} />
+          <ScribbleFigure drawDelay={drawDelay} />
         </TopHalf>
         <LowerHalf />
       </SmoothWrapper>
@@ -72,5 +87,6 @@ const Title = styled.h1`
   mix-blend-mode: normal;
   font-size: clamp(2vw, 3rem, 4.5vw);
   text-align: center;
+  cursor: pointer;
   z-index: 3;
 `;

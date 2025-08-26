@@ -1,15 +1,34 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 const Figure = styled.svg`
   position: absolute;
+  opacity: 0;
   /* mix-blend-mode: color-burn; */
   z-index: 2;
 `;
 
-export default function ScribbleFigure() {
+export default function ScribbleFigure({ drawDelay }: { drawDelay: number }) {
+  const scribbleRef = useRef(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      scribbleRef.current.style.transition = "opacity 3s ease-in";
+      scribbleRef.current.style.opacity = "1";
+    }, drawDelay);
+  }, []);
+
   return (
     <>
-      <Figure width="117" height="161" viewBox="0 0 117 161" fill="none">
+      <Figure
+        ref={scribbleRef}
+        width="117"
+        height="161"
+        viewBox="0 0 117 161"
+        fill="none"
+      >
         <g id="Figure">
           <path
             id="Vector 18"
