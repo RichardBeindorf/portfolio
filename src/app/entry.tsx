@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import { permanentMarker, oswald300 } from "../styles/font";
 
-const EntryWrapper = styled.div`
+export const EntryWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: start;

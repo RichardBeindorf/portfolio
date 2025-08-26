@@ -6,6 +6,7 @@ import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Entry from "./entry";
+import { entryData } from "@/data/storyEntries";
 
 export type TitleProps = {
   currentWindow: number[];
@@ -13,36 +14,6 @@ export type TitleProps = {
   animationTime: number;
   isAnimating: RefObject<boolean>;
 };
-
-export const ChapterContainer = styled.section`
-  position: absolute;
-  top: 85%;
-  left: 50%;
-  transform: translateX(-50%);
-  mix-blend-mode: normal;
-  padding: 15px;
-  border-radius: 15px;
-`;
-
-export const ChapterTitle = styled.h1`
-  color: var(--foreground);
-  mix-blend-mode: normal;
-  font-size: clamp(2vw, 3rem, 4.5vw);
-  text-align: center;
-  user-select: none;
-
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const Intro = styled.h2`
-  min-width: max-content;
-`;
-
-const EntryList = styled.div`
-  margin-top: 30px;
-`;
 
 export default function Story({
   currentWindow,
@@ -63,26 +34,6 @@ export default function Story({
   const titleDuration = 1;
   const topDistanceTitle = "54%";
   const leftDistanceTitle = "24%";
-
-  const entryData = [
-    [
-      "From a disillusioned logistics trainee to become an aspiring actor ..",
-      "2008",
-    ],
-    [
-      "From dreaming actor to a curios student of the Media- and Communication Science ..",
-      "2013",
-    ],
-    [
-      "On to craft mind blowing video advertisments and find a way into film making ..",
-      "2016",
-    ],
-    ["To tipping his toes into the corporate jungle ..", "2024"],
-    [
-      "and .. finally .. realizing his full potential in web development",
-      "now",
-    ],
-  ];
 
   const { contextSafe } = useGSAP(
     () => {
@@ -307,3 +258,34 @@ export default function Story({
     </ChapterContainer>
   );
 }
+
+export const ChapterContainer = styled.section`
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+  mix-blend-mode: normal;
+  padding: 15px;
+  border-radius: 15px;
+`;
+
+export const ChapterTitle = styled.h1`
+  color: var(--foreground);
+  mix-blend-mode: normal;
+  font-size: clamp(2vw, 3rem, 4.5vw);
+  text-align: center;
+  user-select: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+export const Intro = styled.h2`
+  min-width: max-content;
+  color: var(--foreground);
+`;
+
+export const EntryList = styled.div`
+  margin-top: 30px;
+`;

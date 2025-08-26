@@ -1,18 +1,18 @@
 "use client";
 
 import styled from "styled-components";
-import { ChapterContainer, ChapterTitle, TitleProps } from "./story";
-import { permanentMarker } from "@/styles/font";
+import {
+  ChapterContainer,
+  ChapterTitle,
+  EntryList,
+  Intro,
+  TitleProps,
+} from "./story";
+import { oswald300, permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-
-const PassionContainer = styled(ChapterContainer)`
-  top: 70%;
-  left: 90%;
-`;
-
-const Title = styled(ChapterTitle)``;
+import { EntryWrapper } from "./entry";
 
 export default function Work({
   currentWindow,
@@ -110,6 +110,7 @@ export default function Work({
           display: "block",
           duration: animationTime + 1,
           ease: "power4.out",
+          fontSize: "clamp(8vw, 6rem, 11vw)",
           scale: 1,
           top: "70%",
           left: "90%",
@@ -182,6 +183,84 @@ export default function Work({
       <Title style={permanentMarker.style} ref={title}>
         Work
       </Title>
+      {clicked ? (
+        <PassionEntryWrapper>
+          <Intro style={permanentMarker.style}>What have i done ... ?</Intro>
+          <TopicWrapper>
+            <Topic style={permanentMarker.style}>Leapout</Topic>
+            <Text style={oswald300.style}>
+              This was my first major Milestone, a fully functional Activity
+              App, with location planning, activity database, weather report and
+              much more! check it out:
+              <IFrame
+                width="400"
+                height="768"
+                src="https://activities-app-kappa.vercel.app/"
+              ></IFrame>
+              <Highlights></Highlights>
+            </Text>
+          </TopicWrapper>
+          <TopicWrapper>
+            <Topic style={permanentMarker.style}>App-Hub</Topic>
+            <Text>
+              Here we go, i had the honor of creating the first customer related
+              entry point for Buildlinx, the App-Hub connects all future
+              customers with the Buildlinx universe and accumulates all necesary
+              applications for the users and devs based on roles and rights.
+              Design done by
+            </Text>
+          </TopicWrapper>
+          <TopicWrapper>
+            <Topic style={permanentMarker.style}>
+              Building-Management System
+            </Topic>
+            <Text>
+              My biggest project yet, as part of a mandatory software i fully
+              autonomously designed the appearance and implemented it in this
+              rather difficult to code environment. It includes the
+              visualisation and navigation to all the propperties a customer has
+              from a global level down to the tiniest room of a building floor.
+              Sadly it cannto show any of the result because of a NDA.
+            </Text>
+          </TopicWrapper>
+        </PassionEntryWrapper>
+      ) : null}
     </PassionContainer>
   );
 }
+
+const Topic = styled.h3`
+  font-size: 1rem;
+  color: var(--textAccent);
+`;
+const Text = styled.p`
+  font-size: 1rem;
+  color: var(--foreground);
+`;
+const Highlights = styled.span`
+  color: var(--textAccent);
+`;
+
+const IFrame = styled.iframe`
+  transform: scale(0.5);
+`;
+
+const PassionContainer = styled(ChapterContainer)`
+  top: 70%;
+  left: 90%;
+`;
+
+const Title = styled(ChapterTitle)``;
+
+const TopicWrapper = styled(EntryList)``;
+
+const PassionEntryWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0px;
+  background-color: var(--background);
+`;

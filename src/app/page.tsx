@@ -83,5 +83,6 @@ const Title = styled.h1`
   mix-blend-mode: normal;
   font-size: clamp(2vw, 3rem, 4.5vw);
   text-align: center;
+  cursor: pointer;
   z-index: 3;
 `;

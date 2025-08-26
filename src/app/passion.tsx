@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { ChapterContainer, ChapterTitle, TitleProps } from "./story";
-import { permanentMarker } from "@/styles/font";
+import { oswald300, oswald500, permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -8,6 +8,7 @@ import gsap from "gsap";
 const PassionContainer = styled(ChapterContainer)`
   left: 10%;
   top: 70%;
+  transform: translateX(0%);
 `;
 
 const Title = styled(ChapterTitle)``;
@@ -149,6 +150,7 @@ export default function Passion({
           display: "block",
           duration: animationTime + 1,
           ease: "power4.out",
+          fontSize: "clamp(8vw, 6rem, 11vw)",
           scale: 1,
           top: "70%",
           left: "10%",
@@ -189,6 +191,73 @@ export default function Passion({
       >
         Passion
       </Title>
+
+      {clicked ? (
+        <PassionContent>
+          <Subtitle style={permanentMarker.style}>
+            What is it that makes me passionate?
+          </Subtitle>
+          <TopicWrapper style={{ textAlign: "left" }}>
+            <Topic style={permanentMarker.style}>Creation</Topic>
+            <Text style={oswald300.style}>
+              the realization of{" "}
+              <Highlights style={oswald500.style}>
+                endless possibilities
+              </Highlights>{" "}
+              is what made me obsessed with{" "}
+              <Highlights style={oswald500.style}>programming</Highlights> -
+              what great we can achieve when setting our minds to it
+            </Text>
+          </TopicWrapper>
+          <TopicWrapper style={{ textAlign: "right" }}>
+            <Topic style={permanentMarker.style}>life long learning</Topic>
+            <Text style={oswald300.style}>
+              being able to keep learning is an{" "}
+              <Highlights style={oswald500.style}>
+                escape hatch out of mental stiffness
+              </Highlights>{" "}
+              - trying hard to understand new concepts opens my mind
+            </Text>
+          </TopicWrapper>
+          <TopicWrapper style={{ textAlign: "left" }}>
+            <Topic style={permanentMarker.style}>Mastery</Topic>
+            <Text style={oswald300.style}>
+              trying to keep my perfectionism in the bottle and funneling the
+              energy instead into{" "}
+              <Highlights style={oswald500.style}>training skills</Highlights>{" "}
+              rather than micro optimizations is pushing me - in sports,
+              relationships and work
+            </Text>
+          </TopicWrapper>
+          <TopicWrapper style={{ textAlign: "right" }}>
+            <Topic style={permanentMarker.style}>Discovery</Topic>
+            <Text style={oswald300.style}>
+              getting out of my{" "}
+              <Highlights style={oswald500.style}>comfort areas</Highlights> -
+              if it didn't scare me it probably didn't improve my life
+            </Text>
+          </TopicWrapper>
+        </PassionContent>
+      ) : null}
     </PassionContainer>
   );
 }
+
+const PassionContent = styled.div``;
+const TopicWrapper = styled.div``;
+const Subtitle = styled.h2`
+  width: 200px;
+  font-size: 1rem;
+  color: var(--foreground);
+`;
+const Topic = styled.h3`
+  font-size: 1rem;
+  color: var(--textAccent);
+`;
+const Text = styled.p`
+  font-size: 1rem;
+  color: var(--foreground);
+`;
+const Highlights = styled.span`
+  color: var(--textAccent);
+`;
