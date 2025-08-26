@@ -39,6 +39,7 @@ export default function InteractionHandler({
 
       const pointerXOnCanvas = clientX;
       const pointerYOnCanvas = clientY + smoother.scrollTop();
+      console.log(clientX, clientY);
 
       const ndcX = (pointerXOnCanvas / size.width) * 2 - 1;
       const ndcY = -(pointerYOnCanvas / size.height) * 2 + 1;

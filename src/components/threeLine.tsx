@@ -6,7 +6,6 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import * as THREE from "three";
-import ThreeThoughts from "./threeThoughts";
 
 export interface ThreeLineMethods {
   addPoint: (point: THREE.Vector3) => void;
@@ -17,21 +16,36 @@ function ThreeLine({
 }: {
   lineApiRef: React.RefObject<ThreeLineMethods | null>;
 }) {
-  const { size } = useThree();
+  const { size, camera } = useThree();
   const line2Ref = useRef<Line2>(null);
+  // const startingPos = new THREE.Vector3(0, 250, 0);
   const points = useRef<THREE.Vector3[]>([]);
   const triggerThreshold = useRef<number[]>([]);
   const waveDist = useRef([]);
   const MAX_POINTS = 5000;
 
-  // useEffect(() => {
-  //   const thoughtData = ThreeThoughts();
-  //   thoughtData.forEach((thought) => {
-  //     if (thought) {
-  //       points.current.push(thought);
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => {
+    // old thoughts converted in actual line
+    // const thoughtData = ThreeThoughts();
+    // thoughtData.forEach((thought) => {
+    //   if (thought) {
+    //     points.current.push(thought);
+    //   }
+    // });
+
+    if (points.current) {
+      // Logic for setting up line starting position
+      const offset = 0.95;
+      const topHalfYMidPoint = (size.height / 4) * offset;
+      const topHalfXMidPoint = size.width / 2;
+      const ndcX = (topHalfXMidPoint / size.width) * 2 - 1;
+      const ndcY = -(topHalfYMidPoint / size.height) * 2 + 1;
+      console.log("check", ndcY);
+      const vector = new THREE.Vector3(ndcX, ndcY, 0);
+      vector.unproject(camera);
+      points.current.push(vector);
+    }
+  }, []);
 
   const line2Geometry = useMemo(() => {
     const geom = new LineGeometry();
@@ -69,6 +83,8 @@ function ThreeLine({
       line2Geometry.setDrawRange(0, 0);
       return;
     }
+
+    console.log(points.current);
 
     const worldPoints = points.current;
     const pointsToDraw = worldPoints.slice(
