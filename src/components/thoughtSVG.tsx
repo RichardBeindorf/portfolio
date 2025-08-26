@@ -17,13 +17,13 @@ const StyledThoughts = styled.svg`
   }
 `;
 
-export function ThoughtSVG() {
+export function ThoughtSVG({ drawDelay }: { drawDelay: number }) {
   const thoughtRef = useRef<SVGSVGElement | null>(null);
   useEffect(() => {
     setTimeout(() => {
       thoughtRef.current.style.transition = "opacity 1s ease-out";
       thoughtRef.current.style.opacity = "1";
-    }, 3000);
+    }, drawDelay);
   }, []);
 
   return (

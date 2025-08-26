@@ -8,18 +8,19 @@ import InteractionHandler from "./interactionHandler";
 import ScribbleFigure from "@/components/scribbleFigure";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
 import LowerHalf from "./lowerHalf";
-import { ThoughtSVG } from "@/components/newThought";
+import { ThoughtSVG } from "@/components/thoughtSVG";
 
 export default function Home() {
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const titleRef = useRef(null);
+  const drawDelay = 3000;
   // const thoughtRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
     setTimeout(() => {
       titleRef.current.style.transition = "opacity 1s ease-out";
       titleRef.current.style.opacity = "0";
-    }, 3000);
+    }, drawDelay);
   }, []);
 
   return (
@@ -28,8 +29,11 @@ export default function Home() {
         <CanvasWrapper>
           <Canvas orthographic>
             <CameraSetup />
-            <ThreeLine lineApiRef={threeLineRef} />
-            <InteractionHandler lineApiRef={threeLineRef} />
+            <ThreeLine lineApiRef={threeLineRef} drawDelay={drawDelay} />
+            <InteractionHandler
+              lineApiRef={threeLineRef}
+              drawDelay={drawDelay}
+            />
           </Canvas>
         </CanvasWrapper>
         <TopHalf>
@@ -37,8 +41,8 @@ export default function Home() {
             Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based
             in Hamburg
           </Title>
-          <ThoughtSVG />
-          <ScribbleFigure />
+          <ThoughtSVG drawDelay={drawDelay} />
+          <ScribbleFigure drawDelay={drawDelay} />
         </TopHalf>
         <LowerHalf />
       </SmoothWrapper>

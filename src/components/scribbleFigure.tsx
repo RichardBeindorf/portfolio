@@ -10,14 +10,14 @@ const Figure = styled.svg`
   z-index: 2;
 `;
 
-export default function ScribbleFigure() {
+export default function ScribbleFigure({ drawDelay }: { drawDelay: number }) {
   const scribbleRef = useRef(null);
 
   useEffect(() => {
     setTimeout(() => {
       scribbleRef.current.style.transition = "opacity 3s ease-in";
       scribbleRef.current.style.opacity = "1";
-    }, 3000);
+    }, drawDelay);
   }, []);
 
   return (

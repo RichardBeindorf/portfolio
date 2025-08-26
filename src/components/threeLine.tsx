@@ -13,8 +13,10 @@ export interface ThreeLineMethods {
 
 function ThreeLine({
   lineApiRef,
+  drawDelay,
 }: {
   lineApiRef: React.RefObject<ThreeLineMethods | null>;
+  drawDelay: number;
 }) {
   const { size, camera } = useThree();
   const line2Ref = useRef<Line2>(null);
