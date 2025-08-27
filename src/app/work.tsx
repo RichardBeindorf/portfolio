@@ -29,6 +29,42 @@ export default function Work({
   const topDistanceTitle = "54%";
   const leftDistanceTitle = "24%";
   const titleDuration = 1;
+  const entriesRef = useRef(null);
+  const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
+  const [showEntries, setShowEntries] = useState(false);
+  const [currentProject, setCurrentProject] = useState(0);
+  const color = useRef("unset");
+
+  if (clicked) {
+    color.current = "#F2F1E9";
+  } else {
+    color.current = "unset";
+  }
+
+  const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
+
+  const prevProject = () =>
+    setCurrentProject((p) => (p - 1 + projects.length) % projects.length);
+
+  const projects = [
+    {
+      title: "Leapout",
+      description:
+        "This was my first major milestone, a fully functional Activity App with location planning, activity database, weather report and much more!",
+      iframe: "https://activities-app-kappa.vercel.app/",
+    },
+    {
+      title: "App-Hub",
+      description:
+        "I had the honor of creating the first customer-related entry point for Buildlinx. The App-Hub connects all customers with the Buildlinx universe and accumulates all necessary applications for users and devs based on roles and rights.",
+      images: ["/AppHubOne.png", "/AppHubTwo.png"],
+    },
+    {
+      title: "Building-Management System",
+      description:
+        "My biggest project yet, designed and implemented in a complex environment. It includes visualization and navigation across properties from a global level down to the smallest rooms of a building floor. All rooms show information about temperature, humidity and co2 levels. (NDA protected)",
+    },
+  ];
 
   const { contextSafe } = useGSAP(
     () => {
@@ -43,6 +79,7 @@ export default function Work({
           // making sure the animation state is preserved all the way so we can disable any click animation while its on
           onComplete: () => {
             isAnimating.current = false;
+            setShowEntries(true);
           },
           onReverseComplete: () => {
             isAnimating.current = false;
@@ -168,99 +205,216 @@ export default function Work({
     }
   );
 
+  useGSAP(
+    () => {
+      const items = entriesRef.current
+        ? entriesRef.current.querySelectorAll("div")
+        : [];
+      console.log(items);
+      let shift;
+
+      if (!entryStaggerAnimation.current && items.length > 0) {
+        entryStaggerAnimation.current = gsap.from(items, {
+          opacity: 0,
+          y: 20,
+          stagger: 0.03,
+          duration: 0.2,
+          ease: "power2.out",
+          paused: true,
+          onReverseComplete: () => {
+            setShowEntries(false);
+          },
+        });
+      }
+      if (showEntries && entryStaggerAnimation.current) {
+        entryStaggerAnimation.current.play();
+      }
+      if (!clicked && isAnimating.current === true) {
+        entryStaggerAnimation.current.reverse();
+        entryStaggerAnimation.current = null;
+        // Animate the contentWrapper back up when entries are reversing out
+        shift = gsap.to(".contentWrapper", {
+          y: -60,
+          ease: "power2.out",
+          duration: 0.4,
+        });
+        shift.play();
+        shift.reverse();
+      }
+    },
+    {
+      scope: tainer,
+      dependencies: [showEntries, clicked],
+      revertOnUpdate: false,
+    }
+  );
+
   return (
-    <PassionContainer
-      onClick={() => {
-        if (isAnimating.current === false) {
-          const next = !clicked;
-          setClicked(next);
-          setCurrentWindow(next ? [0, 0, 1] : [0, 0, 0]);
-          isAnimating.current = true;
-        }
-      }}
-      ref={tainer}
-    >
-      <Title style={permanentMarker.style} ref={title}>
+    <WorkContainer $backgroundColor={color.current} ref={tainer}>
+      <Title
+        style={permanentMarker.style}
+        ref={title}
+        onClick={() => {
+          if (!isAnimating.current) {
+            const next = !clicked;
+            setClicked(next);
+            setCurrentWindow(next ? [0, 0, 1] : [0, 0, 0]);
+            isAnimating.current = true;
+          }
+        }}
+      >
         Work
       </Title>
-      {clicked ? (
-        <PassionEntryWrapper>
-          <Intro style={permanentMarker.style}>What have i done ... ?</Intro>
-          <TopicWrapper>
-            <Topic style={permanentMarker.style}>Leapout</Topic>
-            <Text style={oswald300.style}>
-              This was my first major Milestone, a fully functional Activity
-              App, with location planning, activity database, weather report and
-              much more! check it out:
-              <IFrame
-                width="400"
-                height="768"
-                src="https://activities-app-kappa.vercel.app/"
-              ></IFrame>
-              <Highlights></Highlights>
-            </Text>
-          </TopicWrapper>
-          <TopicWrapper>
-            <Topic style={permanentMarker.style}>App-Hub</Topic>
-            <Text>
-              Here we go, i had the honor of creating the first customer related
-              entry point for Buildlinx, the App-Hub connects all future
-              customers with the Buildlinx universe and accumulates all necesary
-              applications for the users and devs based on roles and rights.
-              Design done by
-            </Text>
-          </TopicWrapper>
+
+      {clicked && (
+        <WorkEntryWrapper ref={entriesRef}>
+          <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
+
           <TopicWrapper>
             <Topic style={permanentMarker.style}>
-              Building-Management System
+              {projects[currentProject].title}
             </Topic>
-            <Text>
-              My biggest project yet, as part of a mandatory software i fully
-              autonomously designed the appearance and implemented it in this
-              rather difficult to code environment. It includes the
-              visualisation and navigation to all the propperties a customer has
-              from a global level down to the tiniest room of a building floor.
-              Sadly it cannto show any of the result because of a NDA.
-            </Text>
+            <DetailWrapper>
+              <Text style={oswald300.style}>
+                {projects[currentProject].description}
+              </Text>
+              {projects[currentProject].iframe && (
+                <IFrameWrapper>
+                  <IFrame src={projects[currentProject].iframe} />
+                </IFrameWrapper>
+              )}
+              {/* Optional images */}
+              {projects[currentProject].images && (
+                <ImageGallery>
+                  {projects[currentProject].images.map((src, idx) => (
+                    <PreviewImage
+                      key={idx}
+                      src={src}
+                      alt={`${projects[currentProject].title} screenshot ${
+                        idx + 1
+                      }`}
+                    />
+                  ))}
+                </ImageGallery>
+              )}
+            </DetailWrapper>
           </TopicWrapper>
-        </PassionEntryWrapper>
-      ) : null}
-    </PassionContainer>
+
+          <NavButtons>
+            <button onClick={prevProject} style={permanentMarker.style}>
+              ◀ Prev
+            </button>
+            <button onClick={nextProject} style={permanentMarker.style}>
+              Next ▶
+            </button>
+          </NavButtons>
+        </WorkEntryWrapper>
+      )}
+    </WorkContainer>
   );
 }
 
-const Topic = styled.h3`
-  font-size: 1rem;
-  color: var(--textAccent);
-`;
-const Text = styled.p`
-  font-size: 1rem;
-  color: var(--foreground);
-`;
-const Highlights = styled.span`
-  color: var(--textAccent);
-`;
-
-const IFrame = styled.iframe`
-  transform: scale(0.5);
-`;
-
-const PassionContainer = styled(ChapterContainer)`
-  top: 70%;
-  left: 90%;
-`;
-
-const Title = styled(ChapterTitle)``;
-
-const TopicWrapper = styled(EntryList)``;
-
-const PassionEntryWrapper = styled.div`
+const WorkEntryWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: start;
-  align-items: center;
+  align-items: start;
   gap: 0.5rem;
   cursor: pointer;
   padding: 0px;
   background-color: var(--background);
+`;
+
+const WorkContainer = styled(ChapterContainer)`
+  top: 70%;
+  left: 90%;
+  text-align: left;
+  border: 0px solid black;
+  border-radius: 25px;
+`;
+
+const TopicWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+`;
+
+const DetailWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+`;
+
+const Topic = styled.h3`
+  font-size: 2rem;
+  color: var(--textAccent);
+`;
+const Text = styled.p`
+  font-size: 1.25rem;
+  color: var(--foreground);
+  padding: 0;
+  margin: 0;
+`;
+
+const IFrameWrapper = styled.div`
+  width: 280px; /* 400 * 0.7 */
+  height: 476px; /* 768 * 0.7 */
+  overflow: hidden;
+  border-radius: 15px;
+`;
+
+const IFrame = styled.iframe`
+  width: 400px;
+  height: 680px;
+  transform: scale(0.7);
+  transform-origin: top left;
+  border: none;
+`;
+
+const Title = styled(ChapterTitle)`
+  text-align: left;
+`;
+
+const Highlights = styled.span`
+  color: var(--textAccent);
+`;
+
+const NavButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  button {
+    background: var(--background);
+    color: var(--foreground);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--textAccent);
+    }
+  }
+`;
+
+const ImageGallery = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.7rem;
+  margin-top: 1rem;
+`;
+
+const PreviewImage = styled.img`
+  width: 35vw;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  object-fit: cover;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 `;

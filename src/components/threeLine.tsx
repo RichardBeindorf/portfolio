@@ -42,7 +42,6 @@ function ThreeLine({
       const topHalfXMidPoint = size.width / 2;
       const ndcX = (topHalfXMidPoint / size.width) * 2 - 1;
       const ndcY = -(topHalfYMidPoint / size.height) * 2 + 1;
-      console.log("check", ndcY);
       const vector = new THREE.Vector3(ndcX, ndcY, 0);
       vector.unproject(camera);
       points.current.push(vector);
@@ -85,8 +84,6 @@ function ThreeLine({
       line2Geometry.setDrawRange(0, 0);
       return;
     }
-
-    console.log(points.current);
 
     const worldPoints = points.current;
     const pointsToDraw = worldPoints.slice(

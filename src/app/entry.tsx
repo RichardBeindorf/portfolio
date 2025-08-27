@@ -9,6 +9,7 @@ export const EntryWrapper = styled.div`
   justify-content: start;
   align-items: center;
   gap: 0.5rem;
+  margin: 10px 0 10px 0;
   cursor: pointer;
   padding: 0px;
   background-color: rgba(242, 241, 233, 0);
@@ -31,6 +32,7 @@ const Bullet = styled.span`
 
 const EntryText = styled.p`
   width: max-content;
+  font-size: 1.5rem;
 `;
 
 const Year = styled.span`

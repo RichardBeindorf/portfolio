@@ -5,14 +5,6 @@ import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
-const PassionContainer = styled(ChapterContainer)`
-  left: 10%;
-  top: 70%;
-  transform: translateX(0%);
-`;
-
-const Title = styled(ChapterTitle)``;
-
 export default function Passion({
   currentWindow,
   setCurrentWindow,
@@ -29,6 +21,16 @@ export default function Passion({
   const topDistanceTitle = "54%";
   const leftDistanceTitle = "24%";
   const titleDuration = 1;
+  const entriesRef = useRef(null);
+  const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
+  const [showEntries, setShowEntries] = useState(false);
+  const color = useRef("unset");
+
+  if (clicked) {
+    color.current = "#F2F1E9";
+  } else {
+    color.current = "unset";
+  }
 
   const { contextSafe } = useGSAP(
     () => {
@@ -42,7 +44,7 @@ export default function Passion({
           duration: titleDuration,
           keyframes: {
             scaleX: ["100%", "80%", "100%"],
-            left: ["50%", "48%", "50%"],
+            // left: ["50%", "48%", "50%"],
             rotate: [0, -10, 0],
             easeEach: "none",
           },
@@ -65,6 +67,7 @@ export default function Passion({
           ease: "power4.out",
           onComplete: () => {
             isAnimating.current = false;
+            setShowEntries(true);
           },
           duration: titleDelay,
           delay: animationTime,
@@ -175,8 +178,55 @@ export default function Passion({
     }
   );
 
+  //**//
+  /* Staggered Animation of the Entries - Managed outside main GSAP context for clarity */
+  //**//
+  useGSAP(
+    () => {
+      const items = entriesRef.current
+        ? entriesRef.current.querySelectorAll("div")
+        : [];
+      console.log(items);
+      let shift;
+
+      if (!entryStaggerAnimation.current && items.length > 0) {
+        entryStaggerAnimation.current = gsap.from(items, {
+          opacity: 0,
+          y: 20,
+          stagger: 0.03,
+          duration: 0.2,
+          ease: "power2.out",
+          paused: true,
+          onReverseComplete: () => {
+            setShowEntries(false);
+          },
+        });
+      }
+      if (showEntries && entryStaggerAnimation.current) {
+        entryStaggerAnimation.current.play();
+      }
+      if (!clicked && isAnimating.current === true) {
+        entryStaggerAnimation.current.reverse();
+        entryStaggerAnimation.current = null;
+        // Animate the contentWrapper back up when entries are reversing out
+        shift = gsap.to(".contentWrapper", {
+          y: -60,
+          ease: "power2.out",
+          duration: 0.4,
+        });
+        shift.play();
+        shift.reverse();
+      }
+    },
+    {
+      scope: tainer,
+      dependencies: [showEntries, clicked],
+      revertOnUpdate: false,
+    }
+  );
+
   return (
-    <PassionContainer ref={tainer}>
+    <PassionContainer $backgroundColor={color.current} ref={tainer}>
       <Title
         style={permanentMarker.style}
         onClick={() => {
@@ -192,72 +242,93 @@ export default function Passion({
         Passion
       </Title>
 
-      {clicked ? (
-        <PassionContent>
-          <Subtitle style={permanentMarker.style}>
-            What is it that makes me passionate?
-          </Subtitle>
-          <TopicWrapper style={{ textAlign: "left" }}>
-            <Topic style={permanentMarker.style}>Creation</Topic>
-            <Text style={oswald300.style}>
-              the realization of{" "}
-              <Highlights style={oswald500.style}>
-                endless possibilities
-              </Highlights>{" "}
-              is what made me obsessed with{" "}
-              <Highlights style={oswald500.style}>programming</Highlights> -
-              what great we can achieve when setting our minds to it
-            </Text>
-          </TopicWrapper>
-          <TopicWrapper style={{ textAlign: "right" }}>
-            <Topic style={permanentMarker.style}>life long learning</Topic>
-            <Text style={oswald300.style}>
-              being able to keep learning is an{" "}
-              <Highlights style={oswald500.style}>
-                escape hatch out of mental stiffness
-              </Highlights>{" "}
-              - trying hard to understand new concepts opens my mind
-            </Text>
-          </TopicWrapper>
-          <TopicWrapper style={{ textAlign: "left" }}>
-            <Topic style={permanentMarker.style}>Mastery</Topic>
-            <Text style={oswald300.style}>
-              trying to keep my perfectionism in the bottle and funneling the
-              energy instead into{" "}
-              <Highlights style={oswald500.style}>training skills</Highlights>{" "}
-              rather than micro optimizations is pushing me - in sports,
-              relationships and work
-            </Text>
-          </TopicWrapper>
-          <TopicWrapper style={{ textAlign: "right" }}>
-            <Topic style={permanentMarker.style}>Discovery</Topic>
-            <Text style={oswald300.style}>
-              getting out of my{" "}
-              <Highlights style={oswald500.style}>comfort areas</Highlights> -
-              if it didn't scare me it probably didn't improve my life
-            </Text>
-          </TopicWrapper>
-        </PassionContent>
-      ) : null}
+      <PassionContent className="contentWrapper">
+        {clicked ? (
+          <div ref={entriesRef}>
+            <Subtitle style={permanentMarker.style}>
+              What is it that makes me passionate?
+            </Subtitle>
+            <TopicWrapper style={{ textAlign: "left" }}>
+              <Topic style={permanentMarker.style}>Creation</Topic>
+              <Text style={oswald300.style}>
+                the realization of{" "}
+                <Highlights style={oswald500.style}>
+                  endless possibilities
+                </Highlights>{" "}
+                is what made me obsessed with{" "}
+                <Highlights style={oswald500.style}>programming</Highlights> -
+                what great we can achieve when setting our minds to it
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "right" }}>
+              <Topic style={permanentMarker.style}>life long learning</Topic>
+              <Text style={oswald300.style}>
+                being able to keep learning is an{" "}
+                <Highlights style={oswald500.style}>
+                  escape hatch out of mental stiffness
+                </Highlights>{" "}
+                - trying hard to understand new concepts opens my mind
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "left" }}>
+              <Topic style={permanentMarker.style}>Mastery</Topic>
+              <Text style={oswald300.style}>
+                trying to keep my perfectionism in the bottle and funneling the
+                energy instead into{" "}
+                <Highlights style={oswald500.style}>training skills</Highlights>{" "}
+                rather than micro optimizations is pushing me - in sports,
+                relationships and work
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "right" }}>
+              <Topic style={permanentMarker.style}>Discovery</Topic>
+              <Text style={oswald300.style}>
+                getting out of my{" "}
+                <Highlights style={oswald500.style}>comfort areas</Highlights> -
+                if it didn't scare me it probably didn't improve my life
+              </Text>
+            </TopicWrapper>
+          </div>
+        ) : null}
+      </PassionContent>
     </PassionContainer>
   );
 }
 
+const PassionContainer = styled(ChapterContainer)`
+  left: 10%;
+  top: 70%;
+  background-color: var(--background);
+  border: 0px solid black;
+  border-radius: 25px;
+`;
+
+const Title = styled(ChapterTitle)`
+  text-align: left;
+`;
+
 const PassionContent = styled.div``;
-const TopicWrapper = styled.div``;
-const Subtitle = styled.h2`
-  width: 200px;
-  font-size: 1rem;
+
+const TopicWrapper = styled.div`
+  margin-top: 25px;
+`;
+
+const Subtitle = styled.div`
+  width: max-content;
+  font-size: 2rem;
   color: var(--foreground);
 `;
+
 const Topic = styled.h3`
-  font-size: 1rem;
+  font-size: 2rem;
   color: var(--textAccent);
 `;
+
 const Text = styled.p`
-  font-size: 1rem;
+  font-size: 1.25rem;
   color: var(--foreground);
 `;
+
 const Highlights = styled.span`
   color: var(--textAccent);
 `;

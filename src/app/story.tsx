@@ -33,7 +33,14 @@ export default function Story({
   const pullDuration = 1;
   const titleDuration = 1;
   const topDistanceTitle = "54%";
-  const leftDistanceTitle = "24%";
+  const leftDistanceTitle = "40%";
+  const color = useRef("unset");
+
+  if (clicked) {
+    color.current = "#F2F1E9";
+  } else {
+    color.current = "unset";
+  }
 
   const { contextSafe } = useGSAP(
     () => {
@@ -78,7 +85,7 @@ export default function Story({
           ease: "sine.in",
           keyframes: {
             scaleX: ["100%", "80%", "100%"],
-            left: ["50%", "48%", "50%"],
+            // left: ["50%", "48%", "50%"],
             rotate: [0, -10, 0],
             easeEach: "none",
           },
@@ -226,7 +233,7 @@ export default function Story({
   );
 
   return (
-    <ChapterContainer ref={tainer}>
+    <ChapterContainer $backgroundColor={color.current} ref={tainer}>
       <ChapterTitle
         style={permanentMarker.style}
         onClick={() => {
@@ -259,17 +266,22 @@ export default function Story({
   );
 }
 
-export const ChapterContainer = styled.section`
+export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   position: absolute;
   top: 85%;
   left: 50%;
+  text-align: center;
   transform: translateX(-50%);
   mix-blend-mode: normal;
   padding: 15px;
   border-radius: 15px;
+  background-color: ${(props) => props.$backgroundColor};
+  border: 0px solid black;
+  border-radius: 25px;
 `;
 
 export const ChapterTitle = styled.h1`
+  position: relative;
   color: var(--foreground);
   mix-blend-mode: normal;
   font-size: clamp(2vw, 3rem, 4.5vw);
@@ -281,8 +293,10 @@ export const ChapterTitle = styled.h1`
   }
 `;
 
-export const Intro = styled.h2`
-  min-width: max-content;
+export const Intro = styled.div`
+  width: max-content;
+  font-size: 2rem;
+  text-align: center;
   color: var(--foreground);
 `;
 
