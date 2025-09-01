@@ -17,6 +17,20 @@ export type TitleProps = {
   isAnimating: RefObject<boolean>;
 };
 
+export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  text-align: center;
+  transform: translateX(-50%);
+  mix-blend-mode: normal;
+  padding: 15px;
+  border-radius: 15px;
+  background-color: ${(props) => props.$backgroundColor};
+  border: 0px solid black;
+  border-radius: 25px;
+`;
+
 export default function Story({
   currentWindow,
   setCurrentWindow,
@@ -299,20 +313,6 @@ export default function Story({
     </ChapterContainer>
   );
 }
-
-export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
-  position: absolute;
-  top: 85%;
-  left: 50%;
-  text-align: center;
-  transform: translateX(-50%);
-  mix-blend-mode: normal;
-  padding: 15px;
-  border-radius: 15px;
-  background-color: ${(props) => props.$backgroundColor};
-  border: 0px solid black;
-  border-radius: 25px;
-`;
 
 export const ChapterTitle = styled.h1`
   position: relative;
