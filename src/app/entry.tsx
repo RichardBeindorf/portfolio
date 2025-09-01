@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { permanentMarker, oswald300, oswald400 } from "../styles/font";
+import { permanentMarker, oswald300 } from "../styles/font";
 
 export const EntryWrapper = styled.div`
   display: flex;
@@ -44,7 +44,7 @@ export default function Entry(body: string, year: number | string, id: number) {
     <div key={id}>
       <EntryWrapper>
         <Bullet>//</Bullet>
-        <EntryText style={oswald400.style}>{body}</EntryText>
+        <EntryText style={oswald300.style}>{body}</EntryText>
         <Year style={permanentMarker.style}>{year}</Year>
       </EntryWrapper>
     </div>

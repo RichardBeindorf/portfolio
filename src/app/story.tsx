@@ -8,7 +8,6 @@ import gsap from "gsap";
 import Entry from "./entry";
 import { entryData } from "@/data/storyEntries";
 import { DrawSVGPlugin } from "gsap/all";
-import { TitleWrapper } from "./passion";
 
 export type TitleProps = {
   currentWindow: number[];
@@ -16,20 +15,6 @@ export type TitleProps = {
   animationTime: number;
   isAnimating: RefObject<boolean>;
 };
-
-export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
-  position: absolute;
-  top: 85%;
-  left: 50%;
-  text-align: center;
-  transform: translateX(-50%);
-  mix-blend-mode: normal;
-  padding: 15px;
-  border-radius: 15px;
-  background-color: ${(props) => props.$backgroundColor};
-  border: 0px solid black;
-  border-radius: 25px;
-`;
 
 export default function Story({
   currentWindow,
@@ -269,33 +254,20 @@ export default function Story({
 
   return (
     <ChapterContainer $backgroundColor={color.current} ref={tainer}>
-      <TitleWrapper>
-        <ChapterTitle
-          style={permanentMarker.style}
-          onClick={() => {
-            if (isAnimating.current === false) {
-              const next = !clicked;
-              setClicked(next);
-              setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
-              isAnimating.current = true;
-            }
-          }}
-          ref={title}
-        >
-          Story
-        </ChapterTitle>
-        {clicked && !isAnimating.current ? (
-          <svg width="650" height="160">
-            <path
-              ref={underline}
-              d="M 0 0 Q 20 20, 500 0"
-              stroke="#262626"
-              strokeWidth="2.5px"
-              fill="transparent"
-            />
-          </svg>
-        ) : null}
-      </TitleWrapper>
+      <ChapterTitle
+        style={permanentMarker.style}
+        onClick={() => {
+          if (isAnimating.current === false) {
+            const next = !clicked;
+            setClicked(next);
+            setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
+            isAnimating.current = true;
+          }
+        }}
+        ref={title}
+      >
+        Story
+      </ChapterTitle>
       <div className="contentWrapper">
         {showEntries ? ( // Use showEntries here
           <>
@@ -313,6 +285,20 @@ export default function Story({
     </ChapterContainer>
   );
 }
+
+export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  text-align: center;
+  transform: translateX(-50%);
+  mix-blend-mode: normal;
+  padding: 15px;
+  border-radius: 15px;
+  background-color: ${(props) => props.$backgroundColor};
+  border: 0px solid black;
+  border-radius: 25px;
+`;
 
 export const ChapterTitle = styled.h1`
   position: relative;
