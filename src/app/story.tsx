@@ -7,6 +7,8 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Entry from "./entry";
 import { entryData } from "@/data/storyEntries";
+import { DrawSVGPlugin } from "gsap/all";
+import { TitleWrapper } from "./passion";
 
 export type TitleProps = {
   currentWindow: number[];
@@ -25,6 +27,8 @@ export default function Story({
   const [showEntries, setShowEntries] = useState(false);
   const title = useRef(null);
   const tainer = useRef(null);
+  const underline = useRef(null);
+  gsap.registerPlugin(DrawSVGPlugin);
   const storyTimeline = useRef<gsap.core.Timeline | null>(null);
   const currentState = useRef<gsap.core.Tween | null>(null);
   const entriesRef = useRef<HTMLDivElement>(null);
@@ -177,6 +181,23 @@ export default function Story({
       } else if (currentWindow.every(defaultPositionTest)) {
         onPullBack();
       }
+
+      //**//
+      /* Unerline Animation */
+      //**//
+
+      const drawUnderline = contextSafe(() => {
+        gsap.from(underline.current, {
+          drawSVG: "0",
+          ease: "power1.in",
+          delay: 0,
+          duration: 0.35,
+        });
+      });
+
+      if (clicked && !isAnimating.current) {
+        drawUnderline();
+      }
     },
     {
       scope: tainer,
@@ -234,20 +255,33 @@ export default function Story({
 
   return (
     <ChapterContainer $backgroundColor={color.current} ref={tainer}>
-      <ChapterTitle
-        style={permanentMarker.style}
-        onClick={() => {
-          if (isAnimating.current === false) {
-            const next = !clicked;
-            setClicked(next);
-            setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
-            isAnimating.current = true;
-          }
-        }}
-        ref={title}
-      >
-        Story
-      </ChapterTitle>
+      <TitleWrapper>
+        <ChapterTitle
+          style={permanentMarker.style}
+          onClick={() => {
+            if (isAnimating.current === false) {
+              const next = !clicked;
+              setClicked(next);
+              setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
+              isAnimating.current = true;
+            }
+          }}
+          ref={title}
+        >
+          Story
+        </ChapterTitle>
+        {clicked && !isAnimating.current ? (
+          <svg width="650" height="160">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth="2.5px"
+              fill="transparent"
+            />
+          </svg>
+        ) : null}
+      </TitleWrapper>
       <div className="contentWrapper">
         {showEntries ? ( // Use showEntries here
           <>

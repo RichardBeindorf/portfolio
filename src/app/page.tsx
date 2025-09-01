@@ -9,6 +9,9 @@ import ScribbleFigure from "@/components/scribbleFigure";
 import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
 import LowerHalf from "./lowerHalf";
 import { ThoughtSVG } from "@/components/thoughtSVG";
+import gsap from "gsap";
+import { DrawSVGPlugin } from "gsap/all";
+import { useGSAP } from "@gsap/react";
 
 export default function Home() {
   const threeLineRef = useRef<ThreeLineMethods | null>(null);

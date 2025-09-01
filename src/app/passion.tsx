@@ -1,9 +1,12 @@
+"use client";
+
 import styled from "styled-components";
 import { ChapterContainer, ChapterTitle, TitleProps } from "./story";
 import { oswald300, oswald500, permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { DrawSVGPlugin } from "gsap/all";
 
 export default function Passion({
   currentWindow,
@@ -13,6 +16,8 @@ export default function Passion({
 }: TitleProps) {
   const tainer = useRef(null);
   const title = useRef(null);
+  const underline = useRef(null);
+  gsap.registerPlugin(DrawSVGPlugin);
   const [clicked, setClicked] = useState(false);
   const currentState = useRef(null);
   const defaultPositionTest = (pos: number) => pos === 0;
@@ -186,7 +191,6 @@ export default function Passion({
       const items = entriesRef.current
         ? entriesRef.current.querySelectorAll("div")
         : [];
-      console.log(items);
       let shift;
 
       if (!entryStaggerAnimation.current && items.length > 0) {
@@ -217,6 +221,23 @@ export default function Passion({
         shift.play();
         shift.reverse();
       }
+
+      //**//
+      /* Unerline Animation */
+      //**//
+
+      const drawUnderline = contextSafe(() => {
+        gsap.from(underline.current, {
+          drawSVG: "0",
+          ease: "power1.in",
+          delay: 0,
+          duration: 0.35,
+        });
+      });
+
+      if (clicked && !isAnimating.current) {
+        drawUnderline();
+      }
     },
     {
       scope: tainer,
@@ -227,20 +248,33 @@ export default function Passion({
 
   return (
     <PassionContainer $backgroundColor={color.current} ref={tainer}>
-      <Title
-        style={permanentMarker.style}
-        onClick={() => {
-          if (isAnimating.current === false) {
-            const next = !clicked;
-            setClicked(next);
-            setCurrentWindow(next ? [1, 0, 0] : [0, 0, 0]);
-            isAnimating.current = true;
-          }
-        }}
-        ref={title}
-      >
-        Passion
-      </Title>
+      <TitleWrapper>
+        <Title
+          style={permanentMarker.style}
+          onClick={() => {
+            if (isAnimating.current === false) {
+              const next = !clicked;
+              setClicked(next);
+              setCurrentWindow(next ? [1, 0, 0] : [0, 0, 0]);
+              isAnimating.current = true;
+            }
+          }}
+          ref={title}
+        >
+          Passion
+        </Title>
+        {clicked && !isAnimating.current ? (
+          <svg width="650" height="160">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth="2.5px"
+              fill="transparent"
+            />
+          </svg>
+        ) : null}
+      </TitleWrapper>
 
       <PassionContent className="contentWrapper">
         {clicked ? (
@@ -305,6 +339,7 @@ const PassionContainer = styled(ChapterContainer)`
 
 const Title = styled(ChapterTitle)`
   text-align: left;
+  margin-left: 30px;
 `;
 
 const PassionContent = styled.div``;
@@ -331,4 +366,13 @@ const Text = styled.p`
 
 const Highlights = styled.span`
   color: var(--textAccent);
+`;
+
+export const TitleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: min-content;
+  height: min-content;
 `;
