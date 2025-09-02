@@ -1,7 +1,12 @@
 "use client";
 
 import styled from "styled-components";
-import { ChapterContainer, ChapterTitle, TitleProps } from "./story";
+import {
+  ChapterContainer,
+  ChapterTitle,
+  TitleProps,
+  TitleWrapper,
+} from "./story";
 import { oswald300, oswald500, permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
@@ -223,7 +228,7 @@ export default function Passion({
       }
 
       //**//
-      /* Unerline Animation */
+      /* Underline Animation */
       //**//
 
       const drawUnderline = contextSafe(() => {
@@ -264,7 +269,7 @@ export default function Passion({
           Passion
         </Title>
         {clicked && !isAnimating.current ? (
-          <svg width="650" height="160">
+          <svg width="650" height="20">
             <path
               ref={underline}
               d="M 0 0 Q 20 20, 500 0"
@@ -366,13 +371,4 @@ const Text = styled.p`
 
 const Highlights = styled.span`
   color: var(--textAccent);
-`;
-
-export const TitleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: min-content;
-  height: min-content;
 `;

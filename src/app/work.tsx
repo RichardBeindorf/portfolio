@@ -7,12 +7,13 @@ import {
   EntryList,
   Intro,
   TitleProps,
+  TitleWrapper,
 } from "./story";
 import { oswald300, permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { EntryWrapper } from "./entry";
+import { DrawSVGPlugin } from "gsap/all";
 
 export default function Work({
   currentWindow,
@@ -22,6 +23,8 @@ export default function Work({
 }: TitleProps) {
   const tainer = useRef(null);
   const title = useRef(null);
+  const underline = useRef(null);
+  gsap.registerPlugin(DrawSVGPlugin);
   const [clicked, setClicked] = useState(false);
   const workTL = useRef(null);
   const currentState = useRef(null);
@@ -210,7 +213,6 @@ export default function Work({
       const items = entriesRef.current
         ? entriesRef.current.querySelectorAll("div")
         : [];
-      console.log(items);
       let shift;
 
       if (!entryStaggerAnimation.current && items.length > 0) {
@@ -241,6 +243,23 @@ export default function Work({
         shift.play();
         shift.reverse();
       }
+
+      //**//
+      /* Underline Animation */
+      //**//
+
+      const drawUnderline = contextSafe(() => {
+        gsap.from(underline.current, {
+          drawSVG: "0",
+          ease: "power1.in",
+          delay: 0,
+          duration: 0.35,
+        });
+      });
+
+      if (clicked && !isAnimating.current) {
+        drawUnderline();
+      }
     },
     {
       scope: tainer,
@@ -251,25 +270,37 @@ export default function Work({
 
   return (
     <WorkContainer $backgroundColor={color.current} ref={tainer}>
-      <Title
-        style={permanentMarker.style}
-        ref={title}
-        onClick={() => {
-          if (!isAnimating.current) {
-            const next = !clicked;
-            setClicked(next);
-            setCurrentWindow(next ? [0, 0, 1] : [0, 0, 0]);
-            isAnimating.current = true;
-          }
-        }}
-      >
-        Work
-      </Title>
+      <TitleWrapper>
+        <Title
+          style={permanentMarker.style}
+          ref={title}
+          onClick={() => {
+            if (!isAnimating.current) {
+              const next = !clicked;
+              setClicked(next);
+              setCurrentWindow(next ? [0, 0, 1] : [0, 0, 0]);
+              isAnimating.current = true;
+            }
+          }}
+        >
+          Work
+        </Title>
+        {clicked && !isAnimating.current ? (
+          <svg width="650" height="20">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth="2.5px"
+              fill="transparent"
+            />
+          </svg>
+        ) : null}
+      </TitleWrapper>
 
       {clicked && (
         <WorkEntryWrapper ref={entriesRef}>
           <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
-
           <TopicWrapper>
             <Topic style={permanentMarker.style}>
               {projects[currentProject].title}

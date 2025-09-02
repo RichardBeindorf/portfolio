@@ -244,6 +244,23 @@ export default function Story({
         shift.play();
         shift.reverse();
       }
+
+      //**//
+      /* Unerline Animation */
+      //**//
+
+      const drawUnderline = contextSafe(() => {
+        gsap.from(underline.current, {
+          drawSVG: "0",
+          ease: "power1.in",
+          delay: 0,
+          duration: 0.35,
+        });
+      });
+
+      if (clicked && !isAnimating.current) {
+        drawUnderline();
+      }
     },
     {
       scope: tainer,
@@ -254,20 +271,33 @@ export default function Story({
 
   return (
     <ChapterContainer $backgroundColor={color.current} ref={tainer}>
-      <ChapterTitle
-        style={permanentMarker.style}
-        onClick={() => {
-          if (isAnimating.current === false) {
-            const next = !clicked;
-            setClicked(next);
-            setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
-            isAnimating.current = true;
-          }
-        }}
-        ref={title}
-      >
-        Story
-      </ChapterTitle>
+      <TitleWrapper>
+        <ChapterTitle
+          style={permanentMarker.style}
+          onClick={() => {
+            if (isAnimating.current === false) {
+              const next = !clicked;
+              setClicked(next);
+              setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
+              isAnimating.current = true;
+            }
+          }}
+          ref={title}
+        >
+          Story
+        </ChapterTitle>
+        {clicked && !isAnimating.current ? (
+          <svg width="650" height="20">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth="2.5px"
+              fill="transparent"
+            />
+          </svg>
+        ) : null}
+      </TitleWrapper>
       <div className="contentWrapper">
         {showEntries ? ( // Use showEntries here
           <>
@@ -298,6 +328,16 @@ export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
+`;
+
+export const TitleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: min-content;
+  height: min-content;
+  margin-bottom: 5vh;
 `;
 
 export const ChapterTitle = styled.h1`
