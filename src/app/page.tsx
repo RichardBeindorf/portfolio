@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import CameraSetup from "./cameraSetup";
 import { permanentMarker } from "../styles/font";
@@ -10,15 +10,17 @@ import ThreeLine, { ThreeLineMethods } from "@/components/threeLine";
 import LowerHalf from "./lowerHalf";
 import { ThoughtSVG } from "@/components/thoughtSVG";
 import gsap from "gsap";
-import { DrawSVGPlugin } from "gsap/all";
+import { DrawSVGPlugin, MotionPathPlugin } from "gsap/all";
 import { useGSAP } from "@gsap/react";
 
 export default function Home() {
+  gsap.registerPlugin(DrawSVGPlugin, MotionPathPlugin);
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const titleRef = useRef(null);
-  const drawDelay = 3000;
   const directionHelper = useRef(null);
-  gsap.registerPlugin(DrawSVGPlugin);
+  const arrow = useRef(null);
+  const [bottomScroll, setBottomScroll] = useState(false);
+  const drawDelay = 3000;
   // const thoughtRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
@@ -30,11 +32,39 @@ export default function Home() {
 
   useGSAP(() => {
     if (directionHelper.current) {
+      // Taking the maks path and apply it automaticly to the actual path!
+      // Since i drew the path from left to right i have to bend over backwards to get it animated from right to left..
+      // key idea is that 100% 100% means the the line drawing starts at the end and ends there, so nothing is drawn
+      // then we take that and animate it from 0 to 100, thus we go from end to start!
       gsap.fromTo(
-        directionHelper.current,
+        "#maskPath",
         { drawSVG: "100% 100%" },
-        { drawSVG: "0% 100%", duration: 1.5, ease: "power1.in" }
+        {
+          drawSVG: "0% 100%",
+          duration: 5,
+          ease: "power1.in",
+          delay: 11,
+        }
       );
+      gsap.set(arrow.current, {
+        visibility: "hidden",
+      });
+      gsap.to(arrow.current, {
+        onStart: () => {
+          gsap.set(arrow.current, { visibility: "visible" });
+        },
+        duration: 5,
+        delay: 11,
+        ease: "power1.in",
+        motionPath: {
+          path: "#pathGroup",
+          align: "#pathGroup",
+          autoRotate: 180,
+          alignOrigin: [0.5, 0.65],
+          start: 1.0,
+          end: 0,
+        },
+      });
     }
   });
 
@@ -48,6 +78,9 @@ export default function Home() {
             <InteractionHandler
               lineApiRef={threeLineRef}
               drawDelay={drawDelay}
+              bottomScroll={() => {
+                setBottomScroll(true);
+              }}
             />
           </Canvas>
         </CanvasWrapper>
@@ -56,47 +89,50 @@ export default function Home() {
             Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based
             in Hamburg
           </Title>
-          {/* <ThoughtSVG drawDelay={drawDelay} />
-          <ScribbleFigure drawDelay={drawDelay} /> */}
+          <ThoughtSVG drawDelay={drawDelay} />
+          <ScribbleFigure drawDelay={drawDelay} />
           <DirectionHelper
             height="350px"
             width="350px"
             viewBox="-10 -10 550 550"
           >
             <defs>
-              <marker
-                id="arrow"
-                markerHeight="15"
-                markerWidth="15"
-                refX="3"
-                refY="3"
-                viewBox="0 -10 20 20"
-                orient="auto"
-              >
-                <path d="M 0 2 L 8 -2 L 6 8 z" fill="#b2b2b2" />
-              </marker>
-
-              <mask id="helperMask" maskUnits="userSpaceOnUse"></mask>
+              <mask id="helperMask" maskUnits="userSpaceOnUse">
+                <path
+                  id="maskPath"
+                  ref={directionHelper}
+                  d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320
+                  295"
+                  stroke="#fff"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeWidth="5px"
+                />
+              </mask>
             </defs>
-            <path
-              ref={directionHelper}
-              // d="M 0 350 C 50 55, 110 330, 110 330 M 110 330 C 180 -60, 320 200, 320 295"
-              d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320 295"
-              stroke="#b2b2b2"
-              strokeWidth="3px"
-              strokeDasharray="17"
-              fill="transparent"
-              markerStart="url(#arrow)"
-              className="directionHelper"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              // markerMid="url(#arrow)"
-            />
+            <g mask="url(#helperMask)">
+              <path
+                id="pathGroup"
+                mask="url(#maskPath)"
+                d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320 295"
+                stroke="#c8c8c8"
+                strokeWidth="3px"
+                strokeDasharray="17"
+                fill="transparent"
+                markerStart="url(#arrow)"
+                className="directionHelper"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            </g>
             {/* <circle cx={0} cy={150} r={3} fill="red" />
             <circle cx={40} cy={-85} r={3} fill="red" />
             <circle cx={120} cy={100} r={3} fill="red" />
             <circle cx={120} cy={130} r={3} fill="red" /> */}
           </DirectionHelper>
+          <Arrow ref={arrow} height="15" width="15" viewBox="0 -10 20 20">
+            <path id="arrowPath" d="M 0 3 L 10 -4 L 10 10 z" fill="#c8c8c8" />
+          </Arrow>
         </TopHalf>
         <LowerHalf />
       </SmoothWrapper>
@@ -108,6 +144,14 @@ const WelcomeMain = styled.main``;
 
 const DirectionHelper = styled.svg`
   position: absolute;
+  top: 35%;
+  left: 65%;
+`;
+
+const Arrow = styled.svg`
+  position: absolute;
+  top: 35%;
+  left: 65%;
 `;
 
 const SmoothWrapper = styled.div`

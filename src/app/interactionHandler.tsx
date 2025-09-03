@@ -14,9 +14,11 @@ import { ThreeLineMethods } from "@/components/threeLine";
 export default function InteractionHandler({
   lineApiRef,
   drawDelay,
+  bottomScroll,
 }: {
   lineApiRef: React.RefObject<ThreeLineMethods | null>;
   drawDelay: number;
+  bottomScroll: void;
 }) {
   const { size, camera, gl } = useThree();
   // Use a ref to store the last known pointer position.
