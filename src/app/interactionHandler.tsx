@@ -18,7 +18,7 @@ export default function InteractionHandler({
 }: {
   lineApiRef: React.RefObject<ThreeLineMethods | null>;
   drawDelay: number;
-  bottomScroll: void;
+  bottomScroll: (arr) => void;
 }) {
   const { size, camera, gl } = useThree();
   // Use a ref to store the last known pointer position.
@@ -65,6 +65,17 @@ export default function InteractionHandler({
         target: window,
         type: "scroll, pointer, wheel, touch", // We only need to listen to scroll and pointer events
         // onPointerMove handles mouse and touch movement
+
+        onChangeY: () => {
+          // since scrollY is read from the top of the screen and not the bottom we just devide the overall hight and add some tolerance
+          const scrollHight = (document.body.scrollHeight / 2) * 0.9;
+          const currentScroll = window.scrollY;
+          if (currentScroll >= scrollHight) {
+            console.log("obs yes");
+            bottomScroll(true);
+          }
+        },
+
         onMove: (self) => {
           // const eventFix = self.event as PointerEvent;
           // const pagePosition = eventFix.pageY;

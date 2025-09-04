@@ -18,6 +18,8 @@ export default function Home() {
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const titleRef = useRef(null);
   const directionHelper = useRef(null);
+  const path = useRef<gsap.core.Tween | null>(null);
+  const mask = useRef<gsap.core.Tween | null>(null);
   const arrow = useRef(null);
   const [bottomScroll, setBottomScroll] = useState(false);
   const drawDelay = 3000;
@@ -31,12 +33,13 @@ export default function Home() {
   }, []);
 
   useGSAP(() => {
-    if (directionHelper.current) {
+    if (directionHelper.current && arrow.current && !bottomScroll) {
       // Taking the maks path and apply it automaticly to the actual path!
       // Since i drew the path from left to right i have to bend over backwards to get it animated from right to left..
       // key idea is that 100% 100% means the the line drawing starts at the end and ends there, so nothing is drawn
       // then we take that and animate it from 0 to 100, thus we go from end to start!
-      gsap.fromTo(
+
+      mask.current = gsap.fromTo(
         "#maskPath",
         { drawSVG: "100% 100%" },
         {
@@ -46,12 +49,10 @@ export default function Home() {
           delay: 11,
         }
       );
-      gsap.set(arrow.current, {
-        visibility: "hidden",
-      });
-      gsap.to(arrow.current, {
+      path.current = gsap.to(arrow.current, {
         onStart: () => {
           gsap.set(arrow.current, { visibility: "visible" });
+          gsap.set(directionHelper.current, { visibility: "visible" });
         },
         duration: 5,
         delay: 11,
@@ -66,7 +67,19 @@ export default function Home() {
         },
       });
     }
-  });
+
+    if (bottomScroll) {
+      mask.current.kill();
+      path.current.kill();
+
+      gsap.set(arrow.current, {
+        visibility: "hidden",
+      });
+      gsap.set(directionHelper.current, {
+        visibility: "hidden",
+      });
+    }
+  }, [bottomScroll]);
 
   return (
     <WelcomeMain id="smooth-wrapper">
@@ -78,8 +91,8 @@ export default function Home() {
             <InteractionHandler
               lineApiRef={threeLineRef}
               drawDelay={drawDelay}
-              bottomScroll={() => {
-                setBottomScroll(true);
+              bottomScroll={(arr) => {
+                setBottomScroll(arr);
               }}
             />
           </Canvas>
@@ -95,12 +108,12 @@ export default function Home() {
             height="350px"
             width="350px"
             viewBox="-10 -10 550 550"
+            ref={directionHelper}
           >
             <defs>
               <mask id="helperMask" maskUnits="userSpaceOnUse">
                 <path
                   id="maskPath"
-                  ref={directionHelper}
                   d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320
                   295"
                   stroke="#fff"
@@ -146,12 +159,14 @@ const DirectionHelper = styled.svg`
   position: absolute;
   top: 35%;
   left: 65%;
+  visibility: hidden;
 `;
 
 const Arrow = styled.svg`
   position: absolute;
   top: 35%;
   left: 65%;
+  visibility: hidden;
 `;
 
 const SmoothWrapper = styled.div`
