@@ -23,9 +23,20 @@ export default function Home() {
   const arrow = useRef(null);
   const [bottomScroll, setBottomScroll] = useState(false);
   const drawDelay = 3000;
+  const [layoutSwitch, setLayoutSwitch] = useState(1);
+  const desktopSize = 1663;
+  const helperHeight = `${350 * layoutSwitch}px`;
+  const helperWidth = `${350 * layoutSwitch}px`;
+  const helperViewportHeight = 550 * layoutSwitch;
+  const helperViewportWidth = 550 * layoutSwitch;
+  const helperViewport = `-10 -10 ${helperViewportHeight} ${helperViewportWidth}`;
   // const thoughtRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
+    const currentScreenWidth = document.body.clientWidth;
+    const changePercent = 1 - ((100 / desktopSize) * currentScreenWidth) / 100;
+    setLayoutSwitch(changePercent);
+    console.log(changePercent);
     setTimeout(() => {
       titleRef.current.style.transition = "opacity 1s ease-out";
       titleRef.current.style.opacity = "0";
@@ -105,9 +116,9 @@ export default function Home() {
           <ThoughtSVG drawDelay={drawDelay} />
           <ScribbleFigure drawDelay={drawDelay} />
           <DirectionHelper
-            height="350px"
-            width="350px"
-            viewBox="-10 -10 550 550"
+            height={helperHeight}
+            width={helperWidth}
+            viewBox={helperViewport}
             ref={directionHelper}
           >
             <defs>
@@ -138,10 +149,12 @@ export default function Home() {
                 strokeLinecap="round"
               />
             </g>
-            {/* <circle cx={0} cy={150} r={3} fill="red" />
-            <circle cx={40} cy={-85} r={3} fill="red" />
-            <circle cx={120} cy={100} r={3} fill="red" />
-            <circle cx={120} cy={130} r={3} fill="red" /> */}
+            <circle cx={0} cy={350} r={3} fill="red" />
+            <circle cx={50} cy={55} r={3} fill="red" />
+            <circle cx={110} cy={330} r={3} fill="red" />
+            <circle cx={180} cy={-60} r={3} fill="red" />
+            <circle cx={320} cy={200} r={3} fill="red" />
+            <circle cx={320} cy={295} r={3} fill="red" />
           </DirectionHelper>
           <Arrow ref={arrow} height="15" width="15" viewBox="0 -10 20 20">
             <path id="arrowPath" d="M 0 3 L 10 -4 L 10 10 z" fill="#c8c8c8" />
