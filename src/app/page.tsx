@@ -14,6 +14,8 @@ import { DrawSVGPlugin, MotionPathPlugin } from "gsap/all";
 import { useGSAP } from "@gsap/react";
 
 export default function Home() {
+  const [bottomScroll, setBottomScroll] = useState(false);
+  const [layoutSwitch, setLayoutSwitch] = useState(1);
   gsap.registerPlugin(DrawSVGPlugin, MotionPathPlugin);
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const titleRef = useRef(null);
@@ -21,22 +23,22 @@ export default function Home() {
   const path = useRef<gsap.core.Tween | null>(null);
   const mask = useRef<gsap.core.Tween | null>(null);
   const arrow = useRef(null);
-  const [bottomScroll, setBottomScroll] = useState(false);
   const drawDelay = 3000;
-  const [layoutSwitch, setLayoutSwitch] = useState(1);
   const desktopSize = 1663;
   const helperHeight = `${350 * layoutSwitch}px`;
   const helperWidth = `${350 * layoutSwitch}px`;
-  const helperViewportHeight = 550 * layoutSwitch;
-  const helperViewportWidth = 550 * layoutSwitch;
+  const arrowHeight = `${15 * layoutSwitch}px`;
+  const arrowWidth = `${15 * layoutSwitch}px`;
+  const helperViewportHeight = 550;
+  const helperViewportWidth = 550;
   const helperViewport = `-10 -10 ${helperViewportHeight} ${helperViewportWidth}`;
   // const thoughtRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
     const currentScreenWidth = document.body.clientWidth;
-    const changePercent = 1 - ((100 / desktopSize) * currentScreenWidth) / 100;
-    setLayoutSwitch(changePercent);
-    console.log(changePercent);
+    const difference = ((100 / desktopSize) * currentScreenWidth) / 100;
+    setLayoutSwitch(difference);
+    console.log(difference);
     setTimeout(() => {
       titleRef.current.style.transition = "opacity 1s ease-out";
       titleRef.current.style.opacity = "0";
@@ -113,52 +115,66 @@ export default function Home() {
             Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based
             in Hamburg
           </Title>
-          <ThoughtSVG drawDelay={drawDelay} />
-          <ScribbleFigure drawDelay={drawDelay} />
-          <DirectionHelper
-            height={helperHeight}
-            width={helperWidth}
-            viewBox={helperViewport}
-            ref={directionHelper}
-          >
-            <defs>
-              <mask id="helperMask" maskUnits="userSpaceOnUse">
-                <path
-                  id="maskPath"
-                  d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320
+          <FigureWrapper>
+            <ThoughtSVG drawDelay={drawDelay} />
+            <ScribbleFigure drawDelay={drawDelay} />
+          </FigureWrapper>
+          <HelperWrapper>
+            <DirectionHelper
+              height={helperHeight}
+              width={helperWidth}
+              viewBox={helperViewport}
+              ref={directionHelper}
+
+              // height="100%"
+              // width="100%"
+              // viewBox={helperViewport}
+              // ref={directionHelper}
+            >
+              <defs>
+                <mask id="helperMask" maskUnits="userSpaceOnUse">
+                  <path
+                    id="maskPath"
+                    d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320
                   295"
-                  stroke="#fff"
-                  fill="none"
+                    stroke="#fff"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeWidth="5px"
+                  />
+                </mask>
+              </defs>
+              <g mask="url(#helperMask)">
+                <path
+                  id="pathGroup"
+                  mask="url(#maskPath)"
+                  d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320 295"
+                  stroke="#c8c8c8"
+                  strokeWidth="3px"
+                  strokeDasharray="17"
+                  fill="transparent"
+                  markerStart="url(#arrow)"
+                  className="directionHelper"
+                  strokeLinejoin="round"
                   strokeLinecap="round"
-                  strokeWidth="5px"
                 />
-              </mask>
-            </defs>
-            <g mask="url(#helperMask)">
-              <path
-                id="pathGroup"
-                mask="url(#maskPath)"
-                d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320 295"
-                stroke="#c8c8c8"
-                strokeWidth="3px"
-                strokeDasharray="17"
-                fill="transparent"
-                markerStart="url(#arrow)"
-                className="directionHelper"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-              />
-            </g>
-            <circle cx={0} cy={350} r={3} fill="red" />
-            <circle cx={50} cy={55} r={3} fill="red" />
-            <circle cx={110} cy={330} r={3} fill="red" />
-            <circle cx={180} cy={-60} r={3} fill="red" />
-            <circle cx={320} cy={200} r={3} fill="red" />
-            <circle cx={320} cy={295} r={3} fill="red" />
-          </DirectionHelper>
-          <Arrow ref={arrow} height="15" width="15" viewBox="0 -10 20 20">
-            <path id="arrowPath" d="M 0 3 L 10 -4 L 10 10 z" fill="#c8c8c8" />
-          </Arrow>
+              </g>
+              <circle cx={0} cy={350} r={3} fill="red" />
+              <circle cx={50} cy={55} r={3} fill="red" />
+              <circle cx={110} cy={330} r={3} fill="red" />
+              <circle cx={180} cy={-60} r={3} fill="red" />
+              <circle cx={320} cy={200} r={3} fill="red" />
+              <circle cx={320} cy={295} r={3} fill="red" />
+            </DirectionHelper>
+            <Arrow
+              ref={arrow}
+              height={arrowHeight}
+              width={arrowWidth}
+              viewBox="0 -10 20 20"
+            >
+              <path id="arrowPath" d="M 0 3 L 10 -4 L 10 10 z" fill="#c8c8c8" />
+            </Arrow>
+          </HelperWrapper>
         </TopHalf>
         <LowerHalf />
       </SmoothWrapper>
@@ -168,19 +184,23 @@ export default function Home() {
 
 const WelcomeMain = styled.main``;
 
-const DirectionHelper = styled.svg`
-  position: absolute;
-  top: 35%;
-  left: 65%;
-  visibility: hidden;
+const HelperWrapper = styled.div`
+  width: 100%;
+  align-self: flex-end;
+  visibility: visible;
+
+  display: flex;
+  justify-content: flex-end;
+  transform: translate(5%, 30%);
 `;
 
-const Arrow = styled.svg`
+const FigureWrapper = styled.div`
   position: absolute;
-  top: 35%;
-  left: 65%;
-  visibility: hidden;
 `;
+
+const DirectionHelper = styled.svg``;
+
+const Arrow = styled.svg``;
 
 const SmoothWrapper = styled.div`
   display: flex;
@@ -213,6 +233,7 @@ export const TopHalf = styled.div`
 `;
 
 const Title = styled.h1`
+  position: absolute;
   color: #f24150;
   mix-blend-mode: normal;
   font-size: clamp(2vw, 3rem, 4.5vw);

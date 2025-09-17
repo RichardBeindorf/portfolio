@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 const Figure = styled.svg`
-  position: absolute;
   opacity: 0;
   /* mix-blend-mode: color-burn; */
   z-index: 2;
