@@ -30,7 +30,7 @@ export default function Work({
   const currentState = useRef(null);
   const defaultPositionTest = (pos: number) => pos === 0;
   const topDistanceTitle = "54%";
-  const leftDistanceTitle = "24%";
+  const leftDistanceTitle = "25%";
   const titleDuration = 1;
   const entriesRef = useRef(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
@@ -356,10 +356,15 @@ const WorkEntryWrapper = styled.div`
   background-color: var(--background);
 `;
 
-const WorkContainer = styled(ChapterContainer)`
+const WorkContainer = styled.section<{ $backgroundColor: string }>`
   top: 70%;
   left: 90%;
-  text-align: left;
+  position: absolute;
+  transform: translateX(-50%);
+  mix-blend-mode: normal;
+  padding: 15px;
+  border-radius: 15px;
+  background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
 `;

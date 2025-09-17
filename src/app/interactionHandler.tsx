@@ -198,31 +198,31 @@ export default function InteractionHandler({
             }
           }
           // My BOTTOM area guard
-          if (
-            smoother.scrollTop() > pushBackPointBottom && // reading the top side viewport scrollY against the bottom breakpoint -> has to be lower or else currenthalf ist top!!
-            pageScrollGuard.current === false
-          ) {
-            // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
-            currentHalf.current = "bottom";
+          // if (
+          //   smoother.scrollTop() > pushBackPointBottom && // reading the top side viewport scrollY against the bottom breakpoint -> has to be lower or else currenthalf ist top!!
+          //   pageScrollGuard.current === false
+          // ) {
+          //   // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
+          //   currentHalf.current = "bottom";
 
-            if (
-              self.velocityY > 1900 &&
-              currentHalf.current === "bottom" &&
-              currentPercent < 15
-            ) {
-              pageScrollGuard.current = true;
-              gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
+          //   if (
+          //     self.velocityY > 1900 &&
+          //     currentHalf.current === "bottom" &&
+          //     currentPercent < 15
+          //   ) {
+          //     pageScrollGuard.current = true;
+          //     gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
 
-              currentHalf.current = "top";
-              bouncyMovement.current = 0;
+          //     currentHalf.current = "top";
+          //     bouncyMovement.current = 0;
 
-              gsap.to(window, {
-                duration: 4,
-                ease: "power4.out",
-                scrollTo: { y: 0 },
-              });
-            }
-          }
+          //     gsap.to(window, {
+          //       duration: 4,
+          //       ease: "power4.out",
+          //       scrollTo: { y: 0 },
+          //     });
+          //   }
+          // }
 
           // this is part of my animation logic, don`t touch
           lastPointerPosition.current = { x: self.x, y: self.y };

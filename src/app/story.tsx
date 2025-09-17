@@ -5,7 +5,6 @@ import { permanentMarker, oswald300, oswald500 } from "../styles/font";
 import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import Entry from "./entry";
 import { entryData } from "@/data/storyEntries";
 import { DrawSVGPlugin } from "gsap/all";
 
@@ -25,6 +24,7 @@ export default function Story({
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
   const title = useRef(null);
+  const titleWrapper = useRef(null);
   const tainer = useRef(null);
   const underline = useRef(null);
   gsap.registerPlugin(DrawSVGPlugin);
@@ -36,7 +36,7 @@ export default function Story({
   const pullDuration = 1;
   const titleDuration = 1;
   const topDistanceTitle = "54%";
-  const leftDistanceTitle = "40%";
+  const leftDistanceTitle = "25%";
   const color = useRef("unset");
 
   if (clicked) {
@@ -74,6 +74,14 @@ export default function Story({
               keyframes: {
                 color: ["#262626", "#F24150"],
               },
+            },
+            "<"
+          )
+          .to(
+            titleWrapper.current,
+            {
+              // x: "-20%",
+              // textAlign: "left",
             },
             "<"
           );
@@ -271,7 +279,7 @@ export default function Story({
 
   return (
     <ChapterContainer $backgroundColor={color.current} ref={tainer}>
-      <TitleWrapper>
+      <TitleWrapper ref={titleWrapper}>
         <ChapterTitle
           style={permanentMarker.style}
           onClick={() => {
@@ -298,20 +306,23 @@ export default function Story({
           </svg>
         ) : null}
       </TitleWrapper>
-      <div className="contentWrapper">
-        {showEntries ? ( // Use showEntries here
-          <>
-            <Intro style={oswald300.style}>
-              ”Lets say it seems <em style={oswald500.style}>complicated</em>,
-              but in the <em style={oswald500.style}>end</em> it all makes
-              sense”
-            </Intro>
-            <EntryList ref={entriesRef}>
-              {entryData.map((entry, i) => Entry(entry[0], entry[1], i))}
-            </EntryList>
-          </>
-        ) : null}
-      </div>
+      {clicked && ( // Use showEntries here
+        <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
+          <Intro style={oswald300.style}>
+            ”Lets say it seems <em style={oswald500.style}>complicated</em>, but
+            in the <em style={oswald500.style}>end</em> it all makes sense”
+          </Intro>
+          <EntryList>
+            {entryData.map((entry, i) => (
+              <EntryWrapper key={i}>
+                <Bullet>//</Bullet>
+                <EntryText style={oswald300.style}>{entry[0]}</EntryText>
+                <Year style={permanentMarker.style}>{entry[1]}</Year>
+              </EntryWrapper>
+            ))}
+          </EntryList>
+        </StoryEntryWrapper>
+      )}
     </ChapterContainer>
   );
 }
@@ -320,8 +331,7 @@ export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   position: absolute;
   top: 85%;
   left: 50%;
-  text-align: center;
-  transform: translateX(-50%);
+  text-align: left;
   mix-blend-mode: normal;
   padding: 15px;
   border-radius: 15px;
@@ -335,7 +345,6 @@ export const TitleWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  width: min-content;
   height: min-content;
   margin-bottom: 5vh;
 `;
@@ -353,8 +362,19 @@ export const ChapterTitle = styled.h1`
   }
 `;
 
+const StoryEntryWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0px;
+  background-color: var(--background);
+`;
+
 export const Intro = styled.div`
-  width: max-content;
+  /* width: max-content; */
   font-size: 2rem;
   text-align: center;
   color: var(--foreground);
@@ -362,4 +382,40 @@ export const Intro = styled.div`
 
 export const EntryList = styled.div`
   margin-top: 30px;
+`;
+
+const EntryWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 10px 0 10px 0;
+  cursor: pointer;
+  padding: 0px;
+  background-color: rgba(242, 241, 233, 0);
+  transition: padding 1s ease-in, background-color 1s ease-in,
+    font-size 1s ease-in;
+
+  &:hover {
+    padding: 5px;
+    background-color: rgba(242, 241, 233, 1);
+    font-size: clamp(1vw, 1.1rem, 2vw);
+    transition: padding 0.5s ease-out, background-color 0.5s ease-out,
+      font-size 0.5s ease-out;
+  }
+`;
+
+const Bullet = styled.span`
+  color: var(--textAccent);
+  font-size: 2rem;
+`;
+
+const EntryText = styled.p`
+  /* width: max-content; */
+  font-size: 1.5rem;
+`;
+
+const Year = styled.span`
+  font-size: 1.2rem;
 `;

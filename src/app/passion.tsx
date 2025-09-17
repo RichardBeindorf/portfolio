@@ -29,7 +29,7 @@ export default function Passion({
   const titleDelay = 1;
   const pullDuration = 1;
   const topDistanceTitle = "54%";
-  const leftDistanceTitle = "24%";
+  const leftDistanceTitle = "10%";
   const titleDuration = 1;
   const entriesRef = useRef(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
@@ -337,9 +337,6 @@ export default function Passion({
 const PassionContainer = styled(ChapterContainer)`
   left: 10%;
   top: 70%;
-  background-color: var(--background);
-  border: 0px solid black;
-  border-radius: 25px;
 `;
 
 const Title = styled(ChapterTitle)`
