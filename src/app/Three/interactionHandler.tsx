@@ -9,7 +9,7 @@ import { useThree } from "@react-three/fiber";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-import { ThreeLineMethods } from "@/components/threeLine";
+import { ThreeLineMethods } from "@/app/Three/threeLine";
 
 export default function InteractionHandler({
   lineApiRef,

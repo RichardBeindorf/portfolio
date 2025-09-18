@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { permanentMarker, oswald300, oswald500 } from "../styles/font";
+import { permanentMarker, oswald300, oswald500 } from "../../styles/font";
 import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";

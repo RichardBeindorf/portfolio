@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { permanentMarker, oswald300 } from "../styles/font";
+import { permanentMarker, oswald300 } from "../../styles/font";
 
 export const EntryWrapper = styled.div`
   display: flex;

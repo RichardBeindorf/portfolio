@@ -1,10 +1,10 @@
 "use client";
 
 import styled from "styled-components";
-import Story from "./story";
-import Passion from "./passion";
+import Story from "./Subpages/story";
+import Passion from "./Subpages/passion";
 import { useRef, useState } from "react";
-import Work from "./work";
+import Work from "./Subpages/work";
 
 const Container = styled.div`
   display: flex;
