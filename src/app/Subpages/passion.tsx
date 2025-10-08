@@ -1,12 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import {
-  ChapterContainer,
-  ChapterTitle,
-  TitleProps,
-  TitleWrapper,
-} from "./story";
+import { ChapterTitle, TitleProps, TitleWrapper } from "./story";
 import { oswald300, oswald500, permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
@@ -15,7 +10,6 @@ import { DrawSVGPlugin } from "gsap/all";
 
 export default function Passion({
   currentWindow,
-  setCurrentWindow,
   animationTime,
   isAnimating,
 }: TitleProps) {
@@ -334,9 +328,18 @@ export default function Passion({
   );
 }
 
-const PassionContainer = styled(ChapterContainer)`
-  left: 10%;
-  top: 70%;
+const PassionContainer = styled.section<{ $backgroundColor: string }>`
+  display: flex;
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  text-align: left;
+  /* mix-blend-mode: normal; */
+  padding: 15px;
+  border-radius: 15px;
+  background-color: ${(props) => props.$backgroundColor};
+  border: 0px solid black;
+  border-radius: 25px;
 `;
 
 const Title = styled(ChapterTitle)`

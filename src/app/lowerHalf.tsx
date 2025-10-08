@@ -3,39 +3,40 @@
 import styled from "styled-components";
 import Story from "./Subpages/story";
 import Passion from "./Subpages/passion";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import Work from "./Subpages/work";
 
 const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+  position: relative;
+  /* display: flex; */
+  /* align-items: stretch; */
+  /* justify-content: space-around; */
+  /* width: 100%; */
+
+  /* align-items: center; */
+  min-height: 100vh;
   width: 100%;
 `;
 
 export default function LowerHalf() {
-  const [currentWindow, setCurrentWindow] = useState<number[]>([]);
+  const currentWindow = useRef<number[]>([]);
   const pullDurationOrDelay = 1.2;
   const isAnimating = useRef(false);
   return (
     <Container>
       <Story
-        currentWindow={currentWindow}
+        currentWindow={currentWindow.current}
         animationTime={pullDurationOrDelay}
         isAnimating={isAnimating}
-        setCurrentWindow={(arr) => setCurrentWindow(arr)}
       />
       <Passion
-        currentWindow={currentWindow}
+        currentWindow={currentWindow.current}
         animationTime={pullDurationOrDelay}
-        setCurrentWindow={(arr) => setCurrentWindow(arr)}
         isAnimating={isAnimating}
       />
       <Work
-        currentWindow={currentWindow}
+        currentWindow={currentWindow.current}
         animationTime={pullDurationOrDelay}
-        setCurrentWindow={(arr) => setCurrentWindow(arr)}
         isAnimating={isAnimating}
       />
     </Container>

@@ -10,14 +10,12 @@ import { DrawSVGPlugin } from "gsap/all";
 
 export type TitleProps = {
   currentWindow: number[];
-  setCurrentWindow: Dispatch<SetStateAction<number[]>>;
   animationTime: number;
   isAnimating: RefObject<boolean>;
 };
 
 export default function Story({
   currentWindow,
-  setCurrentWindow,
   animationTime,
   isAnimating,
 }: TitleProps) {
@@ -76,15 +74,15 @@ export default function Story({
               },
             },
             "<"
-          )
-          .to(
-            titleWrapper.current,
-            {
-              // x: "-20%",
-              // textAlign: "left",
-            },
-            "<"
           );
+        // .to(
+        //   titleWrapper.current,
+        //   {
+        //     // x: "-20%",
+        //     // textAlign: "left",
+        //   },
+        //   "<"
+        // );
       }
 
       //**//
@@ -140,7 +138,8 @@ export default function Story({
       const onPullLeft = contextSafe(() => {
         gsap.to(tainer.current, {
           scale: 0.1,
-          display: "none",
+          // display: "none",
+          opacity: 0,
           rotate: -30,
           left: "10%",
           top: "70%",
@@ -156,7 +155,8 @@ export default function Story({
         gsap.to(tainer.current, {
           scale: 0.1,
           rotate: 30,
-          display: "none",
+          // display: "none",
+          opacity: 0,
           left: "90%",
           top: "70%",
           duration: pullDuration,
@@ -173,8 +173,8 @@ export default function Story({
           duration: animationTime + 1,
           ease: "power4.out",
           scale: 1,
-          top: "85%",
-          left: "50%",
+          // top: "85%",
+          // left: "50%",
           opacity: 1,
           rotate: 0,
         });
@@ -327,12 +327,12 @@ export default function Story({
   );
 }
 
-export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
+const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   position: absolute;
   top: 85%;
   left: 50%;
   text-align: left;
-  mix-blend-mode: normal;
+  /* mix-blend-mode: normal; */
   padding: 15px;
   border-radius: 15px;
   background-color: ${(props) => props.$backgroundColor};

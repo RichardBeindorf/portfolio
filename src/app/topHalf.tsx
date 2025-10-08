@@ -35,7 +35,6 @@ export function TopHalf({ bottomScroll, drawDelay }: TopHalfProps) {
     const currentScreenWidth = document.body.clientWidth;
     const difference = ((100 / desktopSize) * currentScreenWidth) / 100;
     setLayoutSwitch(difference);
-    console.log(difference);
     setTimeout(() => {
       titleRef.current.style.transition = "opacity 1s ease-out";
       titleRef.current.style.opacity = "0";
@@ -141,12 +140,12 @@ export function TopHalf({ bottomScroll, drawDelay }: TopHalfProps) {
               strokeLinecap="round"
             />
           </g>
-          <circle cx={0} cy={350} r={3} fill="red" />
+          {/* <circle cx={0} cy={350} r={3} fill="red" />
           <circle cx={50} cy={55} r={3} fill="red" />
           <circle cx={110} cy={330} r={3} fill="red" />
           <circle cx={180} cy={-60} r={3} fill="red" />
           <circle cx={320} cy={200} r={3} fill="red" />
-          <circle cx={320} cy={295} r={3} fill="red" />
+          <circle cx={320} cy={295} r={3} fill="red" /> */}
         </DirectionHelper>
         <Arrow
           ref={arrow}
@@ -161,11 +160,19 @@ export function TopHalf({ bottomScroll, drawDelay }: TopHalfProps) {
   );
 }
 
+const TopWrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+`;
+
 const HelperWrapper = styled.div`
   width: 100%;
   align-self: flex-end;
   visibility: visible;
-
   display: flex;
   justify-content: flex-end;
   transform: translate(5%, 30%);
@@ -178,6 +185,7 @@ const FigureWrapper = styled.div`
 const DirectionHelper = styled.svg``;
 
 const Arrow = styled.svg``;
+
 const Title = styled.h1`
   position: absolute;
   color: #f24150;
@@ -186,12 +194,4 @@ const Title = styled.h1`
   text-align: center;
   cursor: pointer;
   z-index: 3;
-`;
-
-export const TopWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
 `;

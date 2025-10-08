@@ -71,7 +71,6 @@ export default function InteractionHandler({
           const scrollHight = (document.body.scrollHeight / 2) * 0.9;
           const currentScroll = window.scrollY;
           if (currentScroll >= scrollHight) {
-            console.log("obs yes");
             bottomScroll(true);
           }
         },
@@ -171,32 +170,32 @@ export default function InteractionHandler({
           //     pageScrollGuard.current === false)
 
           // My top area guard
-          if (
-            (smoother.scrollTop() === 0 && // we have to make sure this is precise so we are able to fire the page scroll but also not stack animations
-              pageScrollGuard.current === false) ||
-            smoother.scrollTop() + viewportHeight < pushBackPointTop
-          ) {
-            // i have to first, make sure that the viewport is positioned at the very bottom or top so the animation wont trigger while we are scrolling down from the top pos
-            currentHalf.current = "top";
-            if (
-              self.velocityY > 2000 &&
-              currentHalf.current === "top" &&
-              currentPercent > 90
-            ) {
-              // this helps me seperate the bouncy animation off the page transition
-              pageScrollGuard.current = true;
-              gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
+          // if (
+          //   (smoother.scrollTop() === 0 && // we have to make sure this is precise so we are able to fire the page scroll but also not stack animations
+          //     pageScrollGuard.current === false) ||
+          //   smoother.scrollTop() + viewportHeight < pushBackPointTop
+          // ) {
+          //   // i have to first, make sure that the viewport is positioned at the very bottom or top so the animation wont trigger while we are scrolling down from the top pos
+          //   currentHalf.current = "top";
+          //   if (
+          //     self.velocityY > 2000 &&
+          //     currentHalf.current === "top" &&
+          //     currentPercent > 90
+          //   ) {
+          //     // this helps me seperate the bouncy animation off the page transition
+          //     pageScrollGuard.current = true;
+          //     gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
 
-              currentHalf.current = "bottom";
-              bouncyMovement.current = viewportHeight;
+          //     currentHalf.current = "bottom";
+          //     bouncyMovement.current = viewportHeight;
 
-              gsap.to(window, {
-                duration: 4,
-                ease: "power4.out",
-                scrollTo: { y: "max" },
-              });
-            }
-          }
+          //     gsap.to(window, {
+          //       duration: 4,
+          //       ease: "power4.out",
+          //       scrollTo: { y: "max" },
+          //     });
+          //   }
+          // }
           // My BOTTOM area guard
           // if (
           //   smoother.scrollTop() > pushBackPointBottom && // reading the top side viewport scrollY against the bottom breakpoint -> has to be lower or else currenthalf ist top!!
