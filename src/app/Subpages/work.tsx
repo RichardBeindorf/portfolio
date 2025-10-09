@@ -1,45 +1,30 @@
 "use client";
 
 import styled from "styled-components";
-import {
-  ChapterContainer,
-  ChapterTitle,
-  EntryList,
-  Intro,
-  TitleProps,
-} from "./story";
+import { ChapterTitle, Intro, TitleProps, TitleWrapper } from "./story";
 import { oswald300, permanentMarker } from "@/styles/font";
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { EntryWrapper } from "./entry";
+import { DrawSVGPlugin, Flip } from "gsap/all";
 
 export default function Work({
   currentWindow,
-  setCurrentWindow,
-  animationTime,
+  delayTime,
   isAnimating,
 }: TitleProps) {
-  const tainer = useRef(null);
-  const title = useRef(null);
   const [clicked, setClicked] = useState(false);
-  const workTL = useRef(null);
-  const currentState = useRef(null);
-  const defaultPositionTest = (pos: number) => pos === 0;
-  const topDistanceTitle = "54%";
-  const leftDistanceTitle = "24%";
-  const titleDuration = 1;
-  const entriesRef = useRef(null);
-  const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
   const [showEntries, setShowEntries] = useState(false);
   const [currentProject, setCurrentProject] = useState(0);
-  const color = useRef("unset");
+  gsap.registerPlugin(DrawSVGPlugin, Flip);
+  const tainer = useRef(null);
+  const title = useRef(null);
 
-  if (clicked) {
-    color.current = "#F2F1E9";
-  } else {
-    color.current = "unset";
-  }
+  const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
+  const entriesRef = useRef(null);
+  const underline = useRef(null);
+  const color = useRef("unset");
+  const defaultPositionTest = (pos: number) => pos === 0;
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 
@@ -66,74 +51,104 @@ export default function Work({
     },
   ];
 
+  // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
+  useLayoutEffect(() => {
+    // first create (or get the existing) batch by id
+    let batch = Flip.batch("id");
+    let action = batch.add({
+      getState() {
+        return Flip.getState(tainer.current);
+      },
+      setState() {
+        if (clicked) {
+          tainer.current.style.setProperty("position", "relative");
+          gsap.set(tainer.current, { left: "10%", top: "25%" });
+        } else {
+          tainer.current.style.setProperty("position", "absolute");
+          gsap.set(tainer.current, { left: "80%", top: "50%" });
+        }
+      },
+      animate(self) {
+        const tl = gsap.timeline();
+        tl.add(
+          Flip.from(self.state, {
+            targets: tainer.current,
+            duration: 2,
+            ease: "power4.out",
+            delay: delayTime,
+            absolute: true,
+            onComplete: () => {
+              if (clicked) {
+                isAnimating.current = false;
+                setShowEntries(true);
+              } else {
+                isAnimating.current = false;
+                currentWindow.current = [0, 0, 0];
+              }
+            },
+            props: "left, top",
+          }),
+          0
+        );
+
+        if (clicked) {
+          tl.add(
+            gsap.to(title.current, {
+              fontSize: "clamp(8vw, 6rem, 11vw)",
+              keyframes: {
+                color: ["#262626", "#F24150"],
+              },
+              duration: 2,
+              delay: delayTime,
+            }),
+            0
+          );
+        }
+        // clicked to close title but we are not done animating
+        if (isAnimating.current && !clicked) {
+          tl.add(
+            gsap.to(title.current, {
+              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              keyframes: {
+                color: ["#F24150", "#262626"],
+              },
+              duration: 2,
+            }),
+            0
+          );
+        }
+      },
+      // since this .from will be called forward and backwards we need to close the entries on start, also making sure
+      onStart() {
+        if (!clicked) {
+          setShowEntries(false);
+        }
+        isAnimating.current = true;
+      },
+    });
+
+    batch.run();
+
+    return () => {
+      action.kill();
+    };
+  }, [clicked]);
+
+  // Logic for click events on other titles, only click related
   const { contextSafe } = useGSAP(
     () => {
-      //**//
-      /* MAIN TITLE ANIMATION */
-      //**//
-      const titleTL = contextSafe(() => {
-        const newTL = gsap.timeline({
-          paused: true,
-          ease: "power4.out",
-          delay: animationTime,
-          // making sure the animation state is preserved all the way so we can disable any click animation while its on
-          onComplete: () => {
-            isAnimating.current = false;
-            setShowEntries(true);
-          },
-          onReverseComplete: () => {
-            isAnimating.current = false;
-            workTL.current = null;
-          },
-        });
-        newTL.to(tainer.current, {
-          top: topDistanceTitle,
-          left: leftDistanceTitle,
-          duration: titleDuration,
-        });
-        newTL.to(
-          title.current,
-          {
-            fontSize: "clamp(8vw, 6rem, 11vw)",
-            color: "#F24150",
-            duration: 2,
-          },
-          "<"
-        );
-        return newTL;
-      });
-
-      if (!workTL.current) {
-        // remembering each timeline or we will just creat a new one everytime and cant play or reverse
-        workTL.current = titleTL();
-      }
-
-      if (workTL.current) {
-        if (clicked) {
-          workTL.current.play();
-        }
-        if (!clicked || currentWindow.every(defaultPositionTest)) {
-          workTL.current.reverse();
-        }
-      }
-
-      //**//
-      /* ---- END ---- */
-      //**//
-
-      const pullDuration = 1;
-
+      // trigger pulls when other titles get clicked
       const onPullMid = contextSafe(() => {
         gsap.to(tainer.current, {
           id: "midIn",
           display: "none",
-          duration: animationTime + 1,
+          duration: delayTime + 1,
           ease: "power4.out",
           keyframes: {
             // 8 different phases maximum currently
+            // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            // first is start position
             top: ["70%", "70%", "85%", "85%"],
             left: ["90%", "89%", "88%", "75%", "50%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
@@ -142,78 +157,74 @@ export default function Work({
         });
       });
 
-      const onPullMidOut = contextSafe(() => {
-        const midOut = gsap.to(tainer.current, {
-          display: "block",
-          duration: animationTime + 1,
-          ease: "power4.out",
-          fontSize: "clamp(8vw, 6rem, 11vw)",
-          scale: 1,
-          top: "70%",
-          left: "90%",
-          opacity: 1,
-          rotate: 0,
-        });
-
-        return midOut;
-      });
-
       const onPullLeft = contextSafe(() => {
         const leftIn = gsap.to(tainer.current, {
           id: "leftIn",
           display: "none",
-          // scale: 0.1,
-          // rotate: -30,
-          // left: "10%",
           top: "70%",
           keyframes: {
-            // 8 different phases maximum currently
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            // first is start position
             // top: ["70%", "70%", "85%", "85%"],
             left: ["90%", "89%", "88%", "75%", "10%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
-          duration: pullDuration,
+          duration: delayTime + 1,
           ease: "power4.out",
         });
 
         return leftIn;
       });
 
-      if (currentWindow[0] === 1) {
+      const onStartBounce = contextSafe(() => {
+        return gsap.to(title.current, {
+          delay: 0.5,
+          ease: "sine.in",
+          keyframes: {
+            scaleX: ["100%", "80%", "100%"],
+            // left: ["50%", "48%", "50%"],
+            rotate: [0, -10, 0],
+            easeEach: "none",
+          },
+        });
+      });
+
+      if (currentWindow.current[0] === 1) {
         onPullLeft();
       }
 
-      if (currentWindow[1] === 1) {
+      if (currentWindow.current[1] === 1) {
         onPullMid();
-        currentState.current = null;
       }
 
-      if (currentWindow.every(defaultPositionTest)) {
-        onPullMidOut();
+      if (currentWindow.current[2] === 1) {
+        onStartBounce();
+      }
+
+      if (currentWindow.current.every(defaultPositionTest)) {
+        // onDefault();
       }
       // clearing the timeline shortly after giving the command to revers to prevent errors
-      currentState.current = null;
     },
     {
       scope: tainer,
-      dependencies: [clicked, currentWindow],
+      dependencies: [clicked],
       revertOnUpdate: false,
     }
   );
 
+  // Logic for animating content of this title, only entries related
   useGSAP(
     () => {
       const items = entriesRef.current
         ? entriesRef.current.querySelectorAll("div")
         : [];
-      console.log(items);
       let shift;
 
       if (!entryStaggerAnimation.current && items.length > 0) {
+        entryStaggerAnimation.current?.kill();
+
         entryStaggerAnimation.current = gsap.from(items, {
           opacity: 0,
           y: 20,
@@ -222,54 +233,95 @@ export default function Work({
           ease: "power2.out",
           paused: true,
           onReverseComplete: () => {
-            setShowEntries(false);
+            entryStaggerAnimation.current = null;
           },
         });
       }
-      if (showEntries && entryStaggerAnimation.current) {
-        entryStaggerAnimation.current.play();
+
+      if (entryStaggerAnimation.current) {
+        if (showEntries) {
+          entryStaggerAnimation.current.play();
+        }
+        if (!showEntries && isAnimating.current) {
+          entryStaggerAnimation.current.reverse();
+          // Animate the contentWrapper back up when entries are reversing out
+          if (entriesRef.current) {
+            shift = gsap.to(entriesRef.current, {
+              y: -60,
+              ease: "power2.out",
+              duration: 0.4,
+            });
+            shift.play();
+            shift.reverse();
+          }
+        }
       }
-      if (!clicked && isAnimating.current === true) {
-        entryStaggerAnimation.current.reverse();
-        entryStaggerAnimation.current = null;
-        // Animate the contentWrapper back up when entries are reversing out
-        shift = gsap.to(".contentWrapper", {
-          y: -60,
-          ease: "power2.out",
-          duration: 0.4,
+
+      //**//
+      /* Underline Animation */
+      //**//
+
+      const drawUnderline = contextSafe(() => {
+        gsap.from(underline.current, {
+          drawSVG: "0",
+          ease: "power1.in",
+          delay: 0,
+          duration: 0.35,
         });
-        shift.play();
-        shift.reverse();
+      });
+
+      if (showEntries && !isAnimating.current && underline.current) {
+        color.current = "#F2F1E9";
+        drawUnderline();
+      } else {
+        color.current = "unset";
       }
     },
     {
       scope: tainer,
-      dependencies: [showEntries, clicked],
+      dependencies: [showEntries],
       revertOnUpdate: false,
     }
   );
 
   return (
-    <WorkContainer $backgroundColor={color.current} ref={tainer}>
-      <Title
-        style={permanentMarker.style}
-        ref={title}
-        onClick={() => {
-          if (!isAnimating.current) {
-            const next = !clicked;
-            setClicked(next);
-            setCurrentWindow(next ? [0, 0, 1] : [0, 0, 0]);
-            isAnimating.current = true;
-          }
-        }}
-      >
-        Work
-      </Title>
+    <WorkContainer
+      $backgroundColor={color.current}
+      ref={tainer}
+      data-flip-id="workTainer"
+    >
+      <TitleWrapper>
+        <Title
+          style={permanentMarker.style}
+          ref={title}
+          onClick={() => {
+            if (!isAnimating.current) {
+              const next = !clicked;
+              setClicked(next);
+              // logic for setting it back to default needs to be in the animation onComplete so it doesn`t get triggered after loading
+              currentWindow.current = next ? [0, 0, 1] : [0, 0, 0];
+              isAnimating.current = true;
+            }
+          }}
+        >
+          Work
+        </Title>
+        {showEntries && (
+          <svg width="650" height="20">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth="2.5px"
+              fill="transparent"
+            />
+          </svg>
+        )}
+      </TitleWrapper>
 
-      {clicked && (
-        <WorkEntryWrapper ref={entriesRef}>
+      {showEntries && (
+        <WorkEntryWrapper className="contentWrapper" ref={entriesRef}>
           <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
-
           <TopicWrapper>
             <Topic style={permanentMarker.style}>
               {projects[currentProject].title}
@@ -314,6 +366,18 @@ export default function Work({
   );
 }
 
+const WorkContainer = styled.section<{ $backgroundColor: string }>`
+  top: 50%;
+  left: 80%;
+  position: absolute;
+  max-width: 90%;
+  mix-blend-mode: normal;
+  padding: 15px;
+  background-color: ${(props) => props.$backgroundColor};
+  border: 0px solid black;
+  border-radius: 25px;
+`;
+
 const WorkEntryWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -323,14 +387,6 @@ const WorkEntryWrapper = styled.div`
   cursor: pointer;
   padding: 0px;
   background-color: var(--background);
-`;
-
-const WorkContainer = styled(ChapterContainer)`
-  top: 70%;
-  left: 90%;
-  text-align: left;
-  border: 0px solid black;
-  border-radius: 25px;
 `;
 
 const TopicWrapper = styled.div`

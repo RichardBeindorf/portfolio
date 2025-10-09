@@ -9,14 +9,16 @@ import { useThree } from "@react-three/fiber";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-import { ThreeLineMethods } from "@/components/threeLine";
+import { ThreeLineMethods } from "@/app/Three/threeLine";
 
 export default function InteractionHandler({
   lineApiRef,
   drawDelay,
+  bottomScroll,
 }: {
   lineApiRef: React.RefObject<ThreeLineMethods | null>;
   drawDelay: number;
+  bottomScroll: (arr) => void;
 }) {
   const { size, camera, gl } = useThree();
   // Use a ref to store the last known pointer position.
@@ -63,6 +65,16 @@ export default function InteractionHandler({
         target: window,
         type: "scroll, pointer, wheel, touch", // We only need to listen to scroll and pointer events
         // onPointerMove handles mouse and touch movement
+
+        onChangeY: () => {
+          // since scrollY is read from the top of the screen and not the bottom we just devide the overall hight and add some tolerance
+          const scrollHight = (document.body.scrollHeight / 2) * 0.9;
+          const currentScroll = window.scrollY;
+          if (currentScroll >= scrollHight) {
+            bottomScroll(true);
+          }
+        },
+
         onMove: (self) => {
           // const eventFix = self.event as PointerEvent;
           // const pagePosition = eventFix.pageY;
@@ -158,58 +170,58 @@ export default function InteractionHandler({
           //     pageScrollGuard.current === false)
 
           // My top area guard
-          if (
-            (smoother.scrollTop() === 0 && // we have to make sure this is precise so we are able to fire the page scroll but also not stack animations
-              pageScrollGuard.current === false) ||
-            smoother.scrollTop() + viewportHeight < pushBackPointTop
-          ) {
-            // i have to first, make sure that the viewport is positioned at the very bottom or top so the animation wont trigger while we are scrolling down from the top pos
-            currentHalf.current = "top";
-            if (
-              self.velocityY > 2000 &&
-              currentHalf.current === "top" &&
-              currentPercent > 90
-            ) {
-              // this helps me seperate the bouncy animation off the page transition
-              pageScrollGuard.current = true;
-              gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
+          // if (
+          //   (smoother.scrollTop() === 0 && // we have to make sure this is precise so we are able to fire the page scroll but also not stack animations
+          //     pageScrollGuard.current === false) ||
+          //   smoother.scrollTop() + viewportHeight < pushBackPointTop
+          // ) {
+          //   // i have to first, make sure that the viewport is positioned at the very bottom or top so the animation wont trigger while we are scrolling down from the top pos
+          //   currentHalf.current = "top";
+          //   if (
+          //     self.velocityY > 2000 &&
+          //     currentHalf.current === "top" &&
+          //     currentPercent > 90
+          //   ) {
+          //     // this helps me seperate the bouncy animation off the page transition
+          //     pageScrollGuard.current = true;
+          //     gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
 
-              currentHalf.current = "bottom";
-              bouncyMovement.current = viewportHeight;
+          //     currentHalf.current = "bottom";
+          //     bouncyMovement.current = viewportHeight;
 
-              gsap.to(window, {
-                duration: 4,
-                ease: "power4.out",
-                scrollTo: { y: "max" },
-              });
-            }
-          }
+          //     gsap.to(window, {
+          //       duration: 4,
+          //       ease: "power4.out",
+          //       scrollTo: { y: "max" },
+          //     });
+          //   }
+          // }
           // My BOTTOM area guard
-          if (
-            smoother.scrollTop() > pushBackPointBottom && // reading the top side viewport scrollY against the bottom breakpoint -> has to be lower or else currenthalf ist top!!
-            pageScrollGuard.current === false
-          ) {
-            // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
-            currentHalf.current = "bottom";
+          // if (
+          //   smoother.scrollTop() > pushBackPointBottom && // reading the top side viewport scrollY against the bottom breakpoint -> has to be lower or else currenthalf ist top!!
+          //   pageScrollGuard.current === false
+          // ) {
+          //   // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
+          //   currentHalf.current = "bottom";
 
-            if (
-              self.velocityY > 1900 &&
-              currentHalf.current === "bottom" &&
-              currentPercent < 15
-            ) {
-              pageScrollGuard.current = true;
-              gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
+          //   if (
+          //     self.velocityY > 1900 &&
+          //     currentHalf.current === "bottom" &&
+          //     currentPercent < 15
+          //   ) {
+          //     pageScrollGuard.current = true;
+          //     gsap.delayedCall(4.5, () => (pageScrollGuard.current = false));
 
-              currentHalf.current = "top";
-              bouncyMovement.current = 0;
+          //     currentHalf.current = "top";
+          //     bouncyMovement.current = 0;
 
-              gsap.to(window, {
-                duration: 4,
-                ease: "power4.out",
-                scrollTo: { y: 0 },
-              });
-            }
-          }
+          //     gsap.to(window, {
+          //       duration: 4,
+          //       ease: "power4.out",
+          //       scrollTo: { y: 0 },
+          //     });
+          //   }
+          // }
 
           // this is part of my animation logic, don`t touch
           lastPointerPosition.current = { x: self.x, y: self.y };

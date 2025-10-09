@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { permanentMarker, oswald300 } from "../styles/font";
+import { permanentMarker, oswald300 } from "../../styles/font";
 
 export const EntryWrapper = styled.div`
   display: flex;
@@ -31,7 +31,7 @@ const Bullet = styled.span`
 `;
 
 const EntryText = styled.p`
-  width: max-content;
+  /* width: max-content; */
   font-size: 1.5rem;
 `;
 
@@ -41,8 +41,8 @@ const Year = styled.span`
 
 export default function Entry(body: string, year: number | string, id: number) {
   return (
-    <div key={id}>
-      <EntryWrapper>
+    <div>
+      <EntryWrapper key={id}>
         <Bullet>//</Bullet>
         <EntryText style={oswald300.style}>{body}</EntryText>
         <Year style={permanentMarker.style}>{year}</Year>

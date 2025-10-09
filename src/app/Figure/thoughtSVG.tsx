@@ -4,17 +4,15 @@ import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 const StyledThoughts = styled.svg`
-  position: absolute;
-  top: 23%;
   opacity: 0;
-
-  @media only screen and (max-height: 830px) {
+  transform: translate(30%, 10%);
+  /* @media only screen and (max-height: 830px) {
     transform: translateY(-15%);
   }
 
   @media only screen and (max-height: 530px) {
     transform: translateY(-40%);
-  }
+  } */
 `;
 
 export function ThoughtSVG({ drawDelay }: { drawDelay: number }) {

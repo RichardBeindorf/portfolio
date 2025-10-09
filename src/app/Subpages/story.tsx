@@ -1,30 +1,31 @@
 "use client";
 
 import styled from "styled-components";
-import { permanentMarker, oswald300, oswald500 } from "../styles/font";
+import { permanentMarker, oswald300, oswald500 } from "../../styles/font";
 import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import Entry from "./entry";
 import { entryData } from "@/data/storyEntries";
+import { DrawSVGPlugin } from "gsap/all";
 
 export type TitleProps = {
-  currentWindow: number[];
-  setCurrentWindow: Dispatch<SetStateAction<number[]>>;
-  animationTime: number;
+  currentWindow: RefObject<number[]>;
+  delayTime: number;
   isAnimating: RefObject<boolean>;
 };
 
 export default function Story({
   currentWindow,
-  setCurrentWindow,
-  animationTime,
+  delayTime,
   isAnimating,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
   const title = useRef(null);
+  const titleWrapper = useRef(null);
   const tainer = useRef(null);
+  const underline = useRef(null);
+  gsap.registerPlugin(DrawSVGPlugin);
   const storyTimeline = useRef<gsap.core.Timeline | null>(null);
   const currentState = useRef<gsap.core.Tween | null>(null);
   const entriesRef = useRef<HTMLDivElement>(null);
@@ -33,7 +34,7 @@ export default function Story({
   const pullDuration = 1;
   const titleDuration = 1;
   const topDistanceTitle = "54%";
-  const leftDistanceTitle = "40%";
+  const leftDistanceTitle = "25%";
   const color = useRef("unset");
 
   if (clicked) {
@@ -61,7 +62,7 @@ export default function Story({
             top: topDistanceTitle,
             left: leftDistanceTitle,
             duration: titleDuration,
-            delay: animationTime,
+            delay: delayTime,
           })
           .to(
             title.current,
@@ -74,6 +75,14 @@ export default function Story({
             },
             "<"
           );
+        // .to(
+        //   titleWrapper.current,
+        //   {
+        //     // x: "-20%",
+        //     // textAlign: "left",
+        //   },
+        //   "<"
+        // );
       }
 
       //**//
@@ -101,7 +110,7 @@ export default function Story({
         }
       } else if (
         !clicked &&
-        currentWindow.every(defaultPositionTest) &&
+        currentWindow.current.every(defaultPositionTest) &&
         isAnimating.current
       ) {
         // Only reverse if not clicked AND back to default window position
@@ -129,7 +138,8 @@ export default function Story({
       const onPullLeft = contextSafe(() => {
         gsap.to(tainer.current, {
           scale: 0.1,
-          display: "none",
+          // display: "none",
+          opacity: 0,
           rotate: -30,
           left: "10%",
           top: "70%",
@@ -145,7 +155,8 @@ export default function Story({
         gsap.to(tainer.current, {
           scale: 0.1,
           rotate: 30,
-          display: "none",
+          // display: "none",
+          opacity: 0,
           left: "90%",
           top: "70%",
           duration: pullDuration,
@@ -159,28 +170,45 @@ export default function Story({
       const onPullBack = contextSafe(() => {
         const midOut = gsap.to(tainer.current, {
           display: "block",
-          duration: animationTime + 1,
+          duration: delayTime + 1,
           ease: "power4.out",
           scale: 1,
-          top: "85%",
-          left: "50%",
+          // top: "85%",
+          // left: "50%",
           opacity: 1,
           rotate: 0,
         });
         return midOut;
       });
 
-      if (currentWindow[0] === 1) {
+      if (currentWindow.current[0] === 1) {
         onPullLeft();
-      } else if (currentWindow[2] === 1) {
+      } else if (currentWindow.current[2] === 1) {
         onPullRight();
-      } else if (currentWindow.every(defaultPositionTest)) {
+      } else if (currentWindow.current.every(defaultPositionTest)) {
         onPullBack();
+      }
+
+      //**//
+      /* Unerline Animation */
+      //**//
+
+      const drawUnderline = contextSafe(() => {
+        gsap.from(underline.current, {
+          drawSVG: "0",
+          ease: "power1.in",
+          delay: 0,
+          duration: 0.35,
+        });
+      });
+
+      if (clicked && !isAnimating.current) {
+        drawUnderline();
       }
     },
     {
       scope: tainer,
-      dependencies: [clicked, currentWindow, isAnimating],
+      dependencies: [clicked, currentWindow.current, isAnimating],
       revertOnUpdate: false,
     }
   );
@@ -224,6 +252,23 @@ export default function Story({
         shift.play();
         shift.reverse();
       }
+
+      //**//
+      /* Unerline Animation */
+      //**//
+
+      const drawUnderline = contextSafe(() => {
+        gsap.from(underline.current, {
+          drawSVG: "0",
+          ease: "power1.in",
+          delay: 0,
+          duration: 0.35,
+        });
+      });
+
+      if (clicked && !isAnimating.current) {
+        drawUnderline();
+      }
     },
     {
       scope: tainer,
@@ -234,50 +279,74 @@ export default function Story({
 
   return (
     <ChapterContainer $backgroundColor={color.current} ref={tainer}>
-      <ChapterTitle
-        style={permanentMarker.style}
-        onClick={() => {
-          if (isAnimating.current === false) {
-            const next = !clicked;
-            setClicked(next);
-            setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
-            isAnimating.current = true;
-          }
-        }}
-        ref={title}
-      >
-        Story
-      </ChapterTitle>
-      <div className="contentWrapper">
-        {showEntries ? ( // Use showEntries here
-          <>
-            <Intro style={oswald300.style}>
-              ”Lets say it seems <em style={oswald500.style}>complicated</em>,
-              but in the <em style={oswald500.style}>end</em> it all makes
-              sense”
-            </Intro>
-            <EntryList ref={entriesRef}>
-              {entryData.map((entry, i) => Entry(entry[0], entry[1], i))}
-            </EntryList>
-          </>
+      <TitleWrapper ref={titleWrapper}>
+        <ChapterTitle
+          style={permanentMarker.style}
+          onClick={() => {
+            if (isAnimating.current === false) {
+              const next = !clicked;
+              setClicked(next);
+              setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
+              isAnimating.current = true;
+            }
+          }}
+          ref={title}
+        >
+          Story
+        </ChapterTitle>
+        {clicked && !isAnimating.current ? (
+          <svg width="650" height="20">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth="2.5px"
+              fill="transparent"
+            />
+          </svg>
         ) : null}
-      </div>
+      </TitleWrapper>
+      {clicked && ( // Use showEntries here
+        <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
+          <Intro style={oswald300.style}>
+            ”Lets say it seems <em style={oswald500.style}>complicated</em>, but
+            in the <em style={oswald500.style}>end</em> it all makes sense”
+          </Intro>
+          <EntryList>
+            {entryData.map((entry, i) => (
+              <EntryWrapper key={i}>
+                <Bullet>//</Bullet>
+                <EntryText style={oswald300.style}>{entry[0]}</EntryText>
+                <Year style={permanentMarker.style}>{entry[1]}</Year>
+              </EntryWrapper>
+            ))}
+          </EntryList>
+        </StoryEntryWrapper>
+      )}
     </ChapterContainer>
   );
 }
 
-export const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
+const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   position: absolute;
   top: 85%;
   left: 50%;
-  text-align: center;
-  transform: translateX(-50%);
-  mix-blend-mode: normal;
+  text-align: left;
+  /* mix-blend-mode: normal; */
   padding: 15px;
   border-radius: 15px;
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
+`;
+
+export const TitleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: min-content;
+  margin-bottom: 5vh;
 `;
 
 export const ChapterTitle = styled.h1`
@@ -293,8 +362,19 @@ export const ChapterTitle = styled.h1`
   }
 `;
 
+const StoryEntryWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0px;
+  background-color: var(--background);
+`;
+
 export const Intro = styled.div`
-  width: max-content;
+  /* width: max-content; */
   font-size: 2rem;
   text-align: center;
   color: var(--foreground);
@@ -302,4 +382,40 @@ export const Intro = styled.div`
 
 export const EntryList = styled.div`
   margin-top: 30px;
+`;
+
+const EntryWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 10px 0 10px 0;
+  cursor: pointer;
+  padding: 0px;
+  background-color: rgba(242, 241, 233, 0);
+  transition: padding 1s ease-in, background-color 1s ease-in,
+    font-size 1s ease-in;
+
+  &:hover {
+    padding: 5px;
+    background-color: rgba(242, 241, 233, 1);
+    font-size: clamp(1vw, 1.1rem, 2vw);
+    transition: padding 0.5s ease-out, background-color 0.5s ease-out,
+      font-size 0.5s ease-out;
+  }
+`;
+
+const Bullet = styled.span`
+  color: var(--textAccent);
+  font-size: 2rem;
+`;
+
+const EntryText = styled.p`
+  /* width: max-content; */
+  font-size: 1.5rem;
+`;
+
+const Year = styled.span`
+  font-size: 1.2rem;
 `;
