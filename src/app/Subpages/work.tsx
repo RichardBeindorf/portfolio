@@ -20,11 +20,9 @@ export default function Work({
   const tainer = useRef(null);
   const title = useRef(null);
 
-  const underline = useRef(null);
-  const currentState = useRef(null);
-
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
   const entriesRef = useRef(null);
+  const underline = useRef(null);
   const color = useRef("unset");
   const defaultPositionTest = (pos: number) => pos === 0;
 
@@ -85,7 +83,7 @@ export default function Work({
                 setShowEntries(true);
               } else {
                 isAnimating.current = false;
-                currentWindow = [0, 0, 0];
+                currentWindow.current = [0, 0, 0];
               }
             },
             props: "left, top",
@@ -105,18 +103,6 @@ export default function Work({
             }),
             0
           );
-          // const onStartBounce = contextSafe(() => {
-          //   gsap.to(title.current, {
-          //     delay: 0.5,
-          //     ease: "sine.in",
-          //     keyframes: {
-          //       scaleX: ["100%", "80%", "100%"],
-          //       // left: ["50%", "48%", "50%"],
-          //       rotate: [0, -10, 0],
-          //       easeEach: "none",
-          //     },
-          //   });
-          // });
         }
         // clicked to close title but we are not done animating
         if (isAnimating.current && !clicked) {
@@ -132,11 +118,12 @@ export default function Work({
           );
         }
       },
-      // since this .from will be called forward and backwards we need to close the entries here on start
+      // since this .from will be called forward and backwards we need to close the entries on start, also making sure
       onStart() {
         if (!clicked) {
           setShowEntries(false);
         }
+        isAnimating.current = true;
       },
     });
 
@@ -190,20 +177,35 @@ export default function Work({
         return leftIn;
       });
 
-      if (currentWindow[0] === 1) {
+      const onStartBounce = contextSafe(() => {
+        return gsap.to(title.current, {
+          delay: 0.5,
+          ease: "sine.in",
+          keyframes: {
+            scaleX: ["100%", "80%", "100%"],
+            // left: ["50%", "48%", "50%"],
+            rotate: [0, -10, 0],
+            easeEach: "none",
+          },
+        });
+      });
+
+      if (currentWindow.current[0] === 1) {
         onPullLeft();
       }
 
-      if (currentWindow[1] === 1) {
+      if (currentWindow.current[1] === 1) {
         onPullMid();
-        currentState.current = null;
       }
 
-      if (currentWindow.every(defaultPositionTest)) {
+      if (currentWindow.current[2] === 1) {
+        onStartBounce();
+      }
+
+      if (currentWindow.current.every(defaultPositionTest)) {
         // onDefault();
       }
       // clearing the timeline shortly after giving the command to revers to prevent errors
-      currentState.current = null;
     },
     {
       scope: tainer,
@@ -235,20 +237,23 @@ export default function Work({
           },
         });
       }
-      if (showEntries && entryStaggerAnimation.current) {
-        entryStaggerAnimation.current.play();
-      }
-      if (!showEntries && isAnimating.current) {
-        entryStaggerAnimation.current.reverse();
-        // Animate the contentWrapper back up when entries are reversing out
-        if (entriesRef.current) {
-          shift = gsap.to(entriesRef.current, {
-            y: -60,
-            ease: "power2.out",
-            duration: 0.4,
-          });
-          shift.play();
-          shift.reverse();
+
+      if (entryStaggerAnimation.current) {
+        if (showEntries) {
+          entryStaggerAnimation.current.play();
+        }
+        if (!showEntries && isAnimating.current) {
+          entryStaggerAnimation.current.reverse();
+          // Animate the contentWrapper back up when entries are reversing out
+          if (entriesRef.current) {
+            shift = gsap.to(entriesRef.current, {
+              y: -60,
+              ease: "power2.out",
+              duration: 0.4,
+            });
+            shift.play();
+            shift.reverse();
+          }
         }
       }
 
@@ -294,7 +299,7 @@ export default function Work({
               const next = !clicked;
               setClicked(next);
               // logic for setting it back to default needs to be in the animation onComplete so it doesn`t get triggered after loading
-              currentWindow = next ? [0, 0, 1] : [0, 0, 0];
+              currentWindow.current = next ? [0, 0, 1] : [0, 0, 0];
               isAnimating.current = true;
             }
           }}

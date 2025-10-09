@@ -9,7 +9,7 @@ import { entryData } from "@/data/storyEntries";
 import { DrawSVGPlugin } from "gsap/all";
 
 export type TitleProps = {
-  currentWindow: number[];
+  currentWindow: RefObject<number[]>;
   delayTime: number;
   isAnimating: RefObject<boolean>;
 };
@@ -110,7 +110,7 @@ export default function Story({
         }
       } else if (
         !clicked &&
-        currentWindow.every(defaultPositionTest) &&
+        currentWindow.current.every(defaultPositionTest) &&
         isAnimating.current
       ) {
         // Only reverse if not clicked AND back to default window position
@@ -181,11 +181,11 @@ export default function Story({
         return midOut;
       });
 
-      if (currentWindow[0] === 1) {
+      if (currentWindow.current[0] === 1) {
         onPullLeft();
-      } else if (currentWindow[2] === 1) {
+      } else if (currentWindow.current[2] === 1) {
         onPullRight();
-      } else if (currentWindow.every(defaultPositionTest)) {
+      } else if (currentWindow.current.every(defaultPositionTest)) {
         onPullBack();
       }
 
@@ -208,7 +208,7 @@ export default function Story({
     },
     {
       scope: tainer,
-      dependencies: [clicked, currentWindow, isAnimating],
+      dependencies: [clicked, currentWindow.current, isAnimating],
       revertOnUpdate: false,
     }
   );

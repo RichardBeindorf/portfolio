@@ -90,7 +90,7 @@ export default function Passion({
         });
       } else if (
         !clicked &&
-        currentWindow.every(defaultPositionTest) &&
+        currentWindow.current.every(defaultPositionTest) &&
         isAnimating.current
       ) {
         // Only reverse if we unclicked AND go back to default window position
@@ -167,17 +167,17 @@ export default function Passion({
         return midOut;
       });
 
-      if (currentWindow[1] === 1) {
+      if (currentWindow.current[1] === 1) {
         onPullMid();
-      } else if (currentWindow[2] === 1) {
+      } else if (currentWindow.current[2] === 1) {
         onPullRight();
-      } else if (currentWindow.every(defaultPositionTest)) {
+      } else if (currentWindow.current.every(defaultPositionTest)) {
         onPullBack();
       }
     },
     {
       scope: tainer,
-      dependencies: [clicked, currentWindow],
+      dependencies: [clicked, currentWindow.current],
       revertOnUpdate: false,
     }
   );
