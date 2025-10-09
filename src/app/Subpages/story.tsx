@@ -10,13 +10,13 @@ import { DrawSVGPlugin } from "gsap/all";
 
 export type TitleProps = {
   currentWindow: number[];
-  animationTime: number;
+  delayTime: number;
   isAnimating: RefObject<boolean>;
 };
 
 export default function Story({
   currentWindow,
-  animationTime,
+  delayTime,
   isAnimating,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
@@ -62,7 +62,7 @@ export default function Story({
             top: topDistanceTitle,
             left: leftDistanceTitle,
             duration: titleDuration,
-            delay: animationTime,
+            delay: delayTime,
           })
           .to(
             title.current,
@@ -170,7 +170,7 @@ export default function Story({
       const onPullBack = contextSafe(() => {
         const midOut = gsap.to(tainer.current, {
           display: "block",
-          duration: animationTime + 1,
+          duration: delayTime + 1,
           ease: "power4.out",
           scale: 1,
           // top: "85%",

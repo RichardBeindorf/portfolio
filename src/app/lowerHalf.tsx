@@ -26,17 +26,17 @@ export default function LowerHalf() {
     <Container>
       <Story
         currentWindow={currentWindow.current}
-        animationTime={pullDurationOrDelay}
+        delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
       />
       <Passion
         currentWindow={currentWindow.current}
-        animationTime={pullDurationOrDelay}
+        delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
       />
       <Work
         currentWindow={currentWindow.current}
-        animationTime={pullDurationOrDelay}
+        delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
       />
     </Container>

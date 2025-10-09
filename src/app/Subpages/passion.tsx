@@ -10,7 +10,7 @@ import { DrawSVGPlugin } from "gsap/all";
 
 export default function Passion({
   currentWindow,
-  animationTime,
+  delayTime,
   isAnimating,
 }: TitleProps) {
   const tainer = useRef(null);
@@ -74,11 +74,11 @@ export default function Passion({
             setShowEntries(true);
           },
           duration: titleDelay,
-          delay: animationTime,
+          delay: delayTime,
         });
         gsap.to(title.current, {
           duration: titleDelay,
-          delay: animationTime,
+          delay: delayTime,
           fontSize: "clamp(8vw, 6rem, 11vw)",
           ease: "power4.out",
           onComplete: () => {
@@ -155,7 +155,7 @@ export default function Passion({
       const onPullBack = contextSafe(() => {
         const midOut = gsap.to(tainer.current, {
           display: "block",
-          duration: animationTime + 1,
+          duration: delayTime + 1,
           ease: "power4.out",
           fontSize: "clamp(8vw, 6rem, 11vw)",
           scale: 1,
