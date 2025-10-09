@@ -139,9 +139,8 @@ export default function Work({
     () => {
       // trigger pulls when other titles get clicked
       const onPullMid = contextSafe(() => {
-        gsap.to(tainer.current, {
+        return gsap.to(tainer.current, {
           id: "midIn",
-          display: "none",
           duration: delayTime + 1,
           ease: "power4.out",
           keyframes: {
@@ -158,9 +157,8 @@ export default function Work({
       });
 
       const onPullLeft = contextSafe(() => {
-        const leftIn = gsap.to(tainer.current, {
+        return gsap.to(tainer.current, {
           id: "leftIn",
-          display: "none",
           top: "70%",
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
@@ -173,8 +171,6 @@ export default function Work({
           duration: delayTime + 1,
           ease: "power4.out",
         });
-
-        return leftIn;
       });
 
       const onStartBounce = contextSafe(() => {
@@ -187,6 +183,19 @@ export default function Work({
             rotate: [0, -10, 0],
             easeEach: "none",
           },
+        });
+      });
+
+      const onDefault = contextSafe(() => {
+        return gsap.to(tainer.current, {
+          id: "default",
+          duration: delayTime + 1,
+          ease: "power4.out",
+          rotate: 0,
+          scale: 1,
+          top: "50%",
+          left: "80%",
+          opacity: 1,
         });
       });
 
@@ -203,9 +212,8 @@ export default function Work({
       }
 
       if (currentWindow.current.every(defaultPositionTest)) {
-        // onDefault();
+        onDefault();
       }
-      // clearing the timeline shortly after giving the command to revers to prevent errors
     },
     {
       scope: tainer,
