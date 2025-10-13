@@ -49,7 +49,7 @@ export default function Story({
     }
 
     // first create (or get the existing) batch by id
-    let batch = Flip.batch("id");
+    let batch = Flip.batch("story");
     let action = batch.add({
       getState() {
         return Flip.getState(tainer.current);
@@ -115,6 +115,7 @@ export default function Story({
         if (!clicked) {
           setShowEntries(false);
           currentWindow.current = [0, 0, 0];
+          console.log("currentWindow - story set");
         }
         isAnimating.current = true;
       },
@@ -185,7 +186,7 @@ export default function Story({
           rotate: 0,
         });
       });
-      console.log("currentWind", currentWindow.current);
+
       if (currentWindow.current[0] === 1 && !clicked) {
         onPullLeft();
       } else if (currentWindow.current[2] === 1) {

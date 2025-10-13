@@ -74,7 +74,7 @@ export default function Work({
     }
 
     // first create (or get the existing) batch by id
-    let batch = Flip.batch("id");
+    let batch = Flip.batch("work");
     let action = batch.add({
       getState() {
         return Flip.getState(tainer.current);

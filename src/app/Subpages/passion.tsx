@@ -24,6 +24,7 @@ export default function Passion({
   const isInitial = useRef(true);
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
+  const initialOrDefaultWindow = useRef(true);
 
   const initialPosition: boolean = currentWindow.current === "initial";
   let defaultPosition: boolean;
@@ -31,11 +32,11 @@ export default function Passion({
     const tester = (pos: number) => pos === 0;
     defaultPosition = currentWindow.current.every(tester);
   }
-  let initialOrDefaultWindow: boolean = true;
+
   if (!initialPosition) {
-    initialOrDefaultWindow = defaultPosition ? true : false;
+    initialOrDefaultWindow.current = defaultPosition ? true : false;
   } else {
-    initialOrDefaultWindow = true;
+    initialOrDefaultWindow.current = true;
   }
   const pullDuration = 1;
 
@@ -47,7 +48,7 @@ export default function Passion({
     }
 
     // first create (or get the existing) batch by id
-    let batch = Flip.batch("id");
+    let batch = Flip.batch("passion");
     let action = batch.add({
       getState() {
         return Flip.getState(tainer.current);
@@ -71,6 +72,7 @@ export default function Passion({
             delay: delayTime,
             absolute: true,
             onComplete: () => {
+              console.log(currentWindow.current);
               isAnimating.current = false;
               if (clicked) {
                 setShowEntries(true);
@@ -281,11 +283,15 @@ export default function Passion({
           style={permanentMarker.style}
           onClick={() => {
             console.log(currentWindow.current);
-            if (!isAnimating.current) {
+            if (
+              !isAnimating.current &&
+              currentWindow.current[1] !== 1 &&
+              currentWindow.current[2] !== 1
+            ) {
               const next = !clicked;
 
               setClicked(next);
-              if (initialOrDefaultWindow) {
+              if (initialOrDefaultWindow.current) {
                 currentWindow.current = [1, 0, 0];
               }
 
