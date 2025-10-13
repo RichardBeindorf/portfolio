@@ -1,12 +1,13 @@
 "use client";
 
 import styled from "styled-components";
-import { ChapterTitle, TitleProps, TitleWrapper } from "./story";
+import { ChapterTitle, TitleWrapper } from "./story";
 import { oswald300, oswald500, permanentMarker } from "@/styles/font";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { DrawSVGPlugin } from "gsap/all";
+import { TitleProps } from "../lowerHalf";
 
 export default function Passion({
   currentWindow,
@@ -19,7 +20,13 @@ export default function Passion({
   gsap.registerPlugin(DrawSVGPlugin);
   const [clicked, setClicked] = useState(false);
   const currentState = useRef(null);
-  const defaultPositionTest = (pos: number) => pos === 0;
+
+  let defaultPosition: boolean;
+  const tester = (pos: number) => pos === 0;
+  if (typeof currentWindow.current !== "string") {
+    defaultPosition = currentWindow.current.every(tester);
+  }
+
   const titleDelay = 1;
   const pullDuration = 1;
   const topDistanceTitle = "54%";
@@ -29,12 +36,6 @@ export default function Passion({
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
   const [showEntries, setShowEntries] = useState(false);
   const color = useRef("unset");
-
-  if (clicked) {
-    color.current = "#F2F1E9";
-  } else {
-    color.current = "unset";
-  }
 
   const { contextSafe } = useGSAP(
     () => {
@@ -88,11 +89,7 @@ export default function Passion({
             color: ["#262626", "#F24150"],
           },
         });
-      } else if (
-        !clicked &&
-        currentWindow.current.every(defaultPositionTest) &&
-        isAnimating.current
-      ) {
+      } else if (!clicked && defaultPosition && isAnimating.current) {
         // Only reverse if we unclicked AND go back to default window position
         gsap.to(tainer.current, {
           left: "10%",
@@ -171,7 +168,7 @@ export default function Passion({
         onPullMid();
       } else if (currentWindow.current[2] === 1) {
         onPullRight();
-      } else if (currentWindow.current.every(defaultPositionTest)) {
+      } else if (defaultPosition && isAnimating.current) {
         onPullBack();
       }
     },
@@ -193,6 +190,8 @@ export default function Passion({
       let shift;
 
       if (!entryStaggerAnimation.current && items.length > 0) {
+        entryStaggerAnimation.current?.kill();
+
         entryStaggerAnimation.current = gsap.from(items, {
           opacity: 0,
           y: 20,
@@ -201,24 +200,28 @@ export default function Passion({
           ease: "power2.out",
           paused: true,
           onReverseComplete: () => {
-            setShowEntries(false);
+            entryStaggerAnimation.current = null;
           },
         });
       }
-      if (showEntries && entryStaggerAnimation.current) {
-        entryStaggerAnimation.current.play();
-      }
-      if (!clicked && isAnimating.current === true) {
-        entryStaggerAnimation.current.reverse();
-        entryStaggerAnimation.current = null;
-        // Animate the contentWrapper back up when entries are reversing out
-        shift = gsap.to(".contentWrapper", {
-          y: -60,
-          ease: "power2.out",
-          duration: 0.4,
-        });
-        shift.play();
-        shift.reverse();
+
+      if (entryStaggerAnimation.current) {
+        if (showEntries) {
+          entryStaggerAnimation.current.play();
+        }
+        if (!showEntries && isAnimating.current) {
+          entryStaggerAnimation.current.reverse();
+          // Animate the contentWrapper back up when entries are reversing out
+          if (entriesRef.current) {
+            shift = gsap.to(entriesRef.current, {
+              y: -60,
+              ease: "power2.out",
+              duration: 0.4,
+            });
+            shift.play();
+            shift.reverse();
+          }
+        }
       }
 
       //**//
@@ -234,13 +237,16 @@ export default function Passion({
         });
       });
 
-      if (clicked && !isAnimating.current) {
+      if (showEntries && !isAnimating.current && underline.current) {
+        color.current = "#F2F1E9";
         drawUnderline();
+      } else {
+        color.current = "unset";
       }
     },
     {
       scope: tainer,
-      dependencies: [showEntries, clicked],
+      dependencies: [showEntries],
       revertOnUpdate: false,
     }
   );
@@ -254,7 +260,7 @@ export default function Passion({
             if (isAnimating.current === false) {
               const next = !clicked;
               setClicked(next);
-              setCurrentWindow(next ? [1, 0, 0] : [0, 0, 0]);
+              currentWindow.current = next ? [1, 0, 0] : [0, 0, 0];
               isAnimating.current = true;
             }
           }}

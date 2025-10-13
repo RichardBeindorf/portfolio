@@ -1,12 +1,13 @@
 "use client";
 
-import styled from "styled-components";
-import { ChapterTitle, Intro, TitleProps, TitleWrapper } from "./story";
-import { oswald300, permanentMarker } from "@/styles/font";
-import { useLayoutEffect, useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import styled from "styled-components";
 import { DrawSVGPlugin, Flip } from "gsap/all";
+import { useLayoutEffect, useRef, useState } from "react";
+import { oswald300, permanentMarker } from "@/styles/font";
+import { ChapterTitle, Intro, TitleWrapper } from "./story";
+import { TitleProps } from "../lowerHalf";
 
 export default function Work({
   currentWindow,
@@ -19,12 +20,26 @@ export default function Work({
   gsap.registerPlugin(DrawSVGPlugin, Flip);
   const tainer = useRef(null);
   const title = useRef(null);
+  const expand = useRef<"expanded" | "default">("default");
+  const isInitial = useRef(true);
 
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
   const entriesRef = useRef(null);
   const underline = useRef(null);
   const color = useRef("unset");
-  const defaultPositionTest = (pos: number) => pos === 0;
+
+  const initialPosition: boolean = currentWindow.current === "initial";
+  let defaultPosition: boolean;
+  if (typeof currentWindow.current !== "string") {
+    const tester = (pos: number) => pos === 0;
+    defaultPosition = currentWindow.current.every(tester);
+  }
+  let initialOrDefaultWindow: boolean = true;
+  if (!initialPosition) {
+    initialOrDefaultWindow = defaultPosition ? true : false;
+  } else {
+    initialOrDefaultWindow = true;
+  }
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 
@@ -53,6 +68,12 @@ export default function Work({
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
+    // Skip the first render
+    if (isInitial.current) {
+      isInitial.current = false;
+      return;
+    }
+
     // first create (or get the existing) batch by id
     let batch = Flip.batch("id");
     let action = batch.add({
@@ -63,7 +84,7 @@ export default function Work({
         if (clicked) {
           tainer.current.style.setProperty("position", "relative");
           gsap.set(tainer.current, { left: "10%", top: "25%" });
-        } else {
+        } else if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
           gsap.set(tainer.current, { left: "80%", top: "50%" });
         }
@@ -78,12 +99,9 @@ export default function Work({
             delay: delayTime,
             absolute: true,
             onComplete: () => {
+              isAnimating.current = false;
               if (clicked) {
-                isAnimating.current = false;
                 setShowEntries(true);
-              } else {
-                isAnimating.current = false;
-                currentWindow.current = [0, 0, 0];
               }
             },
             props: "left, top",
@@ -91,7 +109,7 @@ export default function Work({
           0
         );
 
-        if (clicked) {
+        if (clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
               fontSize: "clamp(8vw, 6rem, 11vw)",
@@ -104,8 +122,9 @@ export default function Work({
             0
           );
         }
+
         // clicked to close title but we are not done animating
-        if (isAnimating.current && !clicked) {
+        if (isAnimating.current && !clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
               fontSize: "clamp(2vw, 3rem, 4.5vw)",
@@ -120,10 +139,11 @@ export default function Work({
       },
       // since this .from will be called forward and backwards we need to close the entries on start, also making sure
       onStart() {
+        isAnimating.current = true;
         if (!clicked) {
           setShowEntries(false);
+          currentWindow.current = [0, 0, 0];
         }
-        isAnimating.current = true;
       },
     });
 
@@ -187,31 +207,32 @@ export default function Work({
       });
 
       const onDefault = contextSafe(() => {
-        return gsap.to(tainer.current, {
-          id: "default",
-          duration: delayTime + 1,
-          ease: "power4.out",
-          rotate: 0,
-          scale: 1,
-          top: "50%",
-          left: "80%",
-          opacity: 1,
-        });
+        if (!isInitial.current)
+          return gsap.to(tainer.current, {
+            id: "default",
+            duration: delayTime + 1,
+            ease: "power4.out",
+            rotate: 0,
+            scale: 1,
+            top: "50%",
+            left: "80%",
+            opacity: 1,
+          });
       });
 
-      if (currentWindow.current[0] === 1) {
+      if (currentWindow.current[0] === 1 && !clicked) {
         onPullLeft();
       }
 
-      if (currentWindow.current[1] === 1) {
+      if (currentWindow.current[1] === 1 && !clicked) {
         onPullMid();
       }
 
-      if (currentWindow.current[2] === 1) {
+      if (currentWindow.current[2] === 1 && clicked) {
         onStartBounce();
       }
 
-      if (currentWindow.current.every(defaultPositionTest)) {
+      if (defaultPosition && !isInitial.current && !clicked) {
         onDefault();
       }
     },
@@ -305,9 +326,12 @@ export default function Work({
           onClick={() => {
             if (!isAnimating.current) {
               const next = !clicked;
+
               setClicked(next);
-              // logic for setting it back to default needs to be in the animation onComplete so it doesn`t get triggered after loading
-              currentWindow.current = next ? [0, 0, 1] : [0, 0, 0];
+              if (initialOrDefaultWindow) {
+                currentWindow.current = [0, 0, 1];
+              }
+
               isAnimating.current = true;
             }
           }}
@@ -420,6 +444,7 @@ const Text = styled.p`
   margin: 0;
 `;
 
+// Gotta find out a better way to adjust
 const IFrameWrapper = styled.div`
   width: 280px; /* 400 * 0.7 */
   height: 476px; /* 768 * 0.7 */

@@ -2,17 +2,12 @@
 
 import styled from "styled-components";
 import { permanentMarker, oswald300, oswald500 } from "../../styles/font";
-import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { entryData } from "@/data/storyEntries";
-import { DrawSVGPlugin } from "gsap/all";
-
-export type TitleProps = {
-  currentWindow: RefObject<number[]>;
-  delayTime: number;
-  isAnimating: RefObject<boolean>;
-};
+import { DrawSVGPlugin, Flip } from "gsap/all";
+import { TitleProps } from "../lowerHalf";
 
 export default function Story({
   currentWindow,
@@ -21,70 +16,114 @@ export default function Story({
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
+  gsap.registerPlugin(DrawSVGPlugin, Flip);
   const title = useRef(null);
-  const titleWrapper = useRef(null);
   const tainer = useRef(null);
+  const color = useRef("unset");
   const underline = useRef(null);
-  gsap.registerPlugin(DrawSVGPlugin);
-  const storyTimeline = useRef<gsap.core.Timeline | null>(null);
-  const currentState = useRef<gsap.core.Tween | null>(null);
+  const isInitial = useRef(true);
+  const titleWrapper = useRef(null);
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
-  const defaultPositionTest = (pos: number) => pos === 0;
-  const pullDuration = 1;
-  const titleDuration = 1;
-  const topDistanceTitle = "54%";
-  const leftDistanceTitle = "25%";
-  const color = useRef("unset");
 
-  if (clicked) {
-    color.current = "#F2F1E9";
-  } else {
-    color.current = "unset";
+  const tester = (pos: number) => pos === 0;
+  let defaultPosition: boolean;
+  if (typeof currentWindow.current !== "string") {
+    defaultPosition = currentWindow.current.every(tester);
   }
+  const pullDuration = 1;
 
-  const { contextSafe } = useGSAP(
-    () => {
-      //**//
-      /* MAIN TITLE ANIMATION */
-      //**//
-      if (!storyTimeline.current) {
-        storyTimeline.current = gsap.timeline({
-          paused: true,
-          ease: "power4.out",
-          onComplete: () => {
-            isAnimating.current = false;
-            setShowEntries(true); // Toggle entries when main animation is done
-          },
-        });
-        storyTimeline.current
-          .to(tainer.current, {
-            top: topDistanceTitle,
-            left: leftDistanceTitle,
-            duration: titleDuration,
+  // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
+  useLayoutEffect(() => {
+    if (isInitial.current) {
+      isInitial.current = false;
+      isAnimating.current = false;
+      return;
+    }
+
+    // first create (or get the existing) batch by id
+    let batch = Flip.batch("id");
+    let action = batch.add({
+      getState() {
+        return Flip.getState(tainer.current);
+      },
+      setState() {
+        if (clicked) {
+          tainer.current.style.setProperty("position", "relative");
+          gsap.set(tainer.current, { left: "10%", top: "25%" });
+        } else {
+          tainer.current.style.setProperty("position", "absolute");
+          gsap.set(tainer.current, { left: "50%", top: "80%" });
+        }
+      },
+      animate(self) {
+        const tl = gsap.timeline();
+        tl.add(
+          Flip.from(self.state, {
+            targets: tainer.current,
+            duration: 2,
+            ease: "power4.out",
             delay: delayTime,
-          })
-          .to(
-            title.current,
-            {
+            absolute: true,
+            onComplete: () => {
+              if (clicked) {
+                isAnimating.current = false;
+                setShowEntries(true);
+              } else {
+                isAnimating.current = false;
+                currentWindow.current = [0, 0, 0];
+              }
+            },
+            props: "left, top",
+          }),
+          0
+        );
+
+        if (clicked) {
+          tl.add(
+            gsap.to(title.current, {
               fontSize: "clamp(8vw, 6rem, 11vw)",
-              duration: titleDuration,
               keyframes: {
                 color: ["#262626", "#F24150"],
               },
-            },
-            "<"
+              duration: 2,
+              delay: delayTime,
+            }),
+            0
           );
-        // .to(
-        //   titleWrapper.current,
-        //   {
-        //     // x: "-20%",
-        //     // textAlign: "left",
-        //   },
-        //   "<"
-        // );
-      }
+        }
+        // clicked to close title but we are not done animating
+        if (isAnimating.current && !clicked && currentWindow.current[1] === 1) {
+          tl.add(
+            gsap.to(title.current, {
+              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              keyframes: {
+                color: ["#F24150", "#262626"],
+              },
+              duration: 2,
+            }),
+            0
+          );
+        }
+      },
+      // since this .from will be called forward and backwards we need to close the entries on start, also making sure
+      onStart() {
+        if (!clicked) {
+          setShowEntries(false);
+        }
+        isAnimating.current = true;
+      },
+    });
 
+    batch.run();
+
+    return () => {
+      action.kill();
+    };
+  }, [clicked]);
+
+  const { contextSafe } = useGSAP(
+    () => {
       //**//
       /* ONLY ONCE PER CYCLE (Bounce animation) */
       //**//
@@ -101,114 +140,61 @@ export default function Story({
         });
       });
 
-      // CONTROLL LOGIC
-      if (clicked) {
-        storyTimeline.current.play();
-        if (isAnimating.current) {
-          // Only trigger bounce if an animation is truly in progress
-          onStartBounce();
-        }
-      } else if (
-        !clicked &&
-        currentWindow.current.every(defaultPositionTest) &&
-        isAnimating.current
-      ) {
-        // Only reverse if not clicked AND back to default window position
-        gsap.to(tainer.current, {
-          top: "85%",
-          left: "50%",
-          duration: titleDuration,
-          ease: "power4.out",
-          onStart: () => {
-            isAnimating.current = false;
-            storyTimeline.current = null;
-          },
-        });
-        gsap.to(title.current, {
-          fontSize: "clamp(2vw, 3rem, 4.5vw)",
-          color: "var(--foreground)",
-          duration: titleDuration,
-        });
-      }
-
       //**//
       /* Secondary Title Animation (Pull Left/Right) */
       //**//
 
       const onPullLeft = contextSafe(() => {
-        gsap.to(tainer.current, {
+        return gsap.to(tainer.current, {
           scale: 0.1,
-          // display: "none",
           opacity: 0,
           rotate: -30,
           left: "10%",
           top: "70%",
           duration: pullDuration,
           ease: "power4.out",
-          onReverseComplete: () => {
-            currentState.current = null; // Clear ref when animation reverses
-          },
         });
       });
 
       const onPullRight = contextSafe(() => {
-        gsap.to(tainer.current, {
+        return gsap.to(tainer.current, {
           scale: 0.1,
           rotate: 30,
-          // display: "none",
           opacity: 0,
           left: "90%",
           top: "70%",
           duration: pullDuration,
           ease: "power4.in",
-          onReverseComplete: () => {
-            currentState.current = null; // Clear ref when animation reverses
-          },
         });
       });
 
-      const onPullBack = contextSafe(() => {
-        const midOut = gsap.to(tainer.current, {
+      const onDefault = contextSafe(() => {
+        return gsap.to(tainer.current, {
           display: "block",
           duration: delayTime + 1,
           ease: "power4.out",
+          top: "85%",
+          left: "50%",
           scale: 1,
-          // top: "85%",
-          // left: "50%",
           opacity: 1,
           rotate: 0,
         });
-        return midOut;
       });
 
       if (currentWindow.current[0] === 1) {
         onPullLeft();
       } else if (currentWindow.current[2] === 1) {
         onPullRight();
-      } else if (currentWindow.current.every(defaultPositionTest)) {
-        onPullBack();
+      } else if (defaultPosition && !isInitial.current) {
+        onDefault();
       }
-
-      //**//
-      /* Unerline Animation */
-      //**//
-
-      const drawUnderline = contextSafe(() => {
-        gsap.from(underline.current, {
-          drawSVG: "0",
-          ease: "power1.in",
-          delay: 0,
-          duration: 0.35,
-        });
-      });
-
-      if (clicked && !isAnimating.current) {
-        drawUnderline();
+      if (currentWindow.current[1] === 1) {
+        onStartBounce();
       }
     },
     {
       scope: tainer,
-      dependencies: [clicked, currentWindow.current, isAnimating],
+      dependencies: [clicked],
       revertOnUpdate: false,
     }
   );
@@ -221,10 +207,11 @@ export default function Story({
       const items = entriesRef.current
         ? entriesRef.current.querySelectorAll("div")
         : [];
-
       let shift;
 
       if (!entryStaggerAnimation.current && items.length > 0) {
+        entryStaggerAnimation.current?.kill();
+
         entryStaggerAnimation.current = gsap.from(items, {
           opacity: 0,
           y: 20,
@@ -233,28 +220,32 @@ export default function Story({
           ease: "power2.out",
           paused: true,
           onReverseComplete: () => {
-            setShowEntries(false);
+            entryStaggerAnimation.current = null;
           },
         });
       }
-      if (showEntries && entryStaggerAnimation.current) {
-        entryStaggerAnimation.current.play();
-      }
-      if (!clicked && isAnimating.current === true) {
-        entryStaggerAnimation.current.reverse();
-        entryStaggerAnimation.current = null;
-        // Animate the contentWrapper back up when entries are reversing out
-        shift = gsap.to(".contentWrapper", {
-          y: -60,
-          ease: "power2.out",
-          duration: 0.4,
-        });
-        shift.play();
-        shift.reverse();
+
+      if (entryStaggerAnimation.current) {
+        if (showEntries) {
+          entryStaggerAnimation.current.play();
+        }
+        if (!showEntries && isAnimating.current) {
+          entryStaggerAnimation.current.reverse();
+          // Animate the contentWrapper back up when entries are reversing out
+          if (entriesRef.current) {
+            shift = gsap.to(entriesRef.current, {
+              y: -60,
+              ease: "power2.out",
+              duration: 0.4,
+            });
+            shift.play();
+            shift.reverse();
+          }
+        }
       }
 
       //**//
-      /* Unerline Animation */
+      /* Underline Animation */
       //**//
 
       const drawUnderline = contextSafe(() => {
@@ -266,13 +257,16 @@ export default function Story({
         });
       });
 
-      if (clicked && !isAnimating.current) {
+      if (showEntries && !isAnimating.current && underline.current) {
+        color.current = "#F2F1E9";
         drawUnderline();
+      } else {
+        color.current = "unset";
       }
     },
     {
       scope: tainer,
-      dependencies: [showEntries, clicked],
+      dependencies: [showEntries],
       revertOnUpdate: false,
     }
   );
@@ -283,10 +277,12 @@ export default function Story({
         <ChapterTitle
           style={permanentMarker.style}
           onClick={() => {
-            if (isAnimating.current === false) {
+            if (isAnimating.current === false && defaultPosition) {
               const next = !clicked;
               setClicked(next);
-              setCurrentWindow(next ? [0, 1, 0] : [0, 0, 0]);
+              if (defaultPosition) {
+                currentWindow.current = [0, 1, 0];
+              }
               isAnimating.current = true;
             }
           }}
@@ -295,7 +291,7 @@ export default function Story({
           Story
         </ChapterTitle>
         {clicked && !isAnimating.current ? (
-          <svg width="650" height="20">
+          <svg width="650" height="20" className="underline">
             <path
               ref={underline}
               d="M 0 0 Q 20 20, 500 0"
@@ -306,7 +302,7 @@ export default function Story({
           </svg>
         ) : null}
       </TitleWrapper>
-      {clicked && ( // Use showEntries here
+      {showEntries && ( // Use showEntries here
         <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
           <Intro style={oswald300.style}>
             ”Lets say it seems <em style={oswald500.style}>complicated</em>, but

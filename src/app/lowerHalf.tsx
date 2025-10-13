@@ -3,8 +3,16 @@
 import styled from "styled-components";
 import Story from "./Subpages/story";
 import Passion from "./Subpages/passion";
-import { useRef } from "react";
+import { RefObject, useRef } from "react";
 import Work from "./Subpages/work";
+
+type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";
+
+export type TitleProps = {
+  currentWindow: RefObject<WindowStates>;
+  delayTime: number;
+  isAnimating: RefObject<boolean>;
+};
 
 const Container = styled.div`
   position: relative;
@@ -19,9 +27,9 @@ const Container = styled.div`
 `;
 
 export default function LowerHalf() {
-  const currentWindow = useRef<number[]>([]);
+  const currentWindow = useRef<WindowStates>("initial");
   const pullDurationOrDelay = 1.2;
-  const isAnimating = useRef(false);
+  const isAnimating = useRef(true);
   return (
     <Container>
       <Story
