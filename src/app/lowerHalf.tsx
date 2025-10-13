@@ -29,6 +29,7 @@ const Container = styled.div`
 export default function LowerHalf() {
   const currentWindow = useRef<WindowStates>("initial");
   const pullDurationOrDelay = 1.2;
+  // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
   const isAnimating = useRef(true);
   return (
     <Container>

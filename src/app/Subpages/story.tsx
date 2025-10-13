@@ -26,10 +26,17 @@ export default function Story({
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
 
-  const tester = (pos: number) => pos === 0;
+  const initialPosition: boolean = currentWindow.current === "initial";
   let defaultPosition: boolean;
   if (typeof currentWindow.current !== "string") {
+    const tester = (pos: number) => pos === 0;
     defaultPosition = currentWindow.current.every(tester);
+  }
+  let initialOrDefaultWindow: boolean = true;
+  if (!initialPosition) {
+    initialOrDefaultWindow = defaultPosition ? true : false;
+  } else {
+    initialOrDefaultWindow = true;
   }
   const pullDuration = 1;
 
@@ -66,12 +73,9 @@ export default function Story({
             delay: delayTime,
             absolute: true,
             onComplete: () => {
+              isAnimating.current = false;
               if (clicked) {
-                isAnimating.current = false;
                 setShowEntries(true);
-              } else {
-                isAnimating.current = false;
-                currentWindow.current = [0, 0, 0];
               }
             },
             props: "left, top",
@@ -110,6 +114,7 @@ export default function Story({
       onStart() {
         if (!clicked) {
           setShowEntries(false);
+          currentWindow.current = [0, 0, 0];
         }
         isAnimating.current = true;
       },
@@ -180,15 +185,15 @@ export default function Story({
           rotate: 0,
         });
       });
-
-      if (currentWindow.current[0] === 1) {
+      console.log("currentWind", currentWindow.current);
+      if (currentWindow.current[0] === 1 && !clicked) {
         onPullLeft();
       } else if (currentWindow.current[2] === 1) {
         onPullRight();
-      } else if (defaultPosition && !isInitial.current) {
+      } else if (defaultPosition && !isInitial.current && !clicked) {
         onDefault();
       }
-      if (currentWindow.current[1] === 1) {
+      if (currentWindow.current[1] === 1 && clicked) {
         onStartBounce();
       }
     },
@@ -277,12 +282,14 @@ export default function Story({
         <ChapterTitle
           style={permanentMarker.style}
           onClick={() => {
-            if (isAnimating.current === false && defaultPosition) {
+            if (!isAnimating.current) {
               const next = !clicked;
+
               setClicked(next);
-              if (defaultPosition) {
+              if (initialOrDefaultWindow) {
                 currentWindow.current = [0, 1, 0];
               }
+
               isAnimating.current = true;
             }
           }}

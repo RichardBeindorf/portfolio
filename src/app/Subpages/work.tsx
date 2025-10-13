@@ -20,7 +20,6 @@ export default function Work({
   gsap.registerPlugin(DrawSVGPlugin, Flip);
   const tainer = useRef(null);
   const title = useRef(null);
-  const expand = useRef<"expanded" | "default">("default");
   const isInitial = useRef(true);
 
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
