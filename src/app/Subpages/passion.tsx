@@ -72,7 +72,6 @@ export default function Passion({
             delay: delayTime,
             absolute: true,
             onComplete: () => {
-              console.log(currentWindow.current);
               isAnimating.current = false;
               if (clicked) {
                 setShowEntries(true);
@@ -282,7 +281,6 @@ export default function Passion({
         <Title
           style={permanentMarker.style}
           onClick={() => {
-            console.log(currentWindow.current);
             if (
               !isAnimating.current &&
               currentWindow.current[1] !== 1 &&

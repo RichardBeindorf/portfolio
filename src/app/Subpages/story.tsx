@@ -115,7 +115,6 @@ export default function Story({
         if (!clicked) {
           setShowEntries(false);
           currentWindow.current = [0, 0, 0];
-          console.log("currentWindow - story set");
         }
         isAnimating.current = true;
       },
@@ -151,7 +150,7 @@ export default function Story({
       //**//
 
       const onPullLeft = contextSafe(() => {
-        return gsap.to(tainer.current, {
+        const left = gsap.to(tainer.current, {
           scale: 0.1,
           opacity: 0,
           rotate: -30,
@@ -160,6 +159,8 @@ export default function Story({
           duration: pullDuration,
           ease: "power4.out",
         });
+
+        return left;
       });
 
       const onPullRight = contextSafe(() => {
@@ -187,21 +188,22 @@ export default function Story({
         });
       });
 
-      if (currentWindow.current[0] === 1 && !clicked) {
+      console.log("check", currentWindow.current);
+      if (currentWindow.current[0] === 1) {
         onPullLeft();
       } else if (currentWindow.current[2] === 1) {
         onPullRight();
       } else if (defaultPosition && !isInitial.current && !clicked) {
         onDefault();
+        console.log("onDef");
       }
       if (currentWindow.current[1] === 1 && clicked) {
         onStartBounce();
       }
     },
     {
-      scope: tainer,
-      dependencies: [clicked],
-      revertOnUpdate: false,
+      dependencies: [clicked, currentWindow.current],
+      // revertOnUpdate: false,
     }
   );
 
