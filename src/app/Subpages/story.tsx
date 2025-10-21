@@ -10,6 +10,9 @@ import { DrawSVGPlugin, Flip } from "gsap/all";
 import { TitleProps } from "../lowerHalf";
 
 export default function Story({
+  pullMasterTl,
+  pullDirection,
+  pulldirectionProp,
   currentWindow,
   delayTime,
   isAnimating,
@@ -25,6 +28,8 @@ export default function Story({
   const titleWrapper = useRef(null);
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
+  const storyRight = useRef(null);
+  const storyLeft = useRef(null);
 
   const initialPosition: boolean = currentWindow.current === "initial";
   let defaultPosition: boolean;
@@ -127,85 +132,27 @@ export default function Story({
     };
   }, [clicked]);
 
-  const { contextSafe } = useGSAP(
-    () => {
-      //**//
-      /* ONLY ONCE PER CYCLE (Bounce animation) */
-      //**//
-      const onStartBounce = contextSafe(() => {
-        gsap.to(title.current, {
-          delay: 0.5,
-          ease: "sine.in",
-          keyframes: {
-            scaleX: ["100%", "80%", "100%"],
-            // left: ["50%", "48%", "50%"],
-            rotate: [0, -10, 0],
-            easeEach: "none",
-          },
-        });
+  const { contextSafe } = useGSAP(() => {
+    //**//
+    /* ONLY ONCE PER CYCLE (Bounce animation) */
+    //**//
+    const onStartBounce = contextSafe(() => {
+      gsap.to(title.current, {
+        delay: 0.5,
+        ease: "sine.in",
+        keyframes: {
+          scaleX: ["100%", "80%", "100%"],
+          // left: ["50%", "48%", "50%"],
+          rotate: [0, -10, 0],
+          easeEach: "none",
+        },
       });
+    });
 
-      //**//
-      /* Secondary Title Animation (Pull Left/Right) */
-      //**//
-
-      const onPullLeft = contextSafe(() => {
-        const left = gsap.to(tainer.current, {
-          scale: 0.1,
-          opacity: 0,
-          rotate: -30,
-          left: "10%",
-          top: "70%",
-          duration: pullDuration,
-          ease: "power4.out",
-        });
-
-        return left;
-      });
-
-      const onPullRight = contextSafe(() => {
-        return gsap.to(tainer.current, {
-          scale: 0.1,
-          rotate: 30,
-          opacity: 0,
-          left: "90%",
-          top: "70%",
-          duration: pullDuration,
-          ease: "power4.in",
-        });
-      });
-
-      const onDefault = contextSafe(() => {
-        return gsap.to(tainer.current, {
-          display: "block",
-          duration: delayTime + 1,
-          ease: "power4.out",
-          top: "85%",
-          left: "50%",
-          scale: 1,
-          opacity: 1,
-          rotate: 0,
-        });
-      });
-
-      console.log("check", currentWindow.current);
-      if (currentWindow.current[0] === 1) {
-        onPullLeft();
-      } else if (currentWindow.current[2] === 1) {
-        onPullRight();
-      } else if (defaultPosition && !isInitial.current && !clicked) {
-        onDefault();
-        console.log("onDef");
-      }
-      if (currentWindow.current[1] === 1 && clicked) {
-        onStartBounce();
-      }
-    },
-    {
-      dependencies: [clicked, currentWindow.current],
-      // revertOnUpdate: false,
+    if (currentWindow.current[1] === 1 && clicked) {
+      onStartBounce();
     }
-  );
+  }, [clicked, currentWindow.current]);
 
   //**//
   /* Staggered Animation of the Entries - Managed outside main GSAP context for clarity */
@@ -279,6 +226,50 @@ export default function Story({
     }
   );
 
+  useGSAP(() => {
+    if (!storyLeft.current) {
+      storyLeft.current = gsap
+        .timeline({
+          paused: true,
+          id: "storyLeft",
+        })
+        .to(tainer.current, {
+          scale: 0.1,
+          opacity: 0,
+          rotate: -30,
+          left: "10%",
+          top: "50%",
+          duration: pullDuration,
+          ease: "power4.out",
+        });
+    }
+
+    if (!storyRight.current) {
+      storyRight.current = gsap
+        .timeline({
+          paused: true,
+          id: "storyRight",
+        })
+        .to(tainer.current, {
+          scale: 0.1,
+          rotate: 30,
+          opacity: 0,
+          left: "90%",
+          top: "50%",
+          duration: pullDuration,
+          ease: "power4.in",
+        });
+    }
+
+    if (pullDirection === "right") {
+      storyRight.current.play();
+    }
+
+    if (pullDirection === "default" && storyRight.current.progress() === 1) {
+      storyRight.current.reverse();
+    }
+  }, [pullDirection]);
+
   return (
     <ChapterContainer $backgroundColor={color.current} ref={tainer}>
       <TitleWrapper ref={titleWrapper}>
@@ -291,6 +282,10 @@ export default function Story({
               setClicked(next);
               if (initialOrDefaultWindow) {
                 currentWindow.current = [0, 1, 0];
+                pulldirectionProp("mid");
+              }
+              if (pullDirection === "mid") {
+                pulldirectionProp("default");
               }
 
               isAnimating.current = true;

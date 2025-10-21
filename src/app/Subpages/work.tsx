@@ -10,6 +10,9 @@ import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import { TitleProps } from "../lowerHalf";
 
 export default function Work({
+  pullMasterTl,
+  pullDirection,
+  pulldirectionProp,
   currentWindow,
   delayTime,
   isAnimating,
@@ -329,6 +332,10 @@ export default function Work({
               setClicked(next);
               if (initialOrDefaultWindow) {
                 currentWindow.current = [0, 0, 1];
+                pulldirectionProp("right");
+              }
+              if (pullDirection === "right") {
+                pulldirectionProp("default");
               }
 
               isAnimating.current = true;

@@ -10,6 +10,9 @@ import { DrawSVGPlugin, Flip } from "gsap/all";
 import { TitleProps } from "../lowerHalf";
 
 export default function Passion({
+  pullMasterTl,
+  pullDirection,
+  pulldirectionProp,
   currentWindow,
   delayTime,
   isAnimating,
