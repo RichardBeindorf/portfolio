@@ -26,22 +26,10 @@ export default function Passion({
   const isInitial = useRef(true);
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
+  const innerRef = useRef(null);
 
   const passionRight = useRef(null);
   const passionMid = useRef(null);
-
-  const initialPosition: boolean = currentWindow.current === "initial";
-  let defaultPosition: boolean;
-  if (typeof currentWindow.current !== "string") {
-    const tester = (pos: number) => pos === 0;
-    defaultPosition = currentWindow.current.every(tester);
-  }
-  let initialOrDefaultWindow: boolean = true;
-  if (!initialPosition) {
-    initialOrDefaultWindow = defaultPosition ? true : false;
-  } else {
-    initialOrDefaultWindow = true;
-  }
 
   const pullDuration = 1;
 
@@ -87,6 +75,23 @@ export default function Passion({
           0
         );
 
+        // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
+        if (innerRef.current) {
+          const targetHeight = clicked
+            ? innerRef.current.scrollHeight
+            : title.current.clientHeight;
+
+          tl.to(
+            innerRef.current,
+            {
+              height: targetHeight,
+              duration: 2,
+              ease: "power4.out",
+            },
+            0
+          );
+        }
+
         if (clicked) {
           tl.add(
             gsap.to(title.current, {
@@ -118,6 +123,7 @@ export default function Passion({
       onStart() {
         if (!clicked) {
           setShowEntries(false);
+
           currentWindow.current = [0, 0, 0];
         }
         isAnimating.current = true;
@@ -138,7 +144,7 @@ export default function Passion({
       //**//
       const onStartBounce = contextSafe(() => {
         gsap.to(title.current, {
-          delay: 0.5,
+          delay: 0.7,
           ease: "sine.in",
           keyframes: {
             scaleX: ["100%", "80%", "100%"],
@@ -204,6 +210,17 @@ export default function Passion({
         }
       }
 
+      const currentTitleHeight = title.current.clientHeight;
+      const heightSwitch = contextSafe(() => {
+        gsap.to(tainer.current, {
+          height: currentTitleHeight,
+        });
+      });
+
+      if (!showEntries) {
+        heightSwitch();
+      }
+
       //**//
       /* Underline Animation */
       //**//
@@ -246,7 +263,7 @@ export default function Passion({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["50%", "50%", "85%", "85%"],
+            top: ["50%", "50%", "80%", "80%"],
             left: ["10%", "11%", "12%", "27%", "50%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -262,11 +279,11 @@ export default function Passion({
         })
         .to(tainer.current, {
           duration: pullDuration,
+          top: "50%",
           ease: "power4.out",
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["50%", "50%", "85%", "85%"],
             left: ["10%", "11%", "12%", "27%", "80%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -288,101 +305,99 @@ export default function Passion({
       default:
         null;
     }
+
+    console.warn("inside PASSION pull directory:", pullDirection);
   }, [pullDirection]);
 
   return (
     <PassionContainer $backgroundColor={color.current} ref={tainer}>
-      <TitleWrapper>
-        <Title
-          style={permanentMarker.style}
-          onClick={() => {
-            if (!isAnimating.current) {
-              const next = !clicked;
-              setClicked(next);
-              if (initialOrDefaultWindow) {
-                currentWindow.current = [1, 0, 0];
-                pulldirectionProp("left");
+      <InnerContainer ref={innerRef}>
+        <TitleWrapper>
+          <Title
+            style={permanentMarker.style}
+            onClick={() => {
+              if (!isAnimating.current) {
+                const next = !clicked;
+                setClicked(next);
+                if (pullDirection === "default") {
+                  currentWindow.current = [1, 0, 0];
+                  pulldirectionProp("left");
+                }
+                if (pullDirection === "left") {
+                  pulldirectionProp("default");
+                }
+                isAnimating.current = true;
               }
-              if (pullDirection === "left") {
-                pulldirectionProp("default");
-              }
-              isAnimating.current = true;
-              console.log(
-                "clicked:",
-                next,
-                "currentWindow:",
-                currentWindow.current,
-                "pulldirection:",
-                pullDirection
-              );
-            }
-          }}
-          ref={title}
-        >
-          Passion
-        </Title>
-        {clicked && !isAnimating.current ? (
-          <svg width="650" height="20">
-            <path
-              ref={underline}
-              d="M 0 0 Q 20 20, 500 0"
-              stroke="#262626"
-              strokeWidth="2.5px"
-              fill="transparent"
-            />
-          </svg>
-        ) : null}
-      </TitleWrapper>
+            }}
+            ref={title}
+          >
+            Passion
+          </Title>
+          {clicked && !isAnimating.current ? (
+            <svg width="650" height="20">
+              <path
+                ref={underline}
+                d="M 0 0 Q 20 20, 500 0"
+                stroke="#262626"
+                strokeWidth="2.5px"
+                fill="transparent"
+              />
+            </svg>
+          ) : null}
+        </TitleWrapper>
 
-      <PassionContent className="contentWrapper">
-        {showEntries && (
-          <div ref={entriesRef}>
-            <Subtitle style={permanentMarker.style}>
-              What is it that makes me passionate?
-            </Subtitle>
-            <TopicWrapper style={{ textAlign: "left" }}>
-              <Topic style={permanentMarker.style}>Creation</Topic>
-              <Text style={oswald300.style}>
-                the realization of{" "}
-                <Highlights style={oswald500.style}>
-                  endless possibilities
-                </Highlights>{" "}
-                is what made me obsessed with{" "}
-                <Highlights style={oswald500.style}>programming</Highlights> -
-                what great we can achieve when setting our minds to it
-              </Text>
-            </TopicWrapper>
-            <TopicWrapper style={{ textAlign: "right" }}>
-              <Topic style={permanentMarker.style}>life long learning</Topic>
-              <Text style={oswald300.style}>
-                being able to keep learning is an{" "}
-                <Highlights style={oswald500.style}>
-                  escape hatch out of mental stiffness
-                </Highlights>{" "}
-                - trying hard to understand new concepts opens my mind
-              </Text>
-            </TopicWrapper>
-            <TopicWrapper style={{ textAlign: "left" }}>
-              <Topic style={permanentMarker.style}>Mastery</Topic>
-              <Text style={oswald300.style}>
-                trying to keep my perfectionism in the bottle and funneling the
-                energy instead into{" "}
-                <Highlights style={oswald500.style}>training skills</Highlights>{" "}
-                rather than micro optimizations is pushing me - in sports,
-                relationships and work
-              </Text>
-            </TopicWrapper>
-            <TopicWrapper style={{ textAlign: "right" }}>
-              <Topic style={permanentMarker.style}>Discovery</Topic>
-              <Text style={oswald300.style}>
-                getting out of my{" "}
-                <Highlights style={oswald500.style}>comfort areas</Highlights> -
-                if it didn't scare me it probably didn't improve my life
-              </Text>
-            </TopicWrapper>
-          </div>
-        )}
-      </PassionContent>
+        <PassionContent className="contentWrapper">
+          {showEntries && (
+            <PassionEntryWrapper ref={entriesRef}>
+              <Subtitle style={permanentMarker.style}>
+                What is it that makes me passionate?
+              </Subtitle>
+              <TopicWrapper style={{ textAlign: "left" }}>
+                <Topic style={permanentMarker.style}>Creation</Topic>
+                <Text style={oswald300.style}>
+                  the realization of{" "}
+                  <Highlights style={oswald500.style}>
+                    endless possibilities
+                  </Highlights>{" "}
+                  is what made me obsessed with{" "}
+                  <Highlights style={oswald500.style}>programming</Highlights> -
+                  what great we can achieve when setting our minds to it
+                </Text>
+              </TopicWrapper>
+              <TopicWrapper style={{ textAlign: "right" }}>
+                <Topic style={permanentMarker.style}>life long learning</Topic>
+                <Text style={oswald300.style}>
+                  being able to keep learning is an{" "}
+                  <Highlights style={oswald500.style}>
+                    escape hatch out of mental stiffness
+                  </Highlights>{" "}
+                  - trying hard to understand new concepts opens my mind
+                </Text>
+              </TopicWrapper>
+              <TopicWrapper style={{ textAlign: "left" }}>
+                <Topic style={permanentMarker.style}>Mastery</Topic>
+                <Text style={oswald300.style}>
+                  trying to keep my perfectionism in the bottle and funneling
+                  the energy instead into{" "}
+                  <Highlights style={oswald500.style}>
+                    training skills
+                  </Highlights>{" "}
+                  rather than micro optimizations is pushing me - in sports,
+                  relationships and work
+                </Text>
+              </TopicWrapper>
+              <TopicWrapper style={{ textAlign: "right" }}>
+                <Topic style={permanentMarker.style}>Discovery</Topic>
+                <Text style={oswald300.style}>
+                  getting out of my{" "}
+                  <Highlights style={oswald500.style}>comfort areas</Highlights>{" "}
+                  - if it didn't scare me it probably didn't improve my life
+                </Text>
+              </TopicWrapper>
+            </PassionEntryWrapper>
+          )}
+        </PassionContent>
+      </InnerContainer>
     </PassionContainer>
   );
 }
@@ -401,9 +416,35 @@ const PassionContainer = styled.section<{ $backgroundColor: string }>`
   border-radius: 25px;
 `;
 
-const Title = styled(ChapterTitle)`
+export const InnerContainer = styled.div`
+  height: auto;
+  will-change: height;
+`;
+
+const Title = styled.h1`
+  position: relative;
+  color: var(--foreground);
+  mix-blend-mode: normal;
+  font-size: clamp(2vw, 3rem, 4.5vw);
   text-align: left;
+
   margin-left: 30px;
+  user-select: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const PassionEntryWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0px;
+  background-color: var(--background);
 `;
 
 const PassionContent = styled.div``;

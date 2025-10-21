@@ -8,6 +8,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import { TitleProps } from "../lowerHalf";
+import { InnerContainer } from "./passion";
 
 export default function Work({
   pullDirection,
@@ -23,6 +24,7 @@ export default function Work({
   const tainer = useRef(null);
   const title = useRef(null);
   const isInitial = useRef(true);
+  const innerRef = useRef(null);
 
   const workLeft = useRef(null);
   const workMid = useRef(null);
@@ -33,19 +35,6 @@ export default function Work({
   const color = useRef("unset");
 
   const pullDuration = 1;
-
-  const initialPosition: boolean = currentWindow.current === "initial";
-  let defaultPosition: boolean;
-  if (typeof currentWindow.current !== "string") {
-    const tester = (pos: number) => pos === 0;
-    defaultPosition = currentWindow.current.every(tester);
-  }
-  let initialOrDefaultWindow: boolean = true;
-  if (!initialPosition) {
-    initialOrDefaultWindow = defaultPosition ? true : false;
-  } else {
-    initialOrDefaultWindow = true;
-  }
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 
@@ -115,6 +104,22 @@ export default function Work({
           0
         );
 
+        if (innerRef.current) {
+          const targetHeight = clicked
+            ? innerRef.current.scrollHeight
+            : title.current.clientHeight;
+
+          tl.to(
+            innerRef.current,
+            {
+              height: targetHeight,
+              duration: 2,
+              ease: "power4.out",
+            },
+            0
+          );
+        }
+
         if (clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
@@ -165,7 +170,7 @@ export default function Work({
     () => {
       const onStartBounce = contextSafe(() => {
         return gsap.to(title.current, {
-          delay: 0.5,
+          delay: 0.7,
           ease: "sine.in",
           keyframes: {
             scaleX: ["100%", "80%", "100%"],
@@ -266,11 +271,11 @@ export default function Work({
         })
         .to(tainer.current, {
           duration: pullDuration,
+          top: "50%",
           ease: "power4.out",
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["50%", "50%", "85%", "85%"],
             left: ["80%", "79%", "78%", "75%", "10%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -292,7 +297,7 @@ export default function Work({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["50%", "50%", "85%", "85%"],
+            top: ["50%", "50%", "80%", "80%"],
             left: ["80%", "79%", "78%", "65%", "50%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -313,6 +318,8 @@ export default function Work({
       default:
         null;
     }
+
+    console.warn("inside WORK pull directory:", pullDirection);
   }, [pullDirection]);
 
   return (
@@ -321,85 +328,88 @@ export default function Work({
       ref={tainer}
       data-flip-id="workTainer"
     >
-      <TitleWrapper>
-        <Title
-          style={permanentMarker.style}
-          ref={title}
-          onClick={() => {
-            if (!isAnimating.current) {
-              const next = !clicked;
+      <InnerContainer ref={innerRef}>
+        <TitleWrapper>
+          <Title
+            style={permanentMarker.style}
+            ref={title}
+            onClick={() => {
+              if (!isAnimating.current) {
+                const next = !clicked;
 
-              setClicked(next);
-              if (initialOrDefaultWindow) {
-                currentWindow.current = [0, 0, 1];
-                pulldirectionProp("right");
-              }
-              if (pullDirection === "right") {
-                pulldirectionProp("default");
-              }
+                setClicked(next);
 
-              isAnimating.current = true;
-            }
-          }}
-        >
-          Work
-        </Title>
+                if (pullDirection === "default") {
+                  currentWindow.current = [0, 0, 1];
+                  pulldirectionProp("right");
+                }
+                if (pullDirection === "right") {
+                  pulldirectionProp("default");
+                }
+
+                isAnimating.current = true;
+              }
+            }}
+          >
+            Work
+          </Title>
+          {showEntries && (
+            <svg width="650" height="20">
+              <path
+                ref={underline}
+                d="M 0 0 Q 20 20, 500 0"
+                stroke="#262626"
+                strokeWidth="2.5px"
+                fill="transparent"
+              />
+            </svg>
+          )}
+        </TitleWrapper>
+
         {showEntries && (
-          <svg width="650" height="20">
-            <path
-              ref={underline}
-              d="M 0 0 Q 20 20, 500 0"
-              stroke="#262626"
-              strokeWidth="2.5px"
-              fill="transparent"
-            />
-          </svg>
+          <WorkEntryWrapper ref={entriesRef}>
+            <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
+            <TopicWrapper>
+              <Topic style={permanentMarker.style}>
+                {projects[currentProject].title}
+              </Topic>
+              <DetailWrapper>
+                <Text style={oswald300.style}>
+                  {projects[currentProject].description}
+                </Text>
+                {projects[currentProject].iframe && (
+                  <IFrameWrapper>
+                    <IFrame src={projects[currentProject].iframe} />
+                  </IFrameWrapper>
+                )}
+                {/* Optional images */}
+                {projects[currentProject].images && (
+                  <ImageGallery>
+                    {projects[currentProject].images.map((src, idx) => (
+                      <PreviewImage
+                        key={idx}
+                        src={src}
+                        alt={`${projects[currentProject].title} screenshot ${
+                          idx + 1
+                        }`}
+                      />
+                    ))}
+                  </ImageGallery>
+                )}
+              </DetailWrapper>
+            </TopicWrapper>
+
+            <NavButtons>
+              <button onClick={prevProject} style={permanentMarker.style}>
+                ◀ Prev
+              </button>
+              <button onClick={nextProject} style={permanentMarker.style}>
+                Next ▶
+              </button>
+            </NavButtons>
+          </WorkEntryWrapper>
         )}
-      </TitleWrapper>
-
-      {showEntries && (
-        <WorkEntryWrapper className="contentWrapper" ref={entriesRef}>
-          <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
-          <TopicWrapper>
-            <Topic style={permanentMarker.style}>
-              {projects[currentProject].title}
-            </Topic>
-            <DetailWrapper>
-              <Text style={oswald300.style}>
-                {projects[currentProject].description}
-              </Text>
-              {projects[currentProject].iframe && (
-                <IFrameWrapper>
-                  <IFrame src={projects[currentProject].iframe} />
-                </IFrameWrapper>
-              )}
-              {/* Optional images */}
-              {projects[currentProject].images && (
-                <ImageGallery>
-                  {projects[currentProject].images.map((src, idx) => (
-                    <PreviewImage
-                      key={idx}
-                      src={src}
-                      alt={`${projects[currentProject].title} screenshot ${
-                        idx + 1
-                      }`}
-                    />
-                  ))}
-                </ImageGallery>
-              )}
-            </DetailWrapper>
-          </TopicWrapper>
-
-          <NavButtons>
-            <button onClick={prevProject} style={permanentMarker.style}>
-              ◀ Prev
-            </button>
-            <button onClick={nextProject} style={permanentMarker.style}>
-              Next ▶
-            </button>
-          </NavButtons>
-        </WorkEntryWrapper>
-      )}
+      </InnerContainer>
     </WorkContainer>
   );
 }

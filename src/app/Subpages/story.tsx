@@ -8,9 +8,9 @@ import gsap from "gsap";
 import { entryData } from "@/data/storyEntries";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { TitleProps } from "../lowerHalf";
+import { InnerContainer } from "./passion";
 
 export default function Story({
-  pullMasterTl,
   pullDirection,
   pulldirectionProp,
   currentWindow,
@@ -30,19 +30,8 @@ export default function Story({
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
   const storyRight = useRef(null);
   const storyLeft = useRef(null);
+  const innerRef = useRef(null);
 
-  const initialPosition: boolean = currentWindow.current === "initial";
-  let defaultPosition: boolean;
-  if (typeof currentWindow.current !== "string") {
-    const tester = (pos: number) => pos === 0;
-    defaultPosition = currentWindow.current.every(tester);
-  }
-  let initialOrDefaultWindow: boolean = true;
-  if (!initialPosition) {
-    initialOrDefaultWindow = defaultPosition ? true : false;
-  } else {
-    initialOrDefaultWindow = true;
-  }
   const pullDuration = 1;
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
@@ -62,10 +51,16 @@ export default function Story({
       setState() {
         if (clicked) {
           tainer.current.style.setProperty("position", "relative");
-          gsap.set(tainer.current, { left: "10%", top: "25%" });
+          gsap.set(tainer.current, {
+            left: "10%",
+            top: "25%",
+          });
         } else {
           tainer.current.style.setProperty("position", "absolute");
-          gsap.set(tainer.current, { left: "50%", top: "80%" });
+          gsap.set(tainer.current, {
+            left: "50%",
+            top: "80%",
+          });
         }
       },
       animate(self) {
@@ -87,6 +82,23 @@ export default function Story({
           }),
           0
         );
+
+        // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
+        if (innerRef.current) {
+          const targetHeight = clicked
+            ? innerRef.current.scrollHeight
+            : title.current.clientHeight;
+
+          tl.to(
+            innerRef.current,
+            {
+              height: targetHeight,
+              duration: 2,
+              ease: "power4.out",
+            },
+            0
+          );
+        }
 
         if (clicked) {
           tl.add(
@@ -138,11 +150,10 @@ export default function Story({
     //**//
     const onStartBounce = contextSafe(() => {
       gsap.to(title.current, {
-        delay: 0.5,
+        delay: 0.7,
         ease: "sine.in",
         keyframes: {
           scaleX: ["100%", "80%", "100%"],
-          // left: ["50%", "48%", "50%"],
           rotate: [0, -10, 0],
           easeEach: "none",
         },
@@ -274,71 +285,79 @@ export default function Story({
       default:
         null;
     }
+
+    console.warn("inside STORY pull directory:", pullDirection);
   }, [pullDirection]);
 
   return (
     <ChapterContainer $backgroundColor={color.current} ref={tainer}>
-      <TitleWrapper ref={titleWrapper}>
-        <ChapterTitle
-          style={permanentMarker.style}
-          onClick={() => {
-            if (!isAnimating.current) {
-              const next = !clicked;
+      <InnerContainer ref={innerRef}>
+        <TitleWrapper ref={titleWrapper}>
+          <ChapterTitle
+            style={permanentMarker.style}
+            onClick={() => {
+              if (!isAnimating.current) {
+                const next = !clicked;
 
-              setClicked(next);
-              if (initialOrDefaultWindow) {
-                currentWindow.current = [0, 1, 0];
-                pulldirectionProp("mid");
-              }
-              if (pullDirection === "mid") {
-                pulldirectionProp("default");
-              }
+                setClicked(next);
+                if (pullDirection === "default") {
+                  currentWindow.current = [0, 1, 0];
+                  pulldirectionProp("mid");
+                }
+                if (pullDirection === "mid") {
+                  pulldirectionProp("default");
+                }
 
-              isAnimating.current = true;
-            }
-          }}
-          ref={title}
-        >
-          Story
-        </ChapterTitle>
-        {clicked && !isAnimating.current ? (
-          <svg width="650" height="20" className="underline">
-            <path
-              ref={underline}
-              d="M 0 0 Q 20 20, 500 0"
-              stroke="#262626"
-              strokeWidth="2.5px"
-              fill="transparent"
-            />
-          </svg>
-        ) : null}
-      </TitleWrapper>
-      {showEntries && ( // Use showEntries here
-        <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
-          <Intro style={oswald300.style}>
-            ”Lets say it seems <em style={oswald500.style}>complicated</em>, but
-            in the <em style={oswald500.style}>end</em> it all makes sense”
-          </Intro>
-          <EntryList>
-            {entryData.map((entry, i) => (
-              <EntryWrapper key={i}>
-                <Bullet>//</Bullet>
-                <EntryText style={oswald300.style}>{entry[0]}</EntryText>
-                <Year style={permanentMarker.style}>{entry[1]}</Year>
-              </EntryWrapper>
-            ))}
-          </EntryList>
-        </StoryEntryWrapper>
-      )}
+                isAnimating.current = true;
+
+                console.log("pull direction", pullDirection);
+              }
+            }}
+            ref={title}
+          >
+            Story
+          </ChapterTitle>
+          {clicked && !isAnimating.current ? (
+            <svg width="650" height="20" className="underline">
+              <path
+                ref={underline}
+                d="M 0 0 Q 20 20, 500 0"
+                stroke="#262626"
+                strokeWidth="2.5px"
+                fill="transparent"
+              />
+            </svg>
+          ) : null}
+        </TitleWrapper>
+        {showEntries && ( // Use showEntries here
+          <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
+            <Intro style={oswald300.style}>
+              ”Lets say it seems <em style={oswald500.style}>complicated</em>,
+              but in the <em style={oswald500.style}>end</em> it all makes
+              sense”
+            </Intro>
+            <EntryList>
+              {entryData.map((entry, i) => (
+                <EntryWrapper key={i}>
+                  <Bullet>//</Bullet>
+                  <EntryText style={oswald300.style}>{entry[0]}</EntryText>
+                  <Year style={permanentMarker.style}>{entry[1]}</Year>
+                </EntryWrapper>
+              ))}
+            </EntryList>
+          </StoryEntryWrapper>
+        )}
+      </InnerContainer>
     </ChapterContainer>
   );
 }
 
 const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   position: absolute;
-  top: 85%;
+  top: 80%;
   left: 50%;
   text-align: left;
+
   /* mix-blend-mode: normal; */
   padding: 15px;
   border-radius: 15px;
@@ -352,8 +371,19 @@ export const TitleWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  height: min-content;
+
   margin-bottom: 5vh;
+`;
+
+const StoryEntryWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0px;
+  background-color: var(--background);
 `;
 
 export const ChapterTitle = styled.h1`
@@ -367,17 +397,6 @@ export const ChapterTitle = styled.h1`
   &:hover {
     cursor: pointer;
   }
-`;
-
-const StoryEntryWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  align-items: start;
-  gap: 0.5rem;
-  cursor: pointer;
-  padding: 0px;
-  background-color: var(--background);
 `;
 
 export const Intro = styled.div`
