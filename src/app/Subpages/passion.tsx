@@ -210,17 +210,6 @@ export default function Passion({
         }
       }
 
-      const currentTitleHeight = title.current.clientHeight;
-      const heightSwitch = contextSafe(() => {
-        gsap.to(tainer.current, {
-          height: currentTitleHeight,
-        });
-      });
-
-      if (!showEntries) {
-        heightSwitch();
-      }
-
       //**//
       /* Underline Animation */
       //**//
@@ -407,7 +396,7 @@ const PassionContainer = styled.section<{ $backgroundColor: string }>`
   top: 50%;
   left: 10%;
   text-align: left;
-  max-width: 90%;
+  max-width: 80%;
   /* mix-blend-mode: normal; */
   padding: 15px;
   border-radius: 15px;
