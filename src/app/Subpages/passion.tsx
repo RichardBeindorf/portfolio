@@ -1,51 +1,145 @@
 "use client";
 
 import styled from "styled-components";
-import { ChapterTitle, TitleProps, TitleWrapper } from "./story";
+import { ChapterTitle, TitleWrapper } from "./story";
 import { oswald300, oswald500, permanentMarker } from "@/styles/font";
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { DrawSVGPlugin } from "gsap/all";
+import { DrawSVGPlugin, Flip } from "gsap/all";
+import { TitleProps } from "../lowerHalf";
 
 export default function Passion({
+  pullDirection,
+  pulldirectionProp,
   currentWindow,
   delayTime,
   isAnimating,
 }: TitleProps) {
-  const tainer = useRef(null);
-  const title = useRef(null);
-  const underline = useRef(null);
-  gsap.registerPlugin(DrawSVGPlugin);
-  const [clicked, setClicked] = useState(false);
-  const currentState = useRef(null);
-  const defaultPositionTest = (pos: number) => pos === 0;
-  const titleDelay = 1;
-  const pullDuration = 1;
-  const topDistanceTitle = "54%";
-  const leftDistanceTitle = "10%";
-  const titleDuration = 1;
-  const entriesRef = useRef(null);
-  const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
+  const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
+  gsap.registerPlugin(DrawSVGPlugin, Flip);
+  const title = useRef(null);
+  const tainer = useRef(null);
   const color = useRef("unset");
+  const underline = useRef(null);
+  const isInitial = useRef(true);
+  const entriesRef = useRef<HTMLDivElement>(null);
+  const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
 
-  if (clicked) {
-    color.current = "#F2F1E9";
-  } else {
-    color.current = "unset";
+  const passionRight = useRef(null);
+  const passionMid = useRef(null);
+
+  const initialPosition: boolean = currentWindow.current === "initial";
+  let defaultPosition: boolean;
+  if (typeof currentWindow.current !== "string") {
+    const tester = (pos: number) => pos === 0;
+    defaultPosition = currentWindow.current.every(tester);
   }
+  let initialOrDefaultWindow: boolean = true;
+  if (!initialPosition) {
+    initialOrDefaultWindow = defaultPosition ? true : false;
+  } else {
+    initialOrDefaultWindow = true;
+  }
+
+  const pullDuration = 1;
+
+  // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
+  useLayoutEffect(() => {
+    if (isInitial.current) {
+      isInitial.current = false;
+      return;
+    }
+
+    // first create (or get the existing) batch by id
+    let batch = Flip.batch("passion");
+    let action = batch.add({
+      getState() {
+        return Flip.getState(tainer.current);
+      },
+      setState() {
+        if (clicked) {
+          tainer.current.style.setProperty("position", "relative");
+          gsap.set(tainer.current, { left: "10%", top: "25%" });
+        } else {
+          tainer.current.style.setProperty("position", "absolute");
+          gsap.set(tainer.current, { left: "10%", top: "50%" });
+        }
+      },
+      animate(self) {
+        const tl = gsap.timeline();
+        tl.add(
+          Flip.from(self.state, {
+            targets: tainer.current,
+            duration: 2,
+            ease: "power4.out",
+            delay: delayTime,
+            absolute: true,
+            onComplete: () => {
+              isAnimating.current = false;
+              if (clicked) {
+                setShowEntries(true);
+              }
+            },
+            props: "left, top",
+          }),
+          0
+        );
+
+        if (clicked) {
+          tl.add(
+            gsap.to(title.current, {
+              fontSize: "clamp(8vw, 6rem, 11vw)",
+              keyframes: {
+                color: ["#262626", "#F24150"],
+              },
+              duration: 2,
+              delay: delayTime,
+            }),
+            0
+          );
+        }
+        // clicked to close title but we are not done animating
+        if (isAnimating.current && !clicked && currentWindow.current[0] === 1) {
+          tl.add(
+            gsap.to(title.current, {
+              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              keyframes: {
+                color: ["#F24150", "#262626"],
+              },
+              duration: 2,
+            }),
+            0
+          );
+        }
+      },
+      // since this .from will be called forward and backwards we need to close the entries on start, also making sure
+      onStart() {
+        if (!clicked) {
+          setShowEntries(false);
+          currentWindow.current = [0, 0, 0];
+        }
+        isAnimating.current = true;
+      },
+    });
+
+    batch.run();
+
+    return () => {
+      action.kill();
+    };
+  }, [clicked]);
 
   const { contextSafe } = useGSAP(
     () => {
       //**//
-      /* ONLY ONCE PER CYCLE (Bounce animation to illustrate the impact of other title crasing into it) */
+      /* ONLY ONCE PER CYCLE (Bounce animation) */
       //**//
       const onStartBounce = contextSafe(() => {
         gsap.to(title.current, {
           delay: 0.5,
           ease: "sine.in",
-          duration: titleDuration,
           keyframes: {
             scaleX: ["100%", "80%", "100%"],
             // left: ["50%", "48%", "50%"],
@@ -54,130 +148,13 @@ export default function Passion({
           },
         });
       });
-
-      //**//
-      /* MAIN TITLE ANIMATION */
-      //**//
-
-      if (clicked) {
-        if (isAnimating.current) {
-          // Only trigger bounce if an animation is truly in progress
-          onStartBounce();
-        }
-
-        gsap.to(tainer.current, {
-          top: topDistanceTitle,
-          left: leftDistanceTitle,
-          ease: "power4.out",
-          onComplete: () => {
-            isAnimating.current = false;
-            setShowEntries(true);
-          },
-          duration: titleDelay,
-          delay: delayTime,
-        });
-        gsap.to(title.current, {
-          duration: titleDelay,
-          delay: delayTime,
-          fontSize: "clamp(8vw, 6rem, 11vw)",
-          ease: "power4.out",
-          onComplete: () => {
-            isAnimating.current = false;
-          },
-          keyframes: {
-            color: ["#262626", "#F24150"],
-          },
-        });
-      } else if (
-        !clicked &&
-        currentWindow.current.every(defaultPositionTest) &&
-        isAnimating.current
-      ) {
-        // Only reverse if we unclicked AND go back to default window position
-        gsap.to(tainer.current, {
-          left: "10%",
-          top: "70%",
-          duration: titleDelay,
-          ease: "power4.out",
-          onStart: () => {
-            isAnimating.current = false;
-          },
-        });
-        gsap.to(title.current, {
-          fontSize: "clamp(2vw, 3rem, 4.5vw)",
-          color: "var(--foreground)",
-          duration: titleDelay,
-        });
-      }
-
-      //**//
-      /* ---- END ---- */
-      //**//
-
-      const onPullMid = contextSafe(() => {
-        if (!currentState.current) {
-          currentState.current = gsap.to(tainer.current, {
-            scale: 0.1,
-            rotate: 30,
-            display: "none",
-            left: "50%",
-            top: "85%",
-            duration: pullDuration,
-            ease: "power4.in",
-            onComplete: () => {
-              currentState.current = null; // Clear ref when animation reverses
-            },
-          });
-        } else {
-          currentState.current.play();
-        }
-      });
-
-      const onPullRight = contextSafe(() => {
-        if (!currentState.current) {
-          currentState.current = gsap.to(tainer.current, {
-            scale: 0.1,
-            rotate: 30,
-            display: "none",
-            left: "90%",
-            top: "70%",
-            duration: pullDuration,
-            ease: "power4.in",
-            onComplete: () => {
-              currentState.current = null; // Clear ref when animation reverses
-            },
-          });
-        } else {
-          currentState.current.play();
-        }
-      });
-
-      const onPullBack = contextSafe(() => {
-        const midOut = gsap.to(tainer.current, {
-          display: "block",
-          duration: delayTime + 1,
-          ease: "power4.out",
-          fontSize: "clamp(8vw, 6rem, 11vw)",
-          scale: 1,
-          top: "70%",
-          left: "10%",
-          opacity: 1,
-          rotate: 0,
-        });
-        return midOut;
-      });
-
-      if (currentWindow.current[1] === 1) {
-        onPullMid();
-      } else if (currentWindow.current[2] === 1) {
-        onPullRight();
-      } else if (currentWindow.current.every(defaultPositionTest)) {
-        onPullBack();
+      if (currentWindow.current[0] === 1 && clicked) {
+        onStartBounce();
       }
     },
     {
       scope: tainer,
-      dependencies: [clicked, currentWindow.current],
+      dependencies: [clicked],
       revertOnUpdate: false,
     }
   );
@@ -193,6 +170,8 @@ export default function Passion({
       let shift;
 
       if (!entryStaggerAnimation.current && items.length > 0) {
+        entryStaggerAnimation.current?.kill();
+
         entryStaggerAnimation.current = gsap.from(items, {
           opacity: 0,
           y: 20,
@@ -201,24 +180,28 @@ export default function Passion({
           ease: "power2.out",
           paused: true,
           onReverseComplete: () => {
-            setShowEntries(false);
+            entryStaggerAnimation.current = null;
           },
         });
       }
-      if (showEntries && entryStaggerAnimation.current) {
-        entryStaggerAnimation.current.play();
-      }
-      if (!clicked && isAnimating.current === true) {
-        entryStaggerAnimation.current.reverse();
-        entryStaggerAnimation.current = null;
-        // Animate the contentWrapper back up when entries are reversing out
-        shift = gsap.to(".contentWrapper", {
-          y: -60,
-          ease: "power2.out",
-          duration: 0.4,
-        });
-        shift.play();
-        shift.reverse();
+
+      if (entryStaggerAnimation.current) {
+        if (showEntries) {
+          entryStaggerAnimation.current.play();
+        }
+        if (!showEntries && isAnimating.current) {
+          entryStaggerAnimation.current.reverse();
+          // Animate the contentWrapper back up when entries are reversing out
+          if (entriesRef.current) {
+            shift = gsap.to(entriesRef.current, {
+              y: -60,
+              ease: "power2.out",
+              duration: 0.4,
+            });
+            shift.play();
+            shift.reverse();
+          }
+        }
       }
 
       //**//
@@ -234,16 +217,78 @@ export default function Passion({
         });
       });
 
-      if (clicked && !isAnimating.current) {
+      if (showEntries && !isAnimating.current && underline.current) {
+        color.current = "#F2F1E9";
         drawUnderline();
+      } else {
+        color.current = "unset";
       }
     },
     {
       scope: tainer,
-      dependencies: [showEntries, clicked],
+      dependencies: [showEntries],
       revertOnUpdate: false,
     }
   );
+
+  useGSAP(() => {
+    if (!passionMid.current) {
+      passionMid.current = gsap
+        .timeline({
+          paused: true,
+          id: "passionMid",
+        })
+        .to(tainer.current, {
+          duration: pullDuration,
+          ease: "power4.in",
+          keyframes: {
+            // 8 different phases maximum currently
+            // first is start position
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            top: ["50%", "50%", "85%", "85%"],
+            left: ["10%", "11%", "12%", "27%", "50%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
+        });
+    }
+
+    if (!passionRight.current) {
+      passionRight.current = gsap
+        .timeline({
+          paused: true,
+          id: "passionRight",
+        })
+        .to(tainer.current, {
+          duration: pullDuration,
+          ease: "power4.out",
+          keyframes: {
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            top: ["50%", "50%", "85%", "85%"],
+            left: ["10%", "11%", "12%", "27%", "80%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
+        });
+    }
+
+    switch (pullDirection) {
+      case "mid":
+        passionMid.current.play();
+        break;
+      case "right":
+        passionRight.current.play();
+        break;
+      case "default":
+        if (passionMid.current.progress() === 1) passionMid.current.reverse();
+        if (passionRight.current.progress() === 1)
+          passionRight.current.reverse();
+      default:
+        null;
+    }
+  }, [pullDirection]);
 
   return (
     <PassionContainer $backgroundColor={color.current} ref={tainer}>
@@ -251,11 +296,25 @@ export default function Passion({
         <Title
           style={permanentMarker.style}
           onClick={() => {
-            if (isAnimating.current === false) {
+            if (!isAnimating.current) {
               const next = !clicked;
               setClicked(next);
-              setCurrentWindow(next ? [1, 0, 0] : [0, 0, 0]);
+              if (initialOrDefaultWindow) {
+                currentWindow.current = [1, 0, 0];
+                pulldirectionProp("left");
+              }
+              if (pullDirection === "left") {
+                pulldirectionProp("default");
+              }
               isAnimating.current = true;
+              console.log(
+                "clicked:",
+                next,
+                "currentWindow:",
+                currentWindow.current,
+                "pulldirection:",
+                pullDirection
+              );
             }
           }}
           ref={title}
@@ -276,7 +335,7 @@ export default function Passion({
       </TitleWrapper>
 
       <PassionContent className="contentWrapper">
-        {clicked ? (
+        {showEntries && (
           <div ref={entriesRef}>
             <Subtitle style={permanentMarker.style}>
               What is it that makes me passionate?
@@ -322,18 +381,18 @@ export default function Passion({
               </Text>
             </TopicWrapper>
           </div>
-        ) : null}
+        )}
       </PassionContent>
     </PassionContainer>
   );
 }
 
 const PassionContainer = styled.section<{ $backgroundColor: string }>`
-  display: flex;
   position: absolute;
-  top: 85%;
-  left: 50%;
+  top: 50%;
+  left: 10%;
   text-align: left;
+  max-width: 90%;
   /* mix-blend-mode: normal; */
   padding: 15px;
   border-radius: 15px;

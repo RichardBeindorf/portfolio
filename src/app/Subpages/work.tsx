@@ -1,14 +1,17 @@
 "use client";
 
-import styled from "styled-components";
-import { ChapterTitle, Intro, TitleProps, TitleWrapper } from "./story";
-import { oswald300, permanentMarker } from "@/styles/font";
-import { useLayoutEffect, useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import styled from "styled-components";
 import { DrawSVGPlugin, Flip } from "gsap/all";
+import { useLayoutEffect, useRef, useState } from "react";
+import { oswald300, permanentMarker } from "@/styles/font";
+import { ChapterTitle, Intro, TitleWrapper } from "./story";
+import { TitleProps } from "../lowerHalf";
 
 export default function Work({
+  pullDirection,
+  pulldirectionProp,
   currentWindow,
   delayTime,
   isAnimating,
@@ -19,12 +22,30 @@ export default function Work({
   gsap.registerPlugin(DrawSVGPlugin, Flip);
   const tainer = useRef(null);
   const title = useRef(null);
+  const isInitial = useRef(true);
+
+  const workLeft = useRef(null);
+  const workMid = useRef(null);
 
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
   const entriesRef = useRef(null);
   const underline = useRef(null);
   const color = useRef("unset");
-  const defaultPositionTest = (pos: number) => pos === 0;
+
+  const pullDuration = 1;
+
+  const initialPosition: boolean = currentWindow.current === "initial";
+  let defaultPosition: boolean;
+  if (typeof currentWindow.current !== "string") {
+    const tester = (pos: number) => pos === 0;
+    defaultPosition = currentWindow.current.every(tester);
+  }
+  let initialOrDefaultWindow: boolean = true;
+  if (!initialPosition) {
+    initialOrDefaultWindow = defaultPosition ? true : false;
+  } else {
+    initialOrDefaultWindow = true;
+  }
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 
@@ -53,8 +74,14 @@ export default function Work({
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
+    // Skip the first render
+    if (isInitial.current) {
+      isInitial.current = false;
+      return;
+    }
+
     // first create (or get the existing) batch by id
-    let batch = Flip.batch("id");
+    let batch = Flip.batch("work");
     let action = batch.add({
       getState() {
         return Flip.getState(tainer.current);
@@ -63,7 +90,7 @@ export default function Work({
         if (clicked) {
           tainer.current.style.setProperty("position", "relative");
           gsap.set(tainer.current, { left: "10%", top: "25%" });
-        } else {
+        } else if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
           gsap.set(tainer.current, { left: "80%", top: "50%" });
         }
@@ -78,12 +105,9 @@ export default function Work({
             delay: delayTime,
             absolute: true,
             onComplete: () => {
+              isAnimating.current = false;
               if (clicked) {
-                isAnimating.current = false;
                 setShowEntries(true);
-              } else {
-                isAnimating.current = false;
-                currentWindow.current = [0, 0, 0];
               }
             },
             props: "left, top",
@@ -91,7 +115,7 @@ export default function Work({
           0
         );
 
-        if (clicked) {
+        if (clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
               fontSize: "clamp(8vw, 6rem, 11vw)",
@@ -104,8 +128,9 @@ export default function Work({
             0
           );
         }
+
         // clicked to close title but we are not done animating
-        if (isAnimating.current && !clicked) {
+        if (isAnimating.current && !clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
               fontSize: "clamp(2vw, 3rem, 4.5vw)",
@@ -120,10 +145,11 @@ export default function Work({
       },
       // since this .from will be called forward and backwards we need to close the entries on start, also making sure
       onStart() {
+        isAnimating.current = true;
         if (!clicked) {
           setShowEntries(false);
+          currentWindow.current = [0, 0, 0];
         }
-        isAnimating.current = true;
       },
     });
 
@@ -137,46 +163,6 @@ export default function Work({
   // Logic for click events on other titles, only click related
   const { contextSafe } = useGSAP(
     () => {
-      // trigger pulls when other titles get clicked
-      const onPullMid = contextSafe(() => {
-        gsap.to(tainer.current, {
-          id: "midIn",
-          display: "none",
-          duration: delayTime + 1,
-          ease: "power4.out",
-          keyframes: {
-            // 8 different phases maximum currently
-            // first is start position
-            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["70%", "70%", "85%", "85%"],
-            left: ["90%", "89%", "88%", "75%", "50%"],
-            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
-            easeEach: "none",
-          },
-        });
-      });
-
-      const onPullLeft = contextSafe(() => {
-        const leftIn = gsap.to(tainer.current, {
-          id: "leftIn",
-          display: "none",
-          top: "70%",
-          keyframes: {
-            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            scale: [1, 1, 1, 1, 0.5, 0.2],
-            // top: ["70%", "70%", "85%", "85%"],
-            left: ["90%", "89%", "88%", "75%", "10%"],
-            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
-            easeEach: "none",
-          },
-          duration: delayTime + 1,
-          ease: "power4.out",
-        });
-
-        return leftIn;
-      });
-
       const onStartBounce = contextSafe(() => {
         return gsap.to(title.current, {
           delay: 0.5,
@@ -190,22 +176,9 @@ export default function Work({
         });
       });
 
-      if (currentWindow.current[0] === 1) {
-        onPullLeft();
-      }
-
-      if (currentWindow.current[1] === 1) {
-        onPullMid();
-      }
-
-      if (currentWindow.current[2] === 1) {
+      if (currentWindow.current[2] === 1 && clicked) {
         onStartBounce();
       }
-
-      if (currentWindow.current.every(defaultPositionTest)) {
-        // onDefault();
-      }
-      // clearing the timeline shortly after giving the command to revers to prevent errors
     },
     {
       scope: tainer,
@@ -284,6 +257,64 @@ export default function Work({
     }
   );
 
+  useGSAP(() => {
+    if (!workLeft.current) {
+      workLeft.current = gsap
+        .timeline({
+          paused: true,
+          id: "workLeft",
+        })
+        .to(tainer.current, {
+          duration: pullDuration,
+          ease: "power4.out",
+          keyframes: {
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            top: ["50%", "50%", "85%", "85%"],
+            left: ["80%", "79%", "78%", "75%", "10%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
+        });
+    }
+
+    if (!workMid.current) {
+      workMid.current = gsap
+        .timeline({
+          paused: true,
+          id: "workMid",
+        })
+        .to(tainer.current, {
+          duration: pullDuration,
+          ease: "power4.in",
+          keyframes: {
+            // 8 different phases maximum currently
+            // first is start position
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            top: ["50%", "50%", "85%", "85%"],
+            left: ["80%", "79%", "78%", "65%", "50%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
+        });
+    }
+
+    switch (pullDirection) {
+      case "mid":
+        workMid.current.play();
+        break;
+      case "left":
+        workLeft.current.play();
+        break;
+      case "default":
+        if (workMid.current.progress() === 1) workMid.current.reverse();
+        if (workLeft.current.progress() === 1) workLeft.current.reverse();
+      default:
+        null;
+    }
+  }, [pullDirection]);
+
   return (
     <WorkContainer
       $backgroundColor={color.current}
@@ -297,9 +328,16 @@ export default function Work({
           onClick={() => {
             if (!isAnimating.current) {
               const next = !clicked;
+
               setClicked(next);
-              // logic for setting it back to default needs to be in the animation onComplete so it doesn`t get triggered after loading
-              currentWindow.current = next ? [0, 0, 1] : [0, 0, 0];
+              if (initialOrDefaultWindow) {
+                currentWindow.current = [0, 0, 1];
+                pulldirectionProp("right");
+              }
+              if (pullDirection === "right") {
+                pulldirectionProp("default");
+              }
+
               isAnimating.current = true;
             }
           }}
@@ -412,6 +450,7 @@ const Text = styled.p`
   margin: 0;
 `;
 
+// Gotta find out a better way to adjust
 const IFrameWrapper = styled.div`
   width: 280px; /* 400 * 0.7 */
   height: 476px; /* 768 * 0.7 */
