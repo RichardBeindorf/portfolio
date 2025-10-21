@@ -26,7 +26,6 @@ export default function Passion({
   const isInitial = useRef(true);
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
-  const initialOrDefaultWindow = useRef(true);
 
   const passionRight = useRef(null);
   const passionMid = useRef(null);
@@ -37,12 +36,13 @@ export default function Passion({
     const tester = (pos: number) => pos === 0;
     defaultPosition = currentWindow.current.every(tester);
   }
-
+  let initialOrDefaultWindow: boolean = true;
   if (!initialPosition) {
-    initialOrDefaultWindow.current = defaultPosition ? true : false;
+    initialOrDefaultWindow = defaultPosition ? true : false;
   } else {
-    initialOrDefaultWindow.current = true;
+    initialOrDefaultWindow = true;
   }
+
   const pullDuration = 1;
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
@@ -148,55 +148,6 @@ export default function Passion({
           },
         });
       });
-
-      //**//
-      /* Secondary Title Animation (Pull Left/Right) */
-      //**//
-
-      const onPullMid = contextSafe(() => {
-        return gsap.to(tainer.current, {
-          scale: 0.1,
-          opacity: 0,
-          rotate: -30,
-          left: "50%",
-          top: "85%",
-          duration: pullDuration,
-          ease: "power4.out",
-        });
-      });
-
-      const onPullRight = contextSafe(() => {
-        return gsap.to(tainer.current, {
-          scale: 0.1,
-          rotate: 30,
-          opacity: 0,
-          left: "90%",
-          top: "70%",
-          duration: pullDuration,
-          ease: "power4.in",
-        });
-      });
-
-      const onDefault = contextSafe(() => {
-        return gsap.to(tainer.current, {
-          display: "block",
-          duration: delayTime + 1,
-          ease: "power4.out",
-          top: "50%",
-          left: "10%",
-          scale: 1,
-          opacity: 1,
-          rotate: 0,
-        });
-      });
-
-      if (currentWindow.current[1] === 1 && !clicked) {
-        onPullMid();
-      } else if (currentWindow.current[2] === 1) {
-        onPullRight();
-      } else if (defaultPosition && !isInitial.current && !clicked) {
-        onDefault();
-      }
       if (currentWindow.current[0] === 1 && clicked) {
         onStartBounce();
       }
@@ -295,7 +246,7 @@ export default function Passion({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["55%", "55%", "85%", "85%"],
+            top: ["50%", "50%", "85%", "85%"],
             left: ["10%", "11%", "12%", "27%", "50%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -315,7 +266,7 @@ export default function Passion({
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["55%", "55%", "85%", "85%"],
+            top: ["50%", "50%", "85%", "85%"],
             left: ["10%", "11%", "12%", "27%", "80%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -345,14 +296,10 @@ export default function Passion({
         <Title
           style={permanentMarker.style}
           onClick={() => {
-            if (
-              !isAnimating.current &&
-              currentWindow.current[1] !== 1 &&
-              currentWindow.current[2] !== 1
-            ) {
+            if (!isAnimating.current) {
               const next = !clicked;
               setClicked(next);
-              if (initialOrDefaultWindow.current) {
+              if (initialOrDefaultWindow) {
                 currentWindow.current = [1, 0, 0];
                 pulldirectionProp("left");
               }
@@ -360,6 +307,14 @@ export default function Passion({
                 pulldirectionProp("default");
               }
               isAnimating.current = true;
+              console.log(
+                "clicked:",
+                next,
+                "currentWindow:",
+                currentWindow.current,
+                "pulldirection:",
+                pullDirection
+              );
             }
           }}
           ref={title}
@@ -434,7 +389,7 @@ export default function Passion({
 
 const PassionContainer = styled.section<{ $backgroundColor: string }>`
   position: absolute;
-  top: 55%;
+  top: 50%;
   left: 10%;
   text-align: left;
   max-width: 90%;

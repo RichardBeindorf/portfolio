@@ -265,11 +265,6 @@ export default function Work({
           id: "workLeft",
         })
         .to(tainer.current, {
-          // scale: 0.1,
-          // opacity: 0,
-          // rotate: -30,
-          // left: "10%",
-          // top: "50%",
           duration: pullDuration,
           ease: "power4.out",
           keyframes: {
