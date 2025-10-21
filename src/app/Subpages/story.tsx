@@ -261,12 +261,18 @@ export default function Story({
         });
     }
 
-    if (pullDirection === "right") {
-      storyRight.current.play();
-    }
-
-    if (pullDirection === "default" && storyRight.current.progress() === 1) {
-      storyRight.current.reverse();
+    switch (pullDirection) {
+      case "right":
+        storyRight.current.play();
+        break;
+      case "left":
+        storyLeft.current.play();
+        break;
+      case "default":
+        if (storyRight.current.progress() === 1) storyRight.current.reverse();
+        if (storyLeft.current.progress() === 1) storyLeft.current.reverse();
+      default:
+        null;
     }
   }, [pullDirection]);
 

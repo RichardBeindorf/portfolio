@@ -10,7 +10,6 @@ import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import { TitleProps } from "../lowerHalf";
 
 export default function Work({
-  pullMasterTl,
   pullDirection,
   pulldirectionProp,
   currentWindow,
@@ -25,10 +24,15 @@ export default function Work({
   const title = useRef(null);
   const isInitial = useRef(true);
 
+  const workLeft = useRef(null);
+  const workMid = useRef(null);
+
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
   const entriesRef = useRef(null);
   const underline = useRef(null);
   const color = useRef("unset");
+
+  const pullDuration = 1;
 
   const initialPosition: boolean = currentWindow.current === "initial";
   let defaultPosition: boolean;
@@ -159,42 +163,6 @@ export default function Work({
   // Logic for click events on other titles, only click related
   const { contextSafe } = useGSAP(
     () => {
-      // trigger pulls when other titles get clicked
-      const onPullMid = contextSafe(() => {
-        return gsap.to(tainer.current, {
-          id: "midIn",
-          duration: delayTime + 1,
-          ease: "power4.out",
-          keyframes: {
-            // 8 different phases maximum currently
-            // first is start position
-            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["70%", "70%", "85%", "85%"],
-            left: ["90%", "89%", "88%", "75%", "50%"],
-            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
-            easeEach: "none",
-          },
-        });
-      });
-
-      const onPullLeft = contextSafe(() => {
-        return gsap.to(tainer.current, {
-          id: "leftIn",
-          top: "70%",
-          keyframes: {
-            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            scale: [1, 1, 1, 1, 0.5, 0.2],
-            // top: ["70%", "70%", "85%", "85%"],
-            left: ["90%", "89%", "88%", "75%", "10%"],
-            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
-            easeEach: "none",
-          },
-          duration: delayTime + 1,
-          ease: "power4.out",
-        });
-      });
-
       const onStartBounce = contextSafe(() => {
         return gsap.to(title.current, {
           delay: 0.5,
@@ -208,34 +176,8 @@ export default function Work({
         });
       });
 
-      const onDefault = contextSafe(() => {
-        if (!isInitial.current)
-          return gsap.to(tainer.current, {
-            id: "default",
-            duration: delayTime + 1,
-            ease: "power4.out",
-            rotate: 0,
-            scale: 1,
-            top: "50%",
-            left: "80%",
-            opacity: 1,
-          });
-      });
-
-      if (currentWindow.current[0] === 1 && !clicked) {
-        onPullLeft();
-      }
-
-      if (currentWindow.current[1] === 1 && !clicked) {
-        onPullMid();
-      }
-
       if (currentWindow.current[2] === 1 && clicked) {
         onStartBounce();
-      }
-
-      if (defaultPosition && !isInitial.current && !clicked) {
-        onDefault();
       }
     },
     {
@@ -314,6 +256,69 @@ export default function Work({
       revertOnUpdate: false,
     }
   );
+
+  useGSAP(() => {
+    if (!workLeft.current) {
+      workLeft.current = gsap
+        .timeline({
+          paused: true,
+          id: "workLeft",
+        })
+        .to(tainer.current, {
+          // scale: 0.1,
+          // opacity: 0,
+          // rotate: -30,
+          // left: "10%",
+          // top: "50%",
+          duration: pullDuration,
+          ease: "power4.out",
+          keyframes: {
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            top: ["50%", "50%", "85%", "85%"],
+            left: ["80%", "79%", "78%", "75%", "10%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
+        });
+    }
+
+    if (!workMid.current) {
+      workMid.current = gsap
+        .timeline({
+          paused: true,
+          id: "workMid",
+        })
+        .to(tainer.current, {
+          duration: pullDuration,
+          ease: "power4.in",
+          keyframes: {
+            // 8 different phases maximum currently
+            // first is start position
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            top: ["50%", "50%", "85%", "85%"],
+            left: ["80%", "79%", "78%", "65%", "50%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
+        });
+    }
+
+    switch (pullDirection) {
+      case "mid":
+        workMid.current.play();
+        break;
+      case "left":
+        workLeft.current.play();
+        break;
+      case "default":
+        if (workMid.current.progress() === 1) workMid.current.reverse();
+        if (workLeft.current.progress() === 1) workLeft.current.reverse();
+      default:
+        null;
+    }
+  }, [pullDirection]);
 
   return (
     <WorkContainer

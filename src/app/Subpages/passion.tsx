@@ -10,7 +10,6 @@ import { DrawSVGPlugin, Flip } from "gsap/all";
 import { TitleProps } from "../lowerHalf";
 
 export default function Passion({
-  pullMasterTl,
   pullDirection,
   pulldirectionProp,
   currentWindow,
@@ -28,6 +27,9 @@ export default function Passion({
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
   const initialOrDefaultWindow = useRef(true);
+
+  const passionRight = useRef(null);
+  const passionMid = useRef(null);
 
   const initialPosition: boolean = currentWindow.current === "initial";
   let defaultPosition: boolean;
@@ -278,6 +280,65 @@ export default function Passion({
     }
   );
 
+  useGSAP(() => {
+    if (!passionMid.current) {
+      passionMid.current = gsap
+        .timeline({
+          paused: true,
+          id: "passionMid",
+        })
+        .to(tainer.current, {
+          duration: pullDuration,
+          ease: "power4.in",
+          keyframes: {
+            // 8 different phases maximum currently
+            // first is start position
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            top: ["55%", "55%", "85%", "85%"],
+            left: ["10%", "11%", "12%", "27%", "50%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
+        });
+    }
+
+    if (!passionRight.current) {
+      passionRight.current = gsap
+        .timeline({
+          paused: true,
+          id: "passionRight",
+        })
+        .to(tainer.current, {
+          duration: pullDuration,
+          ease: "power4.out",
+          keyframes: {
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.2],
+            top: ["55%", "55%", "85%", "85%"],
+            left: ["10%", "11%", "12%", "27%", "80%"],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
+        });
+    }
+
+    switch (pullDirection) {
+      case "mid":
+        passionMid.current.play();
+        break;
+      case "right":
+        passionRight.current.play();
+        break;
+      case "default":
+        if (passionMid.current.progress() === 1) passionMid.current.reverse();
+        if (passionRight.current.progress() === 1)
+          passionRight.current.reverse();
+      default:
+        null;
+    }
+  }, [pullDirection]);
+
   return (
     <PassionContainer $backgroundColor={color.current} ref={tainer}>
       <TitleWrapper>
@@ -290,12 +351,14 @@ export default function Passion({
               currentWindow.current[2] !== 1
             ) {
               const next = !clicked;
-
               setClicked(next);
               if (initialOrDefaultWindow.current) {
                 currentWindow.current = [1, 0, 0];
+                pulldirectionProp("left");
               }
-
+              if (pullDirection === "left") {
+                pulldirectionProp("default");
+              }
               isAnimating.current = true;
             }
           }}
