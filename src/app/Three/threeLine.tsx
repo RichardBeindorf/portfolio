@@ -89,6 +89,8 @@ function ThreeLine({
     const pointsToDraw = worldPoints.slice(
       Math.max(0, worldPoints.length - MAX_POINTS)
     );
+
+    // distances will hold not the distance between sigular points but the overall distance to the point of origin accumulated
     const distances = [0];
     const height = size.height;
     const currentY = worldPoints[worldPoints.length - 1].y;
@@ -134,9 +136,32 @@ function ThreeLine({
 
     let wavedPoints = [];
     if (waveDist.current.length > 0) {
+      // Wave Speed heree
       waveDist.current = waveDist.current
         .map((dist) => dist - 2)
         .filter((dist) => dist > -5);
+
+      // console.log(waveDist.current);
+      // What is in waveDist:
+      // - at the start im checking if a wave should be generate via the threshhold
+      // - then we`re adding the newest distance value that passed ( even if we didnt move we will add a new distance to the ref, though that is unlikeley since we passed the threshold )
+      // - next Step we reduce the dang thing -> every distance value gets substracted 2
+      // - we are also filtering out all values smaller than -5, so we get rid of the waves that are done!
+      //
+
+      // Wave generation procedure
+      // 1. first taking the current points and start looping through them, only to grab the distance of it
+      // 2. then checking the distance of the current point via the index (they have the same length)
+      // 3. then we check in our waves ref for each waves current distance
+      // 4. Now we check how far away we are from the waves current position and compare both
+      // 5. With this comparison we can realize where the wave currently is, when the value of distToWave reaches 0 we hit the waves position!
+      // 6. Now we can manipulate the values in that section
+      //  6a. First of all we are setting a length of the wave using the distToWave value and set a max point (ex 100)
+      //  6b. With this fixed wave distance value i can work to create a nicely shaped wave using math.sin
+      //
+      // Finally adding the the generated offset to the line
+      // Now we just have to use those points to set the ne position for our line geometry! voila a jiggle wiggle effect
+      //
 
       wavedPoints = pointsToDraw.map((p, pointIndex) => {
         let totalWaveOffset = 0;
@@ -146,14 +171,26 @@ function ThreeLine({
         for (const waveOriginDist of waveDist.current) {
           const distToWave = currentPointDistance - waveOriginDist;
 
-          // Make the wave fade out and only affect a certain length of the line
-          if (distToWave > 0 && distToWave < 100) {
-            // Tweak these values
-            const wavePower = Math.exp(-distToWave / 15); // Controls fade out
-            const waveShape = Math.cos(
-              distToWave / 15 - state.clock.elapsedTime * 10
-            );
-            totalWaveOffset += waveShape * 15 * wavePower; // Add this wave's effect
+          // Wave properties
+          const waveFullLength = 150; // distance the wave travels
+          const waveFrequency = 25; // How many ripples
+          const maxAmplitude = 15; // max height of the wave
+
+          // this is my wave window
+          if (distToWave > 0 && distToWave < waveFullLength) {
+            // using math sin to start at 0 height (x value), since math.sin of 0 is 0
+            const waveShape = Math.sin(distToWave / waveFrequency);
+
+            // the "fade in/out" part
+            // We'll use a simple sin curve for the envelope itself!
+            // 'progress' will go from 0 (start) to 1 (end)
+            const progress = distToWave / waveFullLength;
+
+            const envelope = Math.sin(progress * Math.PI);
+
+            // 3. Combine them!
+            // The final offset is the ripple * max height * envelope
+            totalWaveOffset += waveShape * maxAmplitude * envelope;
           }
         }
         // Apply the final summed offset to a clone of the original point
