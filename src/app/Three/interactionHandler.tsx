@@ -42,7 +42,8 @@ export default function InteractionHandler({
       if (!lineApiRef.current) return;
 
       const pointerXOnCanvas = clientX;
-      const pointerYOnCanvas = clientY + smoother.scrollTop();
+      const pointerYOnCanvas = clientY;
+      // + smoother.scrollTop();
 
       const ndcX = (pointerXOnCanvas / size.width) * 2 - 1;
       const ndcY = -(pointerYOnCanvas / size.height) * 2 + 1;
@@ -66,14 +67,14 @@ export default function InteractionHandler({
         type: "scroll, pointer, wheel, touch", // We only need to listen to scroll and pointer events
         // onPointerMove handles mouse and touch movement
 
-        onChangeY: () => {
-          // since scrollY is read from the top of the screen and not the bottom we just devide the overall hight and add some tolerance
-          const scrollHight = (document.body.scrollHeight / 2) * 0.9;
-          const currentScroll = window.scrollY;
-          if (currentScroll >= scrollHight) {
-            bottomScroll(true);
-          }
-        },
+        // onChangeY: () => {
+        //   // since scrollY is read from the top of the screen and not the bottom we just devide the overall hight and add some tolerance
+        //   const scrollHight = (document.body.scrollHeight / 2) * 0.9;
+        //   const currentScroll = window.scrollY;
+        //   if (currentScroll >= scrollHight) {
+        //     bottomScroll(true);
+        //   }
+        // },
 
         onMove: (self) => {
           // const eventFix = self.event as PointerEvent;
@@ -99,16 +100,18 @@ export default function InteractionHandler({
               0,
               Math.min(pushBackPointTop, self.y / 2 - viewportHeight / 3) // dont want it to be negative or to be higher than our push back point
             );
-            if (
-              currentPercent > 15 &&
-              currentPercent < 90 &&
-              breakPointCheck < pushBackPointTop
-            ) {
-              smoother.scrollTo(
-                Math.min(pushBackPointTop, bouncyMovement.current),
-                true
-              );
-            }
+
+            // Hier bleibe ich jedes mal stecken!!
+            // if (
+            //   currentPercent > 15 &&
+            //   currentPercent < 90 &&
+            //   breakPointCheck < pushBackPointTop
+            // ) {
+            //   smoother.scrollTo(
+            //     Math.min(pushBackPointTop, bouncyMovement.current),
+            //     true
+            //   );
+            // }
 
             // as long as we are at the push back point or just have scrolled down + delta is negative -> we scroll up
             if (

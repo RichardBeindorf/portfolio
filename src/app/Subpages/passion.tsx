@@ -157,6 +157,8 @@ export default function Passion({
       if (currentWindow.current[0] === 1 && clicked) {
         onStartBounce();
       }
+
+      clicked ? (color.current = "#F2F1E9") : (color.current = "transparent");
     },
     {
       scope: tainer,
@@ -224,10 +226,9 @@ export default function Passion({
       });
 
       if (showEntries && !isAnimating.current && underline.current) {
-        color.current = "#F2F1E9";
         drawUnderline();
       } else {
-        color.current = "unset";
+        // still have to reverse the underline
       }
     },
     {
@@ -246,11 +247,12 @@ export default function Passion({
         })
         .to(tainer.current, {
           duration: pullDuration,
+          rotate: 30,
           ease: "power4.in",
           keyframes: {
             // 8 different phases maximum currently
             // first is start position
-            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            // rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
             top: ["50%", "50%", "80%", "80%"],
             left: ["10%", "11%", "12%", "27%", "50%"],
@@ -269,10 +271,11 @@ export default function Passion({
         .to(tainer.current, {
           duration: pullDuration,
           top: "50%",
+          rotate: 30,
           ease: "power4.out",
           keyframes: {
-            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
+            // rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             left: ["10%", "11%", "12%", "27%", "80%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -294,12 +297,11 @@ export default function Passion({
       default:
         null;
     }
-
-    console.warn("inside PASSION pull directory:", pullDirection);
   }, [pullDirection]);
 
   return (
     <PassionContainer $backgroundColor={color.current} ref={tainer}>
+      {/* This InnerContainer is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box when entries are closing*/}
       <InnerContainer ref={innerRef}>
         <TitleWrapper>
           <Title
@@ -406,6 +408,7 @@ const PassionContainer = styled.section<{ $backgroundColor: string }>`
 `;
 
 export const InnerContainer = styled.div`
+  position: relative;
   height: auto;
   will-change: height;
 `;

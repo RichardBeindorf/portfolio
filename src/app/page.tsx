@@ -19,21 +19,21 @@ export default function Home() {
         <SmoothWrapper id="smooth-content">
           <TopHalf bottomScroll={bottomScroll} drawDelay={drawDelay} />
           <LowerHalf />
+          <CanvasWrapper>
+            <Canvas orthographic>
+              <CameraSetup />
+              <ThreeLine lineApiRef={threeLineRef} drawDelay={drawDelay} />
+              <InteractionHandler
+                lineApiRef={threeLineRef}
+                drawDelay={drawDelay}
+                bottomScroll={(arr) => {
+                  setBottomScroll(arr);
+                }}
+              />
+            </Canvas>
+          </CanvasWrapper>
         </SmoothWrapper>
       </main>
-      <CanvasWrapper>
-        <Canvas orthographic>
-          <CameraSetup />
-          <ThreeLine lineApiRef={threeLineRef} drawDelay={drawDelay} />
-          <InteractionHandler
-            lineApiRef={threeLineRef}
-            drawDelay={drawDelay}
-            bottomScroll={(arr) => {
-              setBottomScroll(arr);
-            }}
-          />
-        </Canvas>
-      </CanvasWrapper>
     </>
   );
 }
@@ -44,21 +44,18 @@ const SmoothWrapper = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  /* min-height: 100%; */
-  background-color: #f2f1e9;
-  overflow-y: hidden; // debatable
+  overflow-y: hidden;
   /* isolation: isolate; // needed for a color blend setting to work */
 
   /* pointer-events: none; */ /* causes a lot of bugs! use with care */
 `;
 
 const CanvasWrapper = styled.div`
-  position: fixed; /* sticks behind everything */
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  /* height: 200vh; covers 2 screens visually */
+  height: 200vh; /* covers 2 screens visually */
   z-index: -1; /* stays in the back */
-  pointer-events: none; /* if you don’t want it intercepting clicks */
+  pointer-events: none; /* dont register clicks */
 `;
