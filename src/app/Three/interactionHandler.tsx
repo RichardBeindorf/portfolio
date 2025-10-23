@@ -99,16 +99,18 @@ export default function InteractionHandler({
               0,
               Math.min(pushBackPointTop, self.y / 2 - viewportHeight / 3) // dont want it to be negative or to be higher than our push back point
             );
-            if (
-              currentPercent > 15 &&
-              currentPercent < 90 &&
-              breakPointCheck < pushBackPointTop
-            ) {
-              smoother.scrollTo(
-                Math.min(pushBackPointTop, bouncyMovement.current),
-                true
-              );
-            }
+
+            // Hier bleibe ich jedes mal stecken!!
+            // if (
+            //   currentPercent > 15 &&
+            //   currentPercent < 90 &&
+            //   breakPointCheck < pushBackPointTop
+            // ) {
+            //   smoother.scrollTo(
+            //     Math.min(pushBackPointTop, bouncyMovement.current),
+            //     true
+            //   );
+            // }
 
             // as long as we are at the push back point or just have scrolled down + delta is negative -> we scroll up
             if (
@@ -251,6 +253,8 @@ export default function InteractionHandler({
           }
         },
       });
+
+      //TIMEOUT END
     }, drawDelay + 2000);
 
     return () => {
@@ -261,57 +265,3 @@ export default function InteractionHandler({
 
   return null;
 }
-
-// old border scroll code:
-
-// i have to first, make sure that the viewport is positioned at the very bottom so the animation wont trigger while we are scrolling down from the top pos
-// if (smoother.scrollTop() === 0){
-//     currentHalf.current = "top";
-//     const upperTl = gsap.timeline();
-//     // const bounceOutDistance = viewportHeight + (viewportHeight / 100) * 20; // 20 % of the viewport added to the bottom;
-//     const bounceOutDistance = (viewportHeight / 100) * 20; // 20 % of the viewport added to the bottom;
-
-//     // here we set a flag so the event doesnt not get fired too much
-
-//     if( pointerDataRef.current.velocity > 2000 && currentHalf.current === "top" && currentPercent > 90 ){
-//         gsap.to(window, {
-//             duration: 4,
-//             ease: "power4.out",
-//             scrollTo: { y: "max" },
-//         });
-//     }
-
-//     if( !isCooldown && pointerDataRef.current.velocity < 2000 && pointerDataRef.current.velocity > 900 && currentHalf.current === "top" && currentPercent > 45){
-//         isCooldown = true;
-
-//         upperTl.to(window, { duration: 0.5, scrollTo: ((bounceOutDistance / 2) + self.velocityY / 100), ease: "back.out"}).to(window, { duration: 0.5, scrollTo: 0, ease: "power4.out" })
-
-//         gsap.delayedCall(3.5, () => {
-//             isCooldown = false;
-//         });
-//     }
-// }
-// if (smoother.scrollTop() === viewportHeight){
-//     // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
-//     currentHalf.current = "bottom";
-//     const lowerTl = gsap.timeline();
-//     const bounceInDistance = viewportHeight - (viewportHeight / 100) * 20; // 20 % of the viewport substracted of the top;
-
-//     if( pointerDataRef.current.velocity > 2000 && currentHalf.current === "bottom" && currentPercent < 10 ){
-//         gsap.to(window, {
-//             duration: 4,
-//             ease: "power4.out",
-//             scrollTo: { y: 0 },
-//         });
-//     };
-
-//     if( !isCooldown && pointerDataRef.current.velocity < 2000 && pointerDataRef.current.velocity > 1300 && currentHalf.current === "bottom" && currentPercent < 45){
-//         isCooldown = true;
-
-//         lowerTl.to(window, { duration: 0.5, scrollTo: (bounceInDistance / 1 - self.velocityY / 100), ease: "back.out"}).to(window, { duration: 0.5, scrollTo: "max", ease: "power4.out" })
-
-//         gsap.delayedCall(5, () => {
-//             isCooldown = false;
-//         });
-//     }
-// };

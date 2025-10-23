@@ -163,6 +163,8 @@ export default function Story({
     if (currentWindow.current[1] === 1 && clicked) {
       onStartBounce();
     }
+
+    clicked ? (color.current = "#F2F1E9") : (color.current = "transparent");
   }, [clicked, currentWindow.current]);
 
   //**//
@@ -224,10 +226,9 @@ export default function Story({
       });
 
       if (showEntries && !isAnimating.current && underline.current) {
-        color.current = "#F2F1E9";
         drawUnderline();
       } else {
-        color.current = "unset";
+        // still have to reverse the underline
       }
     },
     {
@@ -285,8 +286,6 @@ export default function Story({
       default:
         null;
     }
-
-    console.warn("inside STORY pull directory:", pullDirection);
   }, [pullDirection]);
 
   return (
@@ -309,8 +308,6 @@ export default function Story({
                 }
 
                 isAnimating.current = true;
-
-                console.log("pull direction", pullDirection);
               }
             }}
             ref={title}

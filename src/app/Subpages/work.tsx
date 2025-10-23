@@ -105,15 +105,13 @@ export default function Work({
         );
 
         if (innerRef.current) {
-          const targetHeight = clicked
-            ? innerRef.current.scrollHeight
-            : title.current.clientHeight;
+          const targetHeight = clicked ? "auto" : title.current.clientHeight;
 
           tl.to(
             innerRef.current,
             {
               height: targetHeight,
-              duration: 2,
+              duration: 0.1,
               ease: "power4.out",
             },
             0
@@ -184,6 +182,8 @@ export default function Work({
       if (currentWindow.current[2] === 1 && clicked) {
         onStartBounce();
       }
+
+      clicked ? (color.current = "#F2F1E9") : (color.current = "transparent");
     },
     {
       scope: tainer,
@@ -249,10 +249,9 @@ export default function Work({
       });
 
       if (showEntries && !isAnimating.current && underline.current) {
-        color.current = "#F2F1E9";
         drawUnderline();
       } else {
-        color.current = "unset";
+        //still have to reverse the underline
       }
     },
     {
@@ -318,8 +317,6 @@ export default function Work({
       default:
         null;
     }
-
-    console.warn("inside WORK pull directory:", pullDirection);
   }, [pullDirection]);
 
   return (
