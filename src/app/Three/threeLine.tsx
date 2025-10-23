@@ -6,6 +6,7 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import * as THREE from "three";
+import { disconnect } from "process";
 
 export interface ThreeLineMethods {
   addPoint: (point: THREE.Vector3) => void;
@@ -103,6 +104,59 @@ function ThreeLine({
       );
     }
 
+    //** **//
+    // HERE ADDING FILL UP POINTS TO MAKE WAVE SMOOTHER//
+    //** **//
+
+    // I dont have to loop through the whole points variable since im reading for every render cycle anyways!
+    // Rather just check the current distance and the last
+    // Based on that i can figure out if the line should have a higher resolution, aka more points
+    if (distances.length > 1) {
+      const latestDistance = distances[distances.length - 1];
+      const secondLastDistance = distances[distances.length - 2];
+      const pointToPoint = latestDistance - secondLastDistance;
+
+      if (pointToPoint > 50 && pointToPoint < 100) {
+        const latestPoint = pointsToDraw[pointsToDraw.length - 1];
+        const secondLastPoint = pointsToDraw[pointsToDraw.length - 2];
+        // insert more points to fill the gap
+        const xDelta = latestPoint.x - secondLastPoint.x;
+        const yDelta = latestPoint.y - secondLastPoint.y;
+
+        const newX = latestPoint.x + xDelta / 2;
+        const newY = latestPoint.y + yDelta / 2;
+
+        const newPoint = new THREE.Vector3(newX, newY, -400);
+
+        // mutate points to draw
+        // add new point in between
+        pointsToDraw.splice(pointsToDraw.length - 1, 0, newPoint);
+      }
+      if (pointToPoint > 100) {
+        const latestPoint = pointsToDraw[pointsToDraw.length - 1];
+        const secondLastPoint = pointsToDraw[pointsToDraw.length - 2];
+        // insert more points to fill the gap
+        const xDelta = latestPoint.x - secondLastPoint.x;
+        const yDelta = latestPoint.y - secondLastPoint.y;
+
+        const newXOne = latestPoint.x + xDelta / 3;
+        const newYOne = latestPoint.y + yDelta / 3;
+        const newXTwo = latestPoint.x + (xDelta / 3) * 2;
+        const newYTwo = latestPoint.y + (yDelta / 3) * 2;
+
+        const firstNewPoint = new THREE.Vector3(newXOne, newYOne, -400);
+        const secondNewPoint = new THREE.Vector3(newXTwo, newYTwo, -400);
+
+        // mutate points to draw
+        // add new point in between
+        pointsToDraw.splice(pointsToDraw.length - 1, 0, firstNewPoint);
+        pointsToDraw.splice(pointsToDraw.length - 1, 0, secondNewPoint);
+      }
+    }
+
+    //** **//
+    // Threshold mechanic //
+    //** **//
     // get the difference in height / velocity
     let pastY = currentY; // Default to currentY to get a diff of 0
     if (worldPoints.length >= 5) {
@@ -141,7 +195,6 @@ function ThreeLine({
         .map((dist) => dist - 2)
         .filter((dist) => dist > -5);
 
-      // console.log(waveDist.current);
       // What is in waveDist:
       // - at the start im checking if a wave should be generate via the threshhold
       // - then we`re adding the newest distance value that passed ( even if we didnt move we will add a new distance to the ref, though that is unlikeley since we passed the threshold )
