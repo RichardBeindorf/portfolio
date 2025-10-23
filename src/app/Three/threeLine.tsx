@@ -192,7 +192,7 @@ function ThreeLine({
     if (waveDist.current.length > 0) {
       // Wave Speed heree
       waveDist.current = waveDist.current
-        .map((dist) => dist - 2)
+        .map((dist) => dist - 6)
         .filter((dist) => dist > -5);
 
       // What is in waveDist:

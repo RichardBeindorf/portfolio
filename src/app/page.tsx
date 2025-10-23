@@ -14,27 +14,25 @@ export default function Home() {
   const drawDelay = 3000;
 
   return (
-    <>
-      <main id="smooth-wrapper">
-        <SmoothWrapper id="smooth-content">
-          <TopHalf bottomScroll={bottomScroll} drawDelay={drawDelay} />
-          <LowerHalf />
-          <CanvasWrapper>
-            <Canvas orthographic>
-              <CameraSetup />
-              <ThreeLine lineApiRef={threeLineRef} drawDelay={drawDelay} />
-              <InteractionHandler
-                lineApiRef={threeLineRef}
-                drawDelay={drawDelay}
-                bottomScroll={(arr) => {
-                  setBottomScroll(arr);
-                }}
-              />
-            </Canvas>
-          </CanvasWrapper>
-        </SmoothWrapper>
-      </main>
-    </>
+    <main id="smooth-wrapper">
+      <SmoothWrapper id="smooth-content">
+        <TopHalf bottomScroll={bottomScroll} drawDelay={drawDelay} />
+        <LowerHalf />
+        <CanvasWrapper>
+          <Canvas orthographic>
+            <CameraSetup />
+            <ThreeLine lineApiRef={threeLineRef} drawDelay={drawDelay} />
+            <InteractionHandler
+              lineApiRef={threeLineRef}
+              drawDelay={drawDelay}
+              bottomScroll={(arr) => {
+                setBottomScroll(arr);
+              }}
+            />
+          </Canvas>
+        </CanvasWrapper>
+      </SmoothWrapper>
+    </main>
   );
 }
 
@@ -55,7 +53,7 @@ const CanvasWrapper = styled.div`
   top: 0;
   left: 0;
   width: 100%;
-  height: 200vh; /* covers 2 screens visually */
-  z-index: -1; /* stays in the back */
+  height: 200vh;
+  z-index: -1;
   pointer-events: none; /* dont register clicks */
 `;

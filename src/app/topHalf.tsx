@@ -106,11 +106,6 @@ export function TopHalf({ bottomScroll, drawDelay }: TopHalfProps) {
           width={helperWidth}
           viewBox={helperViewport}
           ref={directionHelper}
-
-          // height="100%"
-          // width="100%"
-          // viewBox={helperViewport}
-          // ref={directionHelper}
         >
           <defs>
             <mask id="helperMask" maskUnits="userSpaceOnUse">
@@ -140,6 +135,7 @@ export function TopHalf({ bottomScroll, drawDelay }: TopHalfProps) {
               strokeLinecap="round"
             />
           </g>
+          {/* Just some helper points in case i need to work on the form again */}
           {/* <circle cx={0} cy={350} r={3} fill="red" />
           <circle cx={50} cy={55} r={3} fill="red" />
           <circle cx={110} cy={330} r={3} fill="red" />
