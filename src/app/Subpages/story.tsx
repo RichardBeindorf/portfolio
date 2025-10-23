@@ -43,8 +43,8 @@ export default function Story({
     }
 
     // first create (or get the existing) batch by id
-    let batch = Flip.batch("story");
-    let action = batch.add({
+    const batch = Flip.batch("story");
+    const action = batch.add({
       getState() {
         return Flip.getState(tainer.current);
       },
@@ -164,7 +164,11 @@ export default function Story({
       onStartBounce();
     }
 
-    clicked ? (color.current = "#F2F1E9") : (color.current = "transparent");
+    if (clicked) {
+      color.current = "#F2F1E9";
+    } else {
+      color.current = "transparent";
+    }
   }, [clicked, currentWindow.current]);
 
   //**//

@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { ChapterTitle, TitleWrapper } from "./story";
+import { TitleWrapper } from "./story";
 import { oswald300, oswald500, permanentMarker } from "@/styles/font";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
@@ -41,8 +41,8 @@ export default function Passion({
     }
 
     // first create (or get the existing) batch by id
-    let batch = Flip.batch("passion");
-    let action = batch.add({
+    const batch = Flip.batch("passion");
+    const action = batch.add({
       getState() {
         return Flip.getState(tainer.current);
       },
@@ -158,7 +158,11 @@ export default function Passion({
         onStartBounce();
       }
 
-      clicked ? (color.current = "#F2F1E9") : (color.current = "transparent");
+      if (clicked) {
+        color.current = "#F2F1E9";
+      } else {
+        color.current = "transparent";
+      }
     },
     {
       scope: tainer,
@@ -291,11 +295,12 @@ export default function Passion({
         passionRight.current.play();
         break;
       case "default":
-        if (passionMid.current.progress() === 1) passionMid.current.reverse();
-        if (passionRight.current.progress() === 1)
+        if (passionMid.current.progress() === 1) {
+          passionMid.current.reverse();
+        }
+        if (passionRight.current.progress() === 1) {
           passionRight.current.reverse();
-      default:
-        null;
+        }
     }
   }, [pullDirection]);
 
@@ -382,7 +387,8 @@ export default function Passion({
                 <Text style={oswald300.style}>
                   getting out of my{" "}
                   <Highlights style={oswald500.style}>comfort areas</Highlights>{" "}
-                  - if it didn't scare me it probably didn't improve my life
+                  - if it didn&#39t scare me it probably didn&#39t improve my
+                  life
                 </Text>
               </TopicWrapper>
             </PassionEntryWrapper>

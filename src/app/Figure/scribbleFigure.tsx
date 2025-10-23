@@ -17,7 +17,7 @@ export default function ScribbleFigure({ drawDelay }: { drawDelay: number }) {
       scribbleRef.current.style.transition = "opacity 3s ease-in";
       scribbleRef.current.style.opacity = "1";
     }, drawDelay);
-  }, []);
+  });
 
   return (
     <>

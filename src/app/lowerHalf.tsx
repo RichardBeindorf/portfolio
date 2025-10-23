@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import Story from "./Subpages/story";
 import Passion from "./Subpages/passion";
-import { Dispatch, RefObject, SetStateAction, useRef, useState } from "react";
+import { Dispatch, RefObject, useRef, useState } from "react";
 import Work from "./Subpages/work";
 
 type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";

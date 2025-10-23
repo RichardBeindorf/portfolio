@@ -6,7 +6,6 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import * as THREE from "three";
-import { disconnect } from "process";
 
 export interface ThreeLineMethods {
   addPoint: (point: THREE.Vector3) => void;
@@ -14,7 +13,6 @@ export interface ThreeLineMethods {
 
 function ThreeLine({
   lineApiRef,
-  drawDelay,
 }: {
   lineApiRef: React.RefObject<ThreeLineMethods | null>;
   drawDelay: number;
@@ -80,7 +78,7 @@ function ThreeLine({
     },
   }));
 
-  useFrame((state) => {
+  useFrame(() => {
     if (points.current.length < 2) {
       line2Geometry.setDrawRange(0, 0);
       return;
@@ -252,9 +250,11 @@ function ThreeLine({
     }
 
     let flatWavedPoints;
-    wavedPoints.length > 0
-      ? (flatWavedPoints = wavedPoints.flatMap((p) => p.toArray()))
-      : (flatWavedPoints = pointsToDraw.flatMap((p) => p.toArray()));
+    if (wavedPoints.length > 0) {
+      flatWavedPoints = wavedPoints.flatMap((p) => p.toArray());
+    } else {
+      flatWavedPoints = pointsToDraw.flatMap((p) => p.toArray());
+    }
 
     line2Geometry.setPositions(flatWavedPoints);
     line2Geometry.setDrawRange(0, pointsToDraw.length);

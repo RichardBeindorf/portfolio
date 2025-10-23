@@ -43,7 +43,7 @@ export default function Entry(body: string, year: number | string, id: number) {
   return (
     <div>
       <EntryWrapper key={id}>
-        <Bullet>//</Bullet>
+        <Bullet>&#47&#47</Bullet>
         <EntryText style={oswald300.style}>{body}</EntryText>
         <Year style={permanentMarker.style}>{year}</Year>
       </EntryWrapper>

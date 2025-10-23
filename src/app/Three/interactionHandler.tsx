@@ -52,7 +52,7 @@ export default function InteractionHandler({
       lineApiRef.current.addPoint(vector);
     };
 
-    let smoother = ScrollSmoother.create({
+    const smoother = ScrollSmoother.create({
       wrapper: "#smooth-wrapper",
       content: "#smooth-content",
       smooth: 1,
@@ -61,7 +61,7 @@ export default function InteractionHandler({
     });
 
     setTimeout(() => {
-      const observer = Observer.create({
+      Observer.create({
         target: window,
         type: "scroll, pointer, wheel, touch", // We only need to listen to scroll and pointer events
         // onPointerMove handles mouse and touch movement
@@ -84,7 +84,7 @@ export default function InteractionHandler({
 
           const pushBackPointTop = viewportHeight + viewportHeight / 8 - 1; // CHANGE THE PUSHBACK POINT TO ADJUST BOUNCE
           const pushBackPointBottom = viewportHeight - viewportHeight / 8; // CHANGE THE PUSHBACK POINT TO ADJUST BOUNCE
-          const breakPointCheck = bouncyMovement.current + viewportHeight; // this is the Bottom of current scrolled position container
+          // const breakPointCheck = bouncyMovement.current + viewportHeight; // this is the Bottom of current scrolled position container
 
           // TOP BOUNCE
           if (

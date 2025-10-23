@@ -183,7 +183,11 @@ export default function Work({
         onStartBounce();
       }
 
-      clicked ? (color.current = "#F2F1E9") : (color.current = "transparent");
+      if (clicked) {
+        color.current = "#F2F1E9";
+      } else {
+        color.current = "transparent";
+      }
     },
     {
       scope: tainer,
@@ -477,9 +481,9 @@ const Title = styled(ChapterTitle)`
   text-align: left;
 `;
 
-const Highlights = styled.span`
-  color: var(--textAccent);
-`;
+// const Highlights = styled.span`
+//   color: var(--textAccent);
+// `;
 
 const NavButtons = styled.div`
   display: flex;
