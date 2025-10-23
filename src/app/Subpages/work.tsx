@@ -70,8 +70,8 @@ export default function Work({
     }
 
     // first create (or get the existing) batch by id
-    let batch = Flip.batch("work");
-    let action = batch.add({
+    const batch = Flip.batch("work");
+    const action = batch.add({
       getState() {
         return Flip.getState(tainer.current);
       },
@@ -318,8 +318,6 @@ export default function Work({
       case "default":
         if (workMid.current.progress() === 1) workMid.current.reverse();
         if (workLeft.current.progress() === 1) workLeft.current.reverse();
-      default:
-        null;
     }
   }, [pullDirection]);
 

@@ -287,8 +287,6 @@ export default function Story({
       case "default":
         if (storyRight.current.progress() === 1) storyRight.current.reverse();
         if (storyLeft.current.progress() === 1) storyLeft.current.reverse();
-      default:
-        null;
     }
   }, [pullDirection]);
 
@@ -330,17 +328,17 @@ export default function Story({
             </svg>
           ) : null}
         </TitleWrapper>
-        {showEntries && ( // Use showEntries here
+        {showEntries && (
           <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
             <Intro style={oswald300.style}>
-              ”Lets say it seems <em style={oswald500.style}>complicated</em>,
-              but in the <em style={oswald500.style}>end</em> it all makes
-              sense”
+              &#34;Lets say it seems{" "}
+              <em style={oswald500.style}>complicated</em>, but in the{" "}
+              <em style={oswald500.style}>end</em> it all makes sense&#34;
             </Intro>
             <EntryList>
               {entryData.map((entry, i) => (
                 <EntryWrapper key={i}>
-                  <Bullet>//</Bullet>
+                  <Bullet>&#47;&#47;</Bullet>
                   <EntryText style={oswald300.style}>{entry[0]}</EntryText>
                   <Year style={permanentMarker.style}>{entry[1]}</Year>
                 </EntryWrapper>
