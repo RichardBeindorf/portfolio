@@ -85,9 +85,7 @@ export default function Story({
 
         // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
         if (innerRef.current) {
-          const targetHeight = clicked
-            ? innerRef.current.scrollHeight
-            : title.current.clientHeight;
+          const targetHeight = clicked ? "auto" : title.current.clientHeight;
 
           tl.to(
             innerRef.current,
@@ -117,7 +115,7 @@ export default function Story({
         if (isAnimating.current && !clicked && currentWindow.current[1] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
               },
@@ -356,6 +354,7 @@ const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   top: 80%;
   left: 50%;
   text-align: left;
+  max-width: 80%;
 
   /* mix-blend-mode: normal; */
   padding: 15px;
@@ -363,6 +362,19 @@ const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
+`;
+
+export const ChapterTitle = styled.h1`
+  position: relative;
+  color: var(--foreground);
+  mix-blend-mode: normal;
+  font-size: var(--header);
+  text-align: center;
+  user-select: none;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 export const TitleWrapper = styled.div`
@@ -383,19 +395,6 @@ const StoryEntryWrapper = styled.div`
   cursor: pointer;
   padding: 0px;
   background-color: var(--background);
-`;
-
-export const ChapterTitle = styled.h1`
-  position: relative;
-  color: var(--foreground);
-  mix-blend-mode: normal;
-  font-size: clamp(2vw, 3rem, 4.5vw);
-  text-align: center;
-  user-select: none;
-
-  &:hover {
-    cursor: pointer;
-  }
 `;
 
 export const Intro = styled.div`

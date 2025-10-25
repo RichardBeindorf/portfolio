@@ -7,7 +7,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { DrawSVGPlugin, Flip } from "gsap/all";
-import { TitleProps } from "../lowerHalf";
+import { TitleProps, ChapterTitle } from "../lowerHalf";
 
 export default function Passion({
   pullDirection,
@@ -77,9 +77,7 @@ export default function Passion({
 
         // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
         if (innerRef.current) {
-          const targetHeight = clicked
-            ? innerRef.current.scrollHeight
-            : title.current.clientHeight;
+          const targetHeight = clicked ? "auto" : title.current.clientHeight;
 
           tl.to(
             innerRef.current,
@@ -109,7 +107,7 @@ export default function Passion({
         if (isAnimating.current && !clicked && currentWindow.current[0] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
               },
@@ -420,13 +418,12 @@ export const InnerContainer = styled.div`
 `;
 
 const Title = styled.h1`
+  text-align: left;
   position: relative;
   color: var(--foreground);
   mix-blend-mode: normal;
-  font-size: clamp(2vw, 3rem, 4.5vw);
-  text-align: left;
+  font-size: var(--header);
 
-  margin-left: 30px;
   user-select: none;
 
   &:hover {

@@ -3,6 +3,10 @@
   --background: #f2f1e9;
   --foreground: #262626;
   --textAccent: #f24150;
+
+  --header: clamp(2vw, 3rem, 8.5vw);
+  --subTitle: clamp(2vw, 2rem, 4.5vw);
+  --inlineText: clamp(1vw, 1rem, 2.5vw);
 }
 
 html,

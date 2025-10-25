@@ -136,7 +136,7 @@ export default function Work({
         if (isAnimating.current && !clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
               },

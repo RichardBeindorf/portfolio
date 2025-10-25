@@ -6,8 +6,6 @@ import Passion from "./Subpages/passion";
 import { Dispatch, RefObject, useRef, useState } from "react";
 import Work from "./Subpages/work";
 
-type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";
-
 export type TitleProps = {
   pulldirectionProp: Dispatch<PullVariants>;
   currentWindow: RefObject<WindowStates>;
@@ -15,6 +13,8 @@ export type TitleProps = {
   pullDirection: string;
   delayTime: number;
 };
+
+type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";
 
 type PullVariants = "left" | "mid" | "right" | "default";
 
