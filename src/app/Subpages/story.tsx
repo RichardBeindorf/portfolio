@@ -55,8 +55,12 @@ export default function Story({
             left: "10%",
             top: "25%",
           });
-        } else {
+        }
+        if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
+          if (matchMedia("(orientation: portrait)").matches) {
+            gsap.set(tainer.current, { left: "35%", top: "50%" });
+          }
           gsap.set(tainer.current, {
             left: "50%",
             top: "80%",
@@ -362,6 +366,10 @@ const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
+
+  @media (orientation: portrait) {
+    left: 35%;
+  }
 `;
 
 export const ChapterTitle = styled.h1`

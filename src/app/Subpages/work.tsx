@@ -81,7 +81,10 @@ export default function Work({
           gsap.set(tainer.current, { left: "10%", top: "25%" });
         } else if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
-          gsap.set(tainer.current, { left: "80%", top: "50%" });
+
+          if (window.matchMedia("orientation: portrait").matches) {
+            gsap.set(tainer.current, { left: "60%", top: "50%" });
+          } else gsap.set(tainer.current, { left: "80%", top: "50%" });
         }
       },
       animate(self) {
@@ -157,6 +160,7 @@ export default function Work({
     });
 
     batch.run();
+    console.log(window.matchMedia("(orientation: portrait)").matches);
 
     return () => {
       action.kill();
@@ -423,6 +427,10 @@ const WorkContainer = styled.section<{ $backgroundColor: string }>`
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
+
+  @media (orientation: portrait) {
+    left: 60%;
+  }
 `;
 
 const WorkEntryWrapper = styled.div`
