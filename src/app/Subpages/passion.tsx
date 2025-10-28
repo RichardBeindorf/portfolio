@@ -7,7 +7,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { DrawSVGPlugin, Flip } from "gsap/all";
-import { TitleProps, ChapterTitle } from "../lowerHalf";
+import { TitleProps } from "../lowerHalf";
 
 export default function Passion({
   pullDirection,
@@ -52,7 +52,11 @@ export default function Passion({
           gsap.set(tainer.current, { left: "10%", top: "25%" });
         } else {
           tainer.current.style.setProperty("position", "absolute");
-          gsap.set(tainer.current, { left: "10%", top: "50%" });
+          if (window.matchMedia("(orientation: portrait)").matches) {
+            gsap.set(tainer.current, { left: "6%", top: "50%" });
+          } else {
+            gsap.set(tainer.current, { left: "10%", top: "50%" });
+          }
         }
       },
       animate(self) {
@@ -400,7 +404,7 @@ export default function Passion({
 const PassionContainer = styled.section<{ $backgroundColor: string }>`
   position: absolute;
   top: 50%;
-  left: 10%;
+  left: 6%;
   text-align: left;
   max-width: 80%;
   /* mix-blend-mode: normal; */
@@ -435,7 +439,7 @@ const PassionEntryWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: start;
-  align-items: start;
+  /* align-items: start; */
   gap: 0.5rem;
   cursor: pointer;
   padding: 0px;

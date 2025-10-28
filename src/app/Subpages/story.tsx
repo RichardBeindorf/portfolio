@@ -31,6 +31,7 @@ export default function Story({
   const storyRight = useRef(null);
   const storyLeft = useRef(null);
   const innerRef = useRef(null);
+  const setLeftDistance = useRef("80%");
 
   const pullDuration = 1;
 
@@ -58,11 +59,9 @@ export default function Story({
         }
         if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
-          if (matchMedia("(orientation: portrait)").matches) {
-            gsap.set(tainer.current, { left: "35%", top: "50%" });
-          }
+
           gsap.set(tainer.current, {
-            left: "50%",
+            left: setLeftDistance.current,
             top: "80%",
           });
         }
@@ -245,6 +244,12 @@ export default function Story({
   );
 
   useGSAP(() => {
+    if (window) {
+      window.matchMedia("(orientation: portrait)").matches
+        ? (setLeftDistance.current = "35%")
+        : (setLeftDistance.current = "45%");
+    }
+
     if (!storyLeft.current) {
       storyLeft.current = gsap
         .timeline({
@@ -356,16 +361,18 @@ export default function Story({
 const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   position: absolute;
   top: 80%;
-  left: 50%;
+  left: 45%;
   text-align: left;
+  width: max-content;
   max-width: 80%;
 
-  /* mix-blend-mode: normal; */
+  mix-blend-mode: screen;
   padding: 15px;
   border-radius: 15px;
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
+  box-shadow: 0 0 15px 10px ${(props) => props.$backgroundColor};
 
   @media (orientation: portrait) {
     left: 35%;

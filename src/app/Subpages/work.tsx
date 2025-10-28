@@ -33,6 +33,7 @@ export default function Work({
   const entriesRef = useRef(null);
   const underline = useRef(null);
   const color = useRef("unset");
+  const setLeftDistance = useRef("80%");
 
   const pullDuration = 1;
 
@@ -81,10 +82,10 @@ export default function Work({
           gsap.set(tainer.current, { left: "10%", top: "25%" });
         } else if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
-
-          if (window.matchMedia("orientation: portrait").matches) {
-            gsap.set(tainer.current, { left: "60%", top: "50%" });
-          } else gsap.set(tainer.current, { left: "80%", top: "50%" });
+          gsap.set(tainer.current, {
+            left: setLeftDistance.current,
+            top: "50%",
+          });
         }
       },
       animate(self) {
@@ -270,6 +271,12 @@ export default function Work({
   );
 
   useGSAP(() => {
+    if (window) {
+      window.matchMedia("(orientation: portrait)").matches
+        ? (setLeftDistance.current = "60%")
+        : (setLeftDistance.current = "80%");
+    }
+
     if (!workLeft.current) {
       workLeft.current = gsap
         .timeline({
@@ -283,7 +290,7 @@ export default function Work({
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            left: ["80%", "79%", "78%", "75%", "10%"],
+            left: [setLeftDistance.current, "10%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
@@ -305,7 +312,7 @@ export default function Work({
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
             top: ["50%", "50%", "80%", "80%"],
-            left: ["80%", "79%", "78%", "65%", "50%"],
+            left: [setLeftDistance.current, "50%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
