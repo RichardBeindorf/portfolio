@@ -12,6 +12,7 @@ export type TitleProps = {
   isAnimating: RefObject<boolean>;
   pullDirection: string;
   delayTime: number;
+  resizeDelta: number | null;
 };
 
 type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";
@@ -24,7 +25,11 @@ const Container = styled.div`
   width: 100%;
 `;
 
-export default function LowerHalf() {
+export default function LowerHalf({
+  resizeDelta,
+}: {
+  resizeDelta: number | null;
+}) {
   const [pullDirection, setPullDirection] = useState<PullVariants>("default");
   const currentWindow = useRef<WindowStates>("initial");
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
@@ -39,6 +44,7 @@ export default function LowerHalf() {
         currentWindow={currentWindow}
         delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
+        resizeDelta={resizeDelta}
       />
       <Passion
         pulldirectionProp={(str: PullVariants) => setPullDirection(str)}
@@ -46,6 +52,7 @@ export default function LowerHalf() {
         currentWindow={currentWindow}
         delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
+        resizeDelta={resizeDelta}
       />
       <Work
         pulldirectionProp={(str: PullVariants) => setPullDirection(str)}
@@ -53,6 +60,7 @@ export default function LowerHalf() {
         currentWindow={currentWindow}
         delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
+        resizeDelta={resizeDelta}
       />
     </Container>
   );

@@ -15,6 +15,7 @@ export default function Passion({
   currentWindow,
   delayTime,
   isAnimating,
+  resizeDelta,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -32,6 +33,10 @@ export default function Passion({
   const passionMid = useRef(null);
 
   const pullDuration = 1;
+  const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
+  const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
+
+  console.log("underline", underlineWidth, resizeDelta);
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -332,12 +337,12 @@ export default function Passion({
             Passion
           </Title>
           {clicked && !isAnimating.current ? (
-            <svg width="650" height="20">
+            <svg width={underlineWidth} height="20">
               <path
                 ref={underline}
                 d="M 0 0 Q 20 20, 500 0"
                 stroke="#262626"
-                strokeWidth="2.5px"
+                strokeWidth={`${strokeWidth}px`}
                 fill="transparent"
               />
             </svg>
@@ -389,7 +394,7 @@ export default function Passion({
                 <Text style={oswald300.style}>
                   getting out of my{" "}
                   <Highlights style={oswald500.style}>comfort areas</Highlights>{" "}
-                  - if it didn&#39t scare me it probably didn&#39t improve my
+                  - if it didn&#39;t scare me it probably didn&#39;t improve my
                   life
                 </Text>
               </TopicWrapper>
@@ -406,7 +411,8 @@ const PassionContainer = styled.section<{ $backgroundColor: string }>`
   top: 50%;
   left: 6%;
   text-align: left;
-  max-width: 80%;
+  width: 80%;
+  max-width: 1100px;
   /* mix-blend-mode: normal; */
   padding: 15px;
   border-radius: 15px;
@@ -454,17 +460,17 @@ const TopicWrapper = styled.div`
 
 const Subtitle = styled.div`
   width: max-content;
-  font-size: 2rem;
+  font-size: var(--subTitle);
   color: var(--foreground);
 `;
 
 const Topic = styled.h3`
-  font-size: 2rem;
+  font-size: var(--subTitle);
   color: var(--textAccent);
 `;
 
 const Text = styled.p`
-  font-size: 1.25rem;
+  font-size: var(--inlineText);
   color: var(--foreground);
 `;
 

@@ -16,6 +16,7 @@ export default function Work({
   currentWindow,
   delayTime,
   isAnimating,
+  resizeDelta,
 }: TitleProps) {
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -36,6 +37,8 @@ export default function Work({
   const setLeftDistance = useRef("80%");
 
   const pullDuration = 1;
+  const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
+  const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 
@@ -364,12 +367,12 @@ export default function Work({
             Work
           </Title>
           {showEntries && (
-            <svg width="650" height="20">
+            <svg width={underlineWidth} height="20">
               <path
                 ref={underline}
                 d="M 0 0 Q 20 20, 500 0"
                 stroke="#262626"
-                strokeWidth="2.5px"
+                strokeWidth={`${strokeWidth}px`}
                 fill="transparent"
               />
             </svg>
@@ -464,11 +467,11 @@ const DetailWrapper = styled.div`
 `;
 
 const Topic = styled.h3`
-  font-size: 2rem;
+  font-size: var(--subTitle);
   color: var(--textAccent);
 `;
 const Text = styled.p`
-  font-size: 1.25rem;
+  font-size: var(--inlineText);
   color: var(--foreground);
   padding: 0;
   margin: 0;

@@ -44,7 +44,7 @@ export default function Home() {
                 drawDelay={drawDelay}
                 resizeDelta={resizeDelta}
               />
-              <LowerHalf />
+              <LowerHalf resizeDelta={resizeDelta} />
             </>
           )}
           <CanvasWrapper>

@@ -16,6 +16,7 @@ export default function Story({
   currentWindow,
   delayTime,
   isAnimating,
+  resizeDelta,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -34,6 +35,8 @@ export default function Story({
   const setLeftDistance = useRef("80%");
 
   const pullDuration = 1;
+  const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
+  const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -324,12 +327,12 @@ export default function Story({
             Story
           </ChapterTitle>
           {clicked && !isAnimating.current ? (
-            <svg width="650" height="20" className="underline">
+            <svg width={underlineWidth} height="20" className="underline">
               <path
                 ref={underline}
                 d="M 0 0 Q 20 20, 500 0"
                 stroke="#262626"
-                strokeWidth="2.5px"
+                strokeWidth={`${strokeWidth}px`}
                 fill="transparent"
               />
             </svg>
@@ -347,7 +350,18 @@ export default function Story({
                 <EntryWrapper key={i}>
                   <Bullet>&#47;&#47;</Bullet>
                   <EntryText style={oswald300.style}>{entry[0]}</EntryText>
-                  <Year style={permanentMarker.style}>{entry[1]}</Year>
+                  {entry[1] === "now" ? (
+                    <Year
+                      style={{
+                        ...permanentMarker.style,
+                        color: "var(--textAccent)",
+                      }}
+                    >
+                      {entry[1]}
+                    </Year>
+                  ) : (
+                    <Year style={permanentMarker.style}>{entry[1]}</Year>
+                  )}
                 </EntryWrapper>
               ))}
             </EntryList>
@@ -413,7 +427,7 @@ const StoryEntryWrapper = styled.div`
 
 export const Intro = styled.div`
   /* width: max-content; */
-  font-size: 2rem;
+  font-size: var(--subTitle);
   text-align: center;
   color: var(--foreground);
 `;
@@ -451,9 +465,9 @@ const Bullet = styled.span`
 
 const EntryText = styled.p`
   /* width: max-content; */
-  font-size: 1.5rem;
+  font-size: var(--inlineText);
 `;
 
 const Year = styled.span`
-  font-size: 1.2rem;
+  font-size: var(--inlineText);
 `;
