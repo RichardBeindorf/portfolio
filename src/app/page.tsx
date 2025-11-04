@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import CameraSetup from "./Three/cameraSetup";
 import { Canvas } from "@react-three/fiber";
@@ -7,32 +7,66 @@ import InteractionHandler from "./Three/interactionHandler";
 import ThreeLine, { ThreeLineMethods } from "@/app/Three/threeLine";
 import LowerHalf from "./lowerHalf";
 import { TopHalf } from "./topHalf";
+import { permanentMarker } from "@/styles/font";
 
 export default function Home() {
-  const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const [bottomScroll, setBottomScroll] = useState(false);
+  const [resizeDelta, setResizeDelta] = useState<number | null>(null);
+  const threeLineRef = useRef<ThreeLineMethods | null>(null);
+  const titleRef = useRef(null);
   const drawDelay = 3000;
 
+  useEffect(() => {
+    const startingWidth = window.innerWidth;
+    const idealWidth = 1680;
+
+    setResizeDelta(startingWidth / idealWidth);
+    console.log("startingWidth / idealWidth", startingWidth / idealWidth);
+
+    setTimeout(() => {
+      titleRef.current.style.transition = "opacity 1s ease-out";
+      titleRef.current.style.opacity = "0";
+    }, drawDelay);
+  }, []);
+
   return (
-    <main id="smooth-wrapper">
-      <SmoothWrapper id="smooth-content">
-        <TopHalf bottomScroll={bottomScroll} drawDelay={drawDelay} />
-        <LowerHalf />
-        <CanvasWrapper>
-          <Canvas orthographic>
-            <CameraSetup />
-            <ThreeLine lineApiRef={threeLineRef} drawDelay={drawDelay} />
-            <InteractionHandler
-              lineApiRef={threeLineRef}
-              drawDelay={drawDelay}
-              bottomScroll={(arr) => {
-                setBottomScroll(arr);
-              }}
-            />
-          </Canvas>
-        </CanvasWrapper>
-      </SmoothWrapper>
-    </main>
+    <>
+      <h1 className="introTitle" ref={titleRef} style={permanentMarker.style}>
+        Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based in
+        Hamburg
+      </h1>
+      <main id="smooth-wrapper">
+        <SmoothWrapper id="smooth-content">
+          {resizeDelta && (
+            <>
+              <TopHalf
+                bottomScroll={bottomScroll}
+                drawDelay={drawDelay}
+                resizeDelta={resizeDelta}
+              />
+              <LowerHalf />
+            </>
+          )}
+          <CanvasWrapper>
+            <Canvas orthographic>
+              <CameraSetup />
+              <ThreeLine
+                lineApiRef={threeLineRef}
+                drawDelay={drawDelay}
+                resizeDelta={resizeDelta}
+              />
+              <InteractionHandler
+                lineApiRef={threeLineRef}
+                drawDelay={drawDelay}
+                bottomScroll={(arr) => {
+                  setBottomScroll(arr);
+                }}
+              />
+            </Canvas>
+          </CanvasWrapper>
+        </SmoothWrapper>
+      </main>
+    </>
   );
 }
 

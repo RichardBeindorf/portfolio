@@ -372,7 +372,6 @@ const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
-  box-shadow: 0 0 15px 10px ${(props) => props.$backgroundColor};
 
   @media (orientation: portrait) {
     left: 35%;
