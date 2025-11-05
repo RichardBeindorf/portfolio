@@ -19,9 +19,10 @@ export default function Home() {
   useEffect(() => {
     const startingWidth = window.innerWidth;
     const idealWidth = 1680;
-
-    setResizeDelta(startingWidth / idealWidth);
-    console.log("startingWidth / idealWidth", startingWidth / idealWidth);
+    // setResizeDelta(startingWidth / idealWidth);
+    const calc = 1 - startingWidth / idealWidth;
+    console.log(1 - startingWidth / idealWidth);
+    setResizeDelta(calc < 1 && calc > 0 ? calc : 1);
 
     setTimeout(() => {
       titleRef.current.style.transition = "opacity 1s ease-out";

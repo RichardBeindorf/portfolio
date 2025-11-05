@@ -7,7 +7,7 @@ const StyledThoughts = styled.svg`
   opacity: 0;
   position: absolute;
   z-index: 3;
-  transform: translate(0%, -13%);
+  transform: translate(0%, -15%);
 `;
 
 export function ThoughtSVG({
@@ -24,8 +24,8 @@ export function ThoughtSVG({
   let height = 87;
 
   if (resizeWidth < 1) {
-    width = 87 * resizeWidth * 2;
-    height = 87 * resizeWidth * 2;
+    width = 87 * (resizeWidth * 0.8);
+    height = 87 * (resizeWidth * 0.8);
   }
 
   useEffect(() => {

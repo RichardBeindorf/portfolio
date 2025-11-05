@@ -36,8 +36,6 @@ export default function Passion({
   const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
   const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
 
-  console.log("underline", underlineWidth, resizeDelta);
-
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
     if (isInitial.current) {

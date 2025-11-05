@@ -9,6 +9,8 @@ import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import { TitleProps } from "../lowerHalf";
 import { InnerContainer } from "./passion";
+import LeftArrow from "../Figure/leftArrow";
+import RightArrow from "../Figure/rightArrow";
 
 export default function Work({
   pullDirection,
@@ -21,6 +23,7 @@ export default function Work({
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
   const [currentProject, setCurrentProject] = useState(0);
+  const [arrowColor, setArrowColor] = useState("#262626");
   gsap.registerPlugin(DrawSVGPlugin, Flip);
   const tainer = useRef(null);
   const title = useRef(null);
@@ -164,7 +167,6 @@ export default function Work({
     });
 
     batch.run();
-    console.log(window.matchMedia("(orientation: portrait)").matches);
 
     return () => {
       action.kill();
@@ -413,12 +415,26 @@ export default function Work({
             </TopicWrapper>
 
             <NavButtons>
-              <button onClick={prevProject} style={permanentMarker.style}>
-                ◀ Prev
-              </button>
-              <button onClick={nextProject} style={permanentMarker.style}>
-                Next ▶
-              </button>
+              <ButtonWrapper onClick={prevProject}>
+                <LeftArrow />
+                <button
+                  style={{
+                    ...permanentMarker.style,
+                    paddingLeft: "0.2rem",
+                    fontSize: "var(--inlineText)",
+                  }}
+                >
+                  Prev
+                </button>
+              </ButtonWrapper>
+              <ButtonWrapper onClick={nextProject}>
+                <button
+                  style={{ ...permanentMarker.style, paddingRight: "0.2rem" }}
+                >
+                  Next
+                </button>
+                <RightArrow />
+              </ButtonWrapper>
             </NavButtons>
           </WorkEntryWrapper>
         )}
@@ -503,8 +519,17 @@ const Title = styled(ChapterTitle)`
 
 const NavButtons = styled.div`
   display: flex;
-  gap: 1rem;
   margin-top: 1rem;
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover svg path {
+    stroke: #f24150;
+  }
 
   button {
     background: var(--background);
@@ -514,11 +539,10 @@ const NavButtons = styled.div`
     border-radius: 10px;
     cursor: pointer;
     font-size: 1rem;
-    transition: color 0.2s ease;
+  }
 
-    &:hover {
-      color: var(--textAccent);
-    }
+  &:hover button {
+    color: #f24150;
   }
 `;
 
