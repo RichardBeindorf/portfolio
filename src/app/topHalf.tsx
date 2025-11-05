@@ -10,18 +10,21 @@ import gsap from "gsap";
 interface TopHalfProps {
   bottomScroll: boolean;
   drawDelay: number;
+  resizeDelta: number | null;
 }
 
-export function TopHalf({ bottomScroll, drawDelay }: TopHalfProps) {
-  const titleRef = useRef(null);
-  const [layoutSwitch, setLayoutSwitch] = useState(1);
+export function TopHalf({
+  bottomScroll,
+  drawDelay,
+  resizeDelta,
+}: TopHalfProps) {
   gsap.registerPlugin(DrawSVGPlugin, MotionPathPlugin);
   const directionHelper = useRef(null);
   const path = useRef<gsap.core.Tween | null>(null);
   const mask = useRef<gsap.core.Tween | null>(null);
   const arrow = useRef(null);
 
-  const desktopSize = 1663;
+  const layoutSwitch = resizeDelta !== null ? resizeDelta : 1;
   const helperHeight = `${350 * layoutSwitch}px`;
   const helperWidth = `${350 * layoutSwitch}px`;
   const arrowHeight = `${15 * layoutSwitch}px`;
@@ -29,17 +32,6 @@ export function TopHalf({ bottomScroll, drawDelay }: TopHalfProps) {
   const helperViewportHeight = 550;
   const helperViewportWidth = 550;
   const helperViewport = `-10 -10 ${helperViewportHeight} ${helperViewportWidth}`;
-  // const thoughtRef = useRef<SVGSVGElement | null>(null);
-
-  useEffect(() => {
-    const currentScreenWidth = document.body.clientWidth;
-    const difference = ((100 / desktopSize) * currentScreenWidth) / 100;
-    setLayoutSwitch(difference);
-    setTimeout(() => {
-      titleRef.current.style.transition = "opacity 1s ease-out";
-      titleRef.current.style.opacity = "0";
-    }, drawDelay);
-  }, []);
 
   useGSAP(() => {
     if (directionHelper.current && arrow.current && !bottomScroll) {
@@ -92,13 +84,9 @@ export function TopHalf({ bottomScroll, drawDelay }: TopHalfProps) {
 
   return (
     <TopWrapper>
-      <Title ref={titleRef} style={permanentMarker.style}>
-        Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based in
-        Hamburg
-      </Title>
       <FigureWrapper>
-        <ThoughtSVG drawDelay={drawDelay} />
-        <ScribbleFigure drawDelay={drawDelay} />
+        <ThoughtSVG drawDelay={drawDelay} resizeDelta={resizeDelta} />
+        <ScribbleFigure drawDelay={drawDelay} resizeDelta={resizeDelta} />
       </FigureWrapper>
       <HelperWrapper>
         <DirectionHelper
@@ -161,7 +149,7 @@ const TopWrapper = styled.div`
   justify-content: space-around;
   align-items: center;
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
 `;
 
@@ -176,18 +164,13 @@ const HelperWrapper = styled.div`
 
 const FigureWrapper = styled.div`
   position: absolute;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
 `;
 
 const DirectionHelper = styled.svg``;
 
 const Arrow = styled.svg``;
-
-const Title = styled.h1`
-  position: absolute;
-  color: #f24150;
-  mix-blend-mode: normal;
-  font-size: clamp(2vw, 3rem, 4.5vw);
-  text-align: center;
-  cursor: pointer;
-  z-index: 3;
-`;

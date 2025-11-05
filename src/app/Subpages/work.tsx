@@ -9,6 +9,8 @@ import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import { TitleProps } from "../lowerHalf";
 import { InnerContainer } from "./passion";
+import LeftArrow from "../Figure/leftArrow";
+import RightArrow from "../Figure/rightArrow";
 
 export default function Work({
   pullDirection,
@@ -16,10 +18,12 @@ export default function Work({
   currentWindow,
   delayTime,
   isAnimating,
+  resizeDelta,
 }: TitleProps) {
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
   const [currentProject, setCurrentProject] = useState(0);
+  const [arrowColor, setArrowColor] = useState("#262626");
   gsap.registerPlugin(DrawSVGPlugin, Flip);
   const tainer = useRef(null);
   const title = useRef(null);
@@ -33,8 +37,11 @@ export default function Work({
   const entriesRef = useRef(null);
   const underline = useRef(null);
   const color = useRef("unset");
+  const setLeftDistance = useRef("80%");
 
   const pullDuration = 1;
+  const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
+  const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 
@@ -81,7 +88,10 @@ export default function Work({
           gsap.set(tainer.current, { left: "10%", top: "25%" });
         } else if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
-          gsap.set(tainer.current, { left: "80%", top: "50%" });
+          gsap.set(tainer.current, {
+            left: setLeftDistance.current,
+            top: "50%",
+          });
         }
       },
       animate(self) {
@@ -136,7 +146,7 @@ export default function Work({
         if (isAnimating.current && !clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
               },
@@ -266,6 +276,12 @@ export default function Work({
   );
 
   useGSAP(() => {
+    if (window) {
+      window.matchMedia("(orientation: portrait)").matches
+        ? (setLeftDistance.current = "60%")
+        : (setLeftDistance.current = "80%");
+    }
+
     if (!workLeft.current) {
       workLeft.current = gsap
         .timeline({
@@ -279,7 +295,7 @@ export default function Work({
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            left: ["80%", "79%", "78%", "75%", "10%"],
+            left: [setLeftDistance.current, "10%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
@@ -301,7 +317,7 @@ export default function Work({
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
             top: ["50%", "50%", "80%", "80%"],
-            left: ["80%", "79%", "78%", "65%", "50%"],
+            left: [setLeftDistance.current, "50%"],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
@@ -353,12 +369,12 @@ export default function Work({
             Work
           </Title>
           {showEntries && (
-            <svg width="650" height="20">
+            <svg width={underlineWidth} height="20">
               <path
                 ref={underline}
                 d="M 0 0 Q 20 20, 500 0"
                 stroke="#262626"
-                strokeWidth="2.5px"
+                strokeWidth={`${strokeWidth}px`}
                 fill="transparent"
               />
             </svg>
@@ -399,12 +415,26 @@ export default function Work({
             </TopicWrapper>
 
             <NavButtons>
-              <button onClick={prevProject} style={permanentMarker.style}>
-                ◀ Prev
-              </button>
-              <button onClick={nextProject} style={permanentMarker.style}>
-                Next ▶
-              </button>
+              <ButtonWrapper onClick={prevProject}>
+                <LeftArrow />
+                <button
+                  style={{
+                    ...permanentMarker.style,
+                    paddingLeft: "0.2rem",
+                    fontSize: "var(--inlineText)",
+                  }}
+                >
+                  Prev
+                </button>
+              </ButtonWrapper>
+              <ButtonWrapper onClick={nextProject}>
+                <button
+                  style={{ ...permanentMarker.style, paddingRight: "0.2rem" }}
+                >
+                  Next
+                </button>
+                <RightArrow />
+              </ButtonWrapper>
             </NavButtons>
           </WorkEntryWrapper>
         )}
@@ -423,6 +453,10 @@ const WorkContainer = styled.section<{ $backgroundColor: string }>`
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
+
+  @media (orientation: portrait) {
+    left: 60%;
+  }
 `;
 
 const WorkEntryWrapper = styled.div`
@@ -449,11 +483,11 @@ const DetailWrapper = styled.div`
 `;
 
 const Topic = styled.h3`
-  font-size: 2rem;
+  font-size: var(--subTitle);
   color: var(--textAccent);
 `;
 const Text = styled.p`
-  font-size: 1.25rem;
+  font-size: var(--inlineText);
   color: var(--foreground);
   padding: 0;
   margin: 0;
@@ -485,8 +519,17 @@ const Title = styled(ChapterTitle)`
 
 const NavButtons = styled.div`
   display: flex;
-  gap: 1rem;
   margin-top: 1rem;
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover svg path {
+    stroke: #f24150;
+  }
 
   button {
     background: var(--background);
@@ -496,11 +539,10 @@ const NavButtons = styled.div`
     border-radius: 10px;
     cursor: pointer;
     font-size: 1rem;
-    transition: color 0.2s ease;
+  }
 
-    &:hover {
-      color: var(--textAccent);
-    }
+  &:hover button {
+    color: #f24150;
   }
 `;
 

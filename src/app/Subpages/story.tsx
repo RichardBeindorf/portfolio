@@ -16,6 +16,7 @@ export default function Story({
   currentWindow,
   delayTime,
   isAnimating,
+  resizeDelta,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -31,8 +32,11 @@ export default function Story({
   const storyRight = useRef(null);
   const storyLeft = useRef(null);
   const innerRef = useRef(null);
+  const setLeftDistance = useRef("80%");
 
   const pullDuration = 1;
+  const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
+  const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -55,10 +59,12 @@ export default function Story({
             left: "10%",
             top: "25%",
           });
-        } else {
+        }
+        if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
+
           gsap.set(tainer.current, {
-            left: "50%",
+            left: setLeftDistance.current,
             top: "80%",
           });
         }
@@ -85,9 +91,7 @@ export default function Story({
 
         // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
         if (innerRef.current) {
-          const targetHeight = clicked
-            ? innerRef.current.scrollHeight
-            : title.current.clientHeight;
+          const targetHeight = clicked ? "auto" : title.current.clientHeight;
 
           tl.to(
             innerRef.current,
@@ -117,7 +121,7 @@ export default function Story({
         if (isAnimating.current && !clicked && currentWindow.current[1] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
               },
@@ -243,6 +247,12 @@ export default function Story({
   );
 
   useGSAP(() => {
+    if (window) {
+      window.matchMedia("(orientation: portrait)").matches
+        ? (setLeftDistance.current = "35%")
+        : (setLeftDistance.current = "45%");
+    }
+
     if (!storyLeft.current) {
       storyLeft.current = gsap
         .timeline({
@@ -317,12 +327,12 @@ export default function Story({
             Story
           </ChapterTitle>
           {clicked && !isAnimating.current ? (
-            <svg width="650" height="20" className="underline">
+            <svg width={underlineWidth} height="20" className="underline">
               <path
                 ref={underline}
                 d="M 0 0 Q 20 20, 500 0"
                 stroke="#262626"
-                strokeWidth="2.5px"
+                strokeWidth={`${strokeWidth}px`}
                 fill="transparent"
               />
             </svg>
@@ -340,7 +350,18 @@ export default function Story({
                 <EntryWrapper key={i}>
                   <Bullet>&#47;&#47;</Bullet>
                   <EntryText style={oswald300.style}>{entry[0]}</EntryText>
-                  <Year style={permanentMarker.style}>{entry[1]}</Year>
+                  {entry[1] === "now" ? (
+                    <Year
+                      style={{
+                        ...permanentMarker.style,
+                        color: "var(--textAccent)",
+                      }}
+                    >
+                      {entry[1]}
+                    </Year>
+                  ) : (
+                    <Year style={permanentMarker.style}>{entry[1]}</Year>
+                  )}
                 </EntryWrapper>
               ))}
             </EntryList>
@@ -354,15 +375,34 @@ export default function Story({
 const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
   position: absolute;
   top: 80%;
-  left: 50%;
+  left: 45%;
   text-align: left;
+  width: max-content;
+  max-width: 80%;
 
-  /* mix-blend-mode: normal; */
+  mix-blend-mode: screen;
   padding: 15px;
   border-radius: 15px;
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
+
+  @media (orientation: portrait) {
+    left: 35%;
+  }
+`;
+
+export const ChapterTitle = styled.h1`
+  position: relative;
+  color: var(--foreground);
+  mix-blend-mode: normal;
+  font-size: var(--header);
+  text-align: center;
+  user-select: none;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 export const TitleWrapper = styled.div`
@@ -385,22 +425,9 @@ const StoryEntryWrapper = styled.div`
   background-color: var(--background);
 `;
 
-export const ChapterTitle = styled.h1`
-  position: relative;
-  color: var(--foreground);
-  mix-blend-mode: normal;
-  font-size: clamp(2vw, 3rem, 4.5vw);
-  text-align: center;
-  user-select: none;
-
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
 export const Intro = styled.div`
   /* width: max-content; */
-  font-size: 2rem;
+  font-size: var(--subTitle);
   text-align: center;
   color: var(--foreground);
 `;
@@ -438,9 +465,9 @@ const Bullet = styled.span`
 
 const EntryText = styled.p`
   /* width: max-content; */
-  font-size: 1.5rem;
+  font-size: var(--inlineText);
 `;
 
 const Year = styled.span`
-  font-size: 1.2rem;
+  font-size: var(--inlineText);
 `;

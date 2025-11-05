@@ -15,6 +15,7 @@ export default function Passion({
   currentWindow,
   delayTime,
   isAnimating,
+  resizeDelta,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -32,6 +33,8 @@ export default function Passion({
   const passionMid = useRef(null);
 
   const pullDuration = 1;
+  const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
+  const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -52,7 +55,11 @@ export default function Passion({
           gsap.set(tainer.current, { left: "10%", top: "25%" });
         } else {
           tainer.current.style.setProperty("position", "absolute");
-          gsap.set(tainer.current, { left: "10%", top: "50%" });
+          if (window.matchMedia("(orientation: portrait)").matches) {
+            gsap.set(tainer.current, { left: "6%", top: "50%" });
+          } else {
+            gsap.set(tainer.current, { left: "10%", top: "50%" });
+          }
         }
       },
       animate(self) {
@@ -77,9 +84,7 @@ export default function Passion({
 
         // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
         if (innerRef.current) {
-          const targetHeight = clicked
-            ? innerRef.current.scrollHeight
-            : title.current.clientHeight;
+          const targetHeight = clicked ? "auto" : title.current.clientHeight;
 
           tl.to(
             innerRef.current,
@@ -109,7 +114,7 @@ export default function Passion({
         if (isAnimating.current && !clicked && currentWindow.current[0] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(2vw, 3rem, 4.5vw)",
+              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
               },
@@ -330,12 +335,12 @@ export default function Passion({
             Passion
           </Title>
           {clicked && !isAnimating.current ? (
-            <svg width="650" height="20">
+            <svg width={underlineWidth} height="20">
               <path
                 ref={underline}
                 d="M 0 0 Q 20 20, 500 0"
                 stroke="#262626"
-                strokeWidth="2.5px"
+                strokeWidth={`${strokeWidth}px`}
                 fill="transparent"
               />
             </svg>
@@ -387,7 +392,7 @@ export default function Passion({
                 <Text style={oswald300.style}>
                   getting out of my{" "}
                   <Highlights style={oswald500.style}>comfort areas</Highlights>{" "}
-                  - if it didn&#39t scare me it probably didn&#39t improve my
+                  - if it didn&#39;t scare me it probably didn&#39;t improve my
                   life
                 </Text>
               </TopicWrapper>
@@ -402,9 +407,10 @@ export default function Passion({
 const PassionContainer = styled.section<{ $backgroundColor: string }>`
   position: absolute;
   top: 50%;
-  left: 10%;
+  left: 6%;
   text-align: left;
-  max-width: 80%;
+  width: 80%;
+  max-width: 1100px;
   /* mix-blend-mode: normal; */
   padding: 15px;
   border-radius: 15px;
@@ -420,13 +426,12 @@ export const InnerContainer = styled.div`
 `;
 
 const Title = styled.h1`
+  text-align: left;
   position: relative;
   color: var(--foreground);
   mix-blend-mode: normal;
-  font-size: clamp(2vw, 3rem, 4.5vw);
-  text-align: left;
+  font-size: var(--header);
 
-  margin-left: 30px;
   user-select: none;
 
   &:hover {
@@ -438,7 +443,7 @@ const PassionEntryWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: start;
-  align-items: start;
+  /* align-items: start; */
   gap: 0.5rem;
   cursor: pointer;
   padding: 0px;
@@ -453,17 +458,17 @@ const TopicWrapper = styled.div`
 
 const Subtitle = styled.div`
   width: max-content;
-  font-size: 2rem;
+  font-size: var(--subTitle);
   color: var(--foreground);
 `;
 
 const Topic = styled.h3`
-  font-size: 2rem;
+  font-size: var(--subTitle);
   color: var(--textAccent);
 `;
 
 const Text = styled.p`
-  font-size: 1.25rem;
+  font-size: var(--inlineText);
   color: var(--foreground);
 `;
 

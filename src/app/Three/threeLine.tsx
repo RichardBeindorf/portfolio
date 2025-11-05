@@ -13,9 +13,11 @@ export interface ThreeLineMethods {
 
 function ThreeLine({
   lineApiRef,
+  resizeDelta,
 }: {
   lineApiRef: React.RefObject<ThreeLineMethods | null>;
   drawDelay: number;
+  resizeDelta: number;
 }) {
   const { size, camera } = useThree();
   const line2Ref = useRef<Line2>(null);
@@ -24,6 +26,7 @@ function ThreeLine({
   const triggerThreshold = useRef<number[]>([]);
   const waveDist = useRef([]);
   const MAX_POINTS = 5000;
+  const resizedWidth = resizeDelta < 1 ? resizeDelta : 1;
 
   useEffect(() => {
     // old thoughts converted in actual line
@@ -56,7 +59,7 @@ function ThreeLine({
   const line2Material = useMemo(() => {
     const mat = new LineMaterial({
       color: "#F24150",
-      linewidth: 2.5,
+      linewidth: 2.5 * resizedWidth * 1.5,
       resolution: new THREE.Vector2(size.width, size.height),
       dashed: false,
       alphaToCoverage: true,

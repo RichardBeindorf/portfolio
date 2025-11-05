@@ -5,35 +5,44 @@ import styled from "styled-components";
 
 const StyledThoughts = styled.svg`
   opacity: 0;
-  transform: translate(30%, 10%);
-  /* @media only screen and (max-height: 830px) {
-    transform: translateY(-15%);
-  }
-
-  @media only screen and (max-height: 530px) {
-    transform: translateY(-40%);
-  } */
+  position: absolute;
+  z-index: 3;
+  transform: translate(0%, -15%);
 `;
 
-export function ThoughtSVG({ drawDelay }: { drawDelay: number }) {
+export function ThoughtSVG({
+  drawDelay,
+  resizeDelta,
+}: {
+  drawDelay: number;
+  resizeDelta: number | null;
+}) {
   const thoughtRef = useRef<SVGSVGElement | null>(null);
+  const resizeWidth = resizeDelta !== null ? resizeDelta : 1;
+
+  let width = 87;
+  let height = 87;
+
+  if (resizeWidth < 1) {
+    width = 87 * (resizeWidth * 0.8);
+    height = 87 * (resizeWidth * 0.8);
+  }
+
   useEffect(() => {
     setTimeout(() => {
       thoughtRef.current.style.transition = "opacity 1s ease-out";
       thoughtRef.current.style.opacity = "1";
     }, drawDelay);
+
+    // just put in a dependecy here that might cause a bug with the timout included! check later
   });
 
   return (
     <StyledThoughts
       ref={thoughtRef}
-      width="75"
-      height="47"
+      width={width}
+      height={height}
       viewBox="498 416 84 56"
-      style={{
-        position: "absolute",
-        top: "23%",
-      }}
     >
       {screenData.map((coord, i) => {
         if (screenData[i + 1] === undefined) return null;
