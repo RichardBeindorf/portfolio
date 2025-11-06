@@ -10,7 +10,7 @@ import gsap from "gsap";
 interface TopHalfProps {
   bottomScroll: boolean;
   drawDelay: number;
-  resizeDelta: number | null;
+  resizeDelta: [number, number] | null;
 }
 
 export function TopHalf({
@@ -24,7 +24,7 @@ export function TopHalf({
   const mask = useRef<gsap.core.Tween | null>(null);
   const arrow = useRef(null);
 
-  const layoutSwitch = resizeDelta !== null ? resizeDelta : 1;
+  const layoutSwitch = resizeDelta[0] !== null ? resizeDelta[0] : 1;
   const helperHeight = `${350 * layoutSwitch}px`;
   const helperWidth = `${350 * layoutSwitch}px`;
   const arrowHeight = `${15 * layoutSwitch}px`;
@@ -85,9 +85,10 @@ export function TopHalf({
   return (
     <TopWrapper>
       <FigureWrapper>
-        <ThoughtSVG drawDelay={drawDelay} resizeDelta={resizeDelta} />
-        <ScribbleFigure drawDelay={drawDelay} resizeDelta={resizeDelta} />
+        <ThoughtSVG drawDelay={drawDelay} resizeDelta={resizeDelta[0]} />
+        <ScribbleFigure drawDelay={drawDelay} resizeDelta={resizeDelta[0]} />
       </FigureWrapper>
+
       <HelperWrapper>
         <DirectionHelper
           height={helperHeight}

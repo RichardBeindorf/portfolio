@@ -11,7 +11,7 @@ import { permanentMarker } from "@/styles/font";
 
 export default function Home() {
   const [bottomScroll, setBottomScroll] = useState(false);
-  const [resizeDelta, setResizeDelta] = useState<number | null>(null);
+  const [resizeDelta, setResizeDelta] = useState<[number, number] | null>(null);
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const titleRef = useRef(null);
   const drawDelay = 3000;
@@ -21,7 +21,10 @@ export default function Home() {
     const idealWidth = 1680;
     const calc = 1 - startingWidth / idealWidth;
 
-    setResizeDelta(calc < 1 && calc > 0 ? calc : 1);
+    setResizeDelta([
+      calc < 1 && calc > 0 ? calc : 1,
+      startingWidth / idealWidth,
+    ]);
 
     setTimeout(() => {
       titleRef.current.style.transition = "opacity 1s ease-out";
@@ -44,7 +47,7 @@ export default function Home() {
                 drawDelay={drawDelay}
                 resizeDelta={resizeDelta}
               />
-              <LowerHalf resizeDelta={resizeDelta} />
+              <LowerHalf resizeDelta={resizeDelta?.[1]} />
             </>
           )}
           <CanvasWrapper>
@@ -53,7 +56,7 @@ export default function Home() {
               <ThreeLine
                 lineApiRef={threeLineRef}
                 drawDelay={drawDelay}
-                resizeDelta={resizeDelta}
+                resizeDelta={resizeDelta?.[0]}
               />
               <InteractionHandler
                 lineApiRef={threeLineRef}

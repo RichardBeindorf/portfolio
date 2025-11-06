@@ -41,6 +41,7 @@ export default function Work({
 
   const pullDuration = 1;
   const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
+  console.log(resizeDelta);
   const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
@@ -429,7 +430,11 @@ export default function Work({
               </ButtonWrapper>
               <ButtonWrapper onClick={nextProject}>
                 <button
-                  style={{ ...permanentMarker.style, paddingRight: "0.2rem" }}
+                  style={{
+                    ...permanentMarker.style,
+                    paddingRight: "0.2rem",
+                    fontSize: "var(--inlineText)",
+                  }}
                 >
                   Next
                 </button>
