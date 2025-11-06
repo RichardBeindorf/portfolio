@@ -19,9 +19,8 @@ export default function Home() {
   useEffect(() => {
     const startingWidth = window.innerWidth;
     const idealWidth = 1680;
-    // setResizeDelta(startingWidth / idealWidth);
     const calc = 1 - startingWidth / idealWidth;
-    console.log(1 - startingWidth / idealWidth);
+
     setResizeDelta(calc < 1 && calc > 0 ? calc : 1);
 
     setTimeout(() => {
