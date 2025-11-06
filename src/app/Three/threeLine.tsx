@@ -36,7 +36,6 @@ function ThreeLine({
     //     points.current.push(thought);
     //   }
     // });
-
     if (points.current) {
       // Logic for setting up line starting position
       const offset = 0.95;
