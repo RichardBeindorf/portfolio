@@ -1,8 +1,7 @@
 import styled from "styled-components";
-import { ThoughtSVG } from "./Figure/thoughtSVG";
-import ScribbleFigure from "./Figure/scribbleFigure";
-import { permanentMarker } from "@/styles/font";
-import { useEffect, useRef, useState } from "react";
+import { ThoughtSVG } from "./SVG`s/thoughtSVG";
+import ScribbleFigure from "./SVG`s/scribbleFigure";
+import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { DrawSVGPlugin, MotionPathPlugin } from "gsap/all";
 import gsap from "gsap";

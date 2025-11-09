@@ -9,8 +9,9 @@ import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import { TitleProps } from "../lowerHalf";
 import { InnerContainer } from "./passion";
-import LeftArrow from "../Figure/leftArrow";
-import RightArrow from "../Figure/rightArrow";
+import LeftArrow from "../SVG`s/leftArrow";
+import RightArrow from "../SVG`s/rightArrow";
+import BMS from "../SVG`s/bmsMockup";
 
 export default function Work({
   pullDirection,
@@ -41,7 +42,6 @@ export default function Work({
 
   const pullDuration = 1;
   const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
-  console.log(resizeDelta);
   const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
@@ -66,6 +66,7 @@ export default function Work({
       title: "Building-Management System",
       description:
         "My biggest project yet, designed and implemented in a complex environment. It includes visualization and navigation across properties from a global level down to the smallest rooms of a building floor. All rooms show information about temperature, humidity and co2 levels. (NDA protected)",
+      svg: [<BMS />],
     },
   ];
 
@@ -402,16 +403,12 @@ export default function Work({
                 {projects[currentProject].images && (
                   <ImageGallery>
                     {projects[currentProject].images.map((src, idx) => (
-                      <PreviewImage
-                        key={idx}
-                        src={src}
-                        alt={`${projects[currentProject].title} screenshot ${
-                          idx + 1
-                        }`}
-                      />
+                      <PreviewImage key={idx} src={src} />
                     ))}
                   </ImageGallery>
                 )}
+                {projects[currentProject].svg &&
+                  projects[currentProject].svg.map((svg) => svg)}
               </DetailWrapper>
             </TopicWrapper>
 
