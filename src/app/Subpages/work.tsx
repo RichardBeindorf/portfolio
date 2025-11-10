@@ -11,7 +11,8 @@ import { TitleProps } from "../lowerHalf";
 import { InnerContainer } from "./passion";
 import LeftArrow from "../SVG`s/leftArrow";
 import RightArrow from "../SVG`s/rightArrow";
-import BMS from "../SVG`s/bmsMockup";
+import BMSOne from "../SVG`s/bmsMockupOne";
+import BMSTwo from "../SVG`s/bmsMockupTwo";
 
 export default function Work({
   pullDirection,
@@ -51,12 +52,6 @@ export default function Work({
 
   const projects = [
     {
-      title: "Leapout",
-      description:
-        "This was my first major milestone, a fully functional Activity App with location planning, activity database, weather report and much more!",
-      iframe: "https://activities-app-kappa.vercel.app/",
-    },
-    {
       title: "App-Hub",
       description:
         "I had the honor of creating the first customer-related entry point for Buildlinx. The App-Hub connects all customers with the Buildlinx universe and accumulates all necessary applications for users and devs based on roles and rights.",
@@ -65,8 +60,14 @@ export default function Work({
     {
       title: "Building-Management System",
       description:
-        "My biggest project yet, designed and implemented in a complex environment. It includes visualization and navigation across properties from a global level down to the smallest rooms of a building floor. All rooms show information about temperature, humidity and co2 levels. (NDA protected)",
-      svg: [<BMS />],
+        "My biggest project yet, designed and implemented in a complex environment. Unfortunately it is under NDA protection, but i got the permission to scetch a little mockup of it for you. This building management system enables the user to controll and monitor the status not just of stand-alone real estate but an entire fleet of it. I started with a redesign of the old system and then implemented it including a more maintainable algorithm to connect all buildings down to the last room with our complex backend. All rooms show information about temperature, humidity and co2 levels.",
+      svg: [<BMSOne key={1} />, <BMSTwo key={2} />],
+    },
+    {
+      title: "Leapout",
+      description:
+        "This was my first major milestone, a fully functional Activity App with location planning, activity database, weather report and much more!",
+      iframe: "https://activities-app-kappa.vercel.app/",
     },
   ];
 
@@ -407,8 +408,11 @@ export default function Work({
                     ))}
                   </ImageGallery>
                 )}
-                {projects[currentProject].svg &&
-                  projects[currentProject].svg.map((svg) => svg)}
+                {projects[currentProject].svg && (
+                  <SVGWrapper>
+                    {projects[currentProject].svg.map((svg) => svg)}
+                  </SVGWrapper>
+                )}
               </DetailWrapper>
             </TopicWrapper>
 
@@ -488,6 +492,7 @@ const Topic = styled.h3`
   font-size: var(--subTitle);
   color: var(--textAccent);
 `;
+
 const Text = styled.p`
   font-size: var(--inlineText);
   color: var(--foreground);
@@ -553,6 +558,10 @@ const ImageGallery = styled.div`
   flex-wrap: wrap;
   gap: 1.7rem;
   margin-top: 1rem;
+
+  @media only screen and (max-width: 400px) {
+    flex-direction: column;
+  }
 `;
 
 const PreviewImage = styled.img`
@@ -564,5 +573,20 @@ const PreviewImage = styled.img`
 
   &:hover {
     transform: scale(1.05);
+  }
+
+  @media only screen and (max-width: 400px) {
+    width: 80vw;
+  }
+`;
+
+const SVGWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.7rem;
+  margin-top: 1rem;
+
+  @media only screen and (max-width: 400px) {
+    flex-direction: column;
   }
 `;
