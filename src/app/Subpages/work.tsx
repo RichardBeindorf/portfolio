@@ -21,6 +21,7 @@ export default function Work({
   delayTime,
   isAnimating,
   resizeDelta,
+  positionsObj,
 }: TitleProps) {
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -38,7 +39,6 @@ export default function Work({
   const entriesRef = useRef(null);
   const underline = useRef(null);
   const color = useRef("unset");
-  const setLeftDistance = useRef("80%");
 
   const pullDuration = 1;
   const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
@@ -91,13 +91,13 @@ export default function Work({
         } else if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
           gsap.set(tainer.current, {
-            left: setLeftDistance.current,
+            left: positionsObj.work,
             top: "50%",
           });
         }
       },
       animate(self) {
-        const tl = gsap.timeline();
+        const tl = gsap.timeline({ ease: "power1.in" });
         tl.add(
           Flip.from(self.state, {
             targets: tainer.current,
@@ -124,7 +124,6 @@ export default function Work({
             {
               height: targetHeight,
               duration: 0.1,
-              ease: "power1.in",
             },
             0
           );
@@ -133,9 +132,9 @@ export default function Work({
         if (clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(8vw, 6rem, 11vw)",
               keyframes: {
                 color: ["#262626", "#F24150"],
+                fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
               duration: 1,
               delay: delayTime,
@@ -148,9 +147,9 @@ export default function Work({
         if (isAnimating.current && !clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
+                fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
               duration: 1,
             }),
@@ -278,12 +277,6 @@ export default function Work({
   );
 
   useGSAP(() => {
-    if (window) {
-      window.matchMedia("(orientation: portrait)").matches
-        ? (setLeftDistance.current = "60%")
-        : (setLeftDistance.current = "80%");
-    }
-
     if (!workLeft.current) {
       workLeft.current = gsap
         .timeline({
@@ -297,7 +290,7 @@ export default function Work({
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            left: [setLeftDistance.current, "10%"],
+            left: [positionsObj.work, positionsObj.passion],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
@@ -319,12 +312,14 @@ export default function Work({
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
             top: ["50%", "50%", "80%", "80%"],
-            left: [setLeftDistance.current, "50%"],
+            left: [positionsObj.work, positionsObj.story],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
         });
     }
+
+    console.log(positionsObj.work);
 
     switch (pullDirection) {
       case "mid":
@@ -342,6 +337,7 @@ export default function Work({
   return (
     <WorkContainer
       $backgroundColor={color.current}
+      $position={positionsObj.work}
       ref={tainer}
       data-flip-id="workTainer"
     >
@@ -448,20 +444,20 @@ export default function Work({
   );
 }
 
-const WorkContainer = styled.section<{ $backgroundColor: string }>`
+const WorkContainer = styled.section<{
+  $backgroundColor: string;
+  $position: string;
+}>`
   top: 50%;
-  left: 80%;
+  left: ${(props) => props.$position};
   position: absolute;
   max-width: 90%;
-  mix-blend-mode: normal;
+  mix-blend-mode: screen;
+
   padding: 15px;
   background-color: ${(props) => props.$backgroundColor};
   border: 0px solid black;
   border-radius: 25px;
-
-  @media (orientation: portrait) {
-    left: 60%;
-  }
 `;
 
 const WorkEntryWrapper = styled.div`

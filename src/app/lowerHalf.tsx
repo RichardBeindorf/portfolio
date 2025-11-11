@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import Story from "./Subpages/story";
 import Passion from "./Subpages/passion";
-import { Dispatch, RefObject, useRef, useState } from "react";
+import { Dispatch, RefObject, useEffect, useRef, useState } from "react";
 import Work from "./Subpages/work";
 import { PullVariants } from "./page";
 
@@ -14,9 +14,16 @@ export type TitleProps = {
   pullDirection: string;
   delayTime: number;
   resizeDelta: number | null;
+  positionsObj: PositionSwapper;
 };
 
 type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";
+
+type PositionSwapper = {
+  passion: string;
+  story: string;
+  work: string;
+};
 
 const Container = styled.div`
   position: relative;
@@ -36,7 +43,18 @@ export default function LowerHalf({
   const currentWindow = useRef<WindowStates>("initial");
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
   const isAnimating = useRef(true);
+  const positions = useRef<PositionSwapper>(null);
   const pullDurationOrDelay = 1.2;
+
+  if (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    ) // testing for mobile device
+  ) {
+    positions.current = { passion: "6%", story: "35%", work: "60%" };
+  } else {
+    positions.current = { passion: "10%", story: "45%", work: "80%" };
+  }
 
   return (
     <Container>
@@ -47,6 +65,7 @@ export default function LowerHalf({
         delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
         resizeDelta={resizeDelta}
+        positionsObj={positions.current}
       />
       <Passion
         pulldirectionProp={pulldirectionProp}
@@ -55,6 +74,7 @@ export default function LowerHalf({
         delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
         resizeDelta={resizeDelta}
+        positionsObj={positions.current}
       />
       <Work
         pulldirectionProp={pulldirectionProp}
@@ -63,6 +83,7 @@ export default function LowerHalf({
         delayTime={pullDurationOrDelay}
         isAnimating={isAnimating}
         resizeDelta={resizeDelta}
+        positionsObj={positions.current}
       />
     </Container>
   );

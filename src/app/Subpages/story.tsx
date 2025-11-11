@@ -17,6 +17,7 @@ export default function Story({
   delayTime,
   isAnimating,
   resizeDelta,
+  positionsObj,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -32,7 +33,6 @@ export default function Story({
   const storyRight = useRef(null);
   const storyLeft = useRef(null);
   const innerRef = useRef(null);
-  const setLeftDistance = useRef("80%");
 
   const pullDuration = 1;
   const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
@@ -64,17 +64,17 @@ export default function Story({
           tainer.current.style.setProperty("position", "absolute");
 
           gsap.set(tainer.current, {
-            left: setLeftDistance.current,
+            left: positionsObj.story,
             top: "80%",
           });
         }
       },
       animate(self) {
-        const tl = gsap.timeline();
+        const tl = gsap.timeline({ ease: "power1.in" });
         tl.add(
           Flip.from(self.state, {
             targets: tainer.current,
-            duration: 2,
+            duration: 1,
             ease: "power1.in",
             delay: delayTime,
             absolute: true,
@@ -97,7 +97,7 @@ export default function Story({
             innerRef.current,
             {
               height: targetHeight,
-              duration: 2,
+              duration: 1,
               ease: "power1.in",
             },
             0
@@ -107,11 +107,11 @@ export default function Story({
         if (clicked) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(8vw, 6rem, 11vw)",
               keyframes: {
                 color: ["#262626", "#F24150"],
+                fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
-              duration: 2,
+              duration: 1,
               delay: delayTime,
             }),
             0
@@ -121,11 +121,11 @@ export default function Story({
         if (isAnimating.current && !clicked && currentWindow.current[1] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
+                fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
-              duration: 2,
+              duration: 1,
             }),
             0
           );
@@ -247,12 +247,6 @@ export default function Story({
   );
 
   useGSAP(() => {
-    if (window) {
-      window.matchMedia("(orientation: portrait)").matches
-        ? (setLeftDistance.current = "35%")
-        : (setLeftDistance.current = "45%");
-    }
-
     if (!storyLeft.current) {
       storyLeft.current = gsap
         .timeline({
@@ -260,13 +254,18 @@ export default function Story({
           id: "storyLeft",
         })
         .to(tainer.current, {
-          scale: 0.1,
-          opacity: 0,
-          rotate: -30,
-          left: "10%",
-          top: "50%",
           duration: pullDuration,
           ease: "power1.in",
+          keyframes: {
+            // 8 different phases maximum currently
+            // first is start position
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.1],
+            top: ["80%", "80%", "50%", "50%"],
+            left: [positionsObj.story, positionsObj.passion],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
         });
     }
 
@@ -277,13 +276,18 @@ export default function Story({
           id: "storyRight",
         })
         .to(tainer.current, {
-          scale: 0.1,
-          rotate: 30,
-          opacity: 0,
-          left: "90%",
-          top: "50%",
           duration: pullDuration,
           ease: "power1.in",
+          keyframes: {
+            // 8 different phases maximum currently
+            // first is start position
+            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+            scale: [1, 1, 1, 1, 0.5, 0.1],
+            top: ["80%", "80%", "50%", "50%"],
+            left: [positionsObj.story, positionsObj.work],
+            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
+            easeEach: "none",
+          },
         });
     }
 

@@ -16,6 +16,7 @@ export default function Passion({
   delayTime,
   isAnimating,
   resizeDelta,
+  positionsObj,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -52,18 +53,20 @@ export default function Passion({
       setState() {
         if (clicked) {
           tainer.current.style.setProperty("position", "relative");
-          gsap.set(tainer.current, { left: "10%", top: "25%" });
-        } else {
+          gsap.set(tainer.current, { left: "10%", top: "25%", width: "80%" });
+        }
+        if (!clicked) {
           tainer.current.style.setProperty("position", "absolute");
-          if (window.matchMedia("(orientation: portrait)").matches) {
-            gsap.set(tainer.current, { left: "6%", top: "50%" });
-          } else {
-            gsap.set(tainer.current, { left: "10%", top: "50%" });
-          }
+
+          gsap.set(tainer.current, {
+            left: positionsObj.passion,
+            top: "50%",
+            width: "auto",
+          });
         }
       },
       animate(self) {
-        const tl = gsap.timeline();
+        const tl = gsap.timeline({ ease: "power1.in" });
         tl.add(
           Flip.from(self.state, {
             targets: tainer.current,
@@ -100,9 +103,9 @@ export default function Passion({
         if (clicked) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "clamp(8vw, 6rem, 11vw)",
               keyframes: {
                 color: ["#262626", "#F24150"],
+                fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
               duration: 1,
               delay: delayTime,
@@ -114,9 +117,9 @@ export default function Passion({
         if (isAnimating.current && !clicked && currentWindow.current[0] === 1) {
           tl.add(
             gsap.to(title.current, {
-              fontSize: "var(--header)",
               keyframes: {
                 color: ["#F24150", "#262626"],
+                fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
               duration: 1,
             }),
@@ -257,14 +260,14 @@ export default function Passion({
         .to(tainer.current, {
           duration: pullDuration,
           rotate: 30,
-          ease: "power4.in",
+          ease: "power1.in",
           keyframes: {
             // 8 different phases maximum currently
             // first is start position
             // rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
             top: ["50%", "50%", "80%", "80%"],
-            left: ["10%", "11%", "12%", "27%", "50%"],
+            left: [positionsObj.passion, positionsObj.story],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
@@ -285,12 +288,14 @@ export default function Passion({
           keyframes: {
             scale: [1, 1, 1, 1, 0.5, 0.2],
             // rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            left: ["10%", "11%", "12%", "27%", "80%"],
+            left: [positionsObj.passion, positionsObj.work],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
         });
     }
+
+    console.log(positionsObj);
 
     switch (pullDirection) {
       case "mid":
@@ -409,9 +414,9 @@ const PassionContainer = styled.section<{ $backgroundColor: string }>`
   top: 50%;
   left: 6%;
   text-align: left;
-  width: 80%;
   max-width: 1100px;
-  /* mix-blend-mode: normal; */
+  mix-blend-mode: screen;
+
   padding: 15px;
   border-radius: 15px;
   background-color: ${(props) => props.$backgroundColor};
