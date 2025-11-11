@@ -21,13 +21,13 @@ function ThreeLine({
 }) {
   const { size, camera } = useThree();
   const line2Ref = useRef<Line2>(null);
-  // const startingPos = new THREE.Vector3(0, 250, 0);
   const points = useRef<THREE.Vector3[]>([]);
   const triggerThreshold = useRef<number[]>([]);
   const waveDist = useRef([]);
   const maxValue = useRef<number>(500);
-  const MAX_POINTS = 5000;
   const resizedWidth = resizeDelta < 1 ? resizeDelta : 1;
+  // const startingPos = new THREE.Vector3(0, 250, 0);
+  // const MAX_POINTS = 5000;
 
   useEffect(() => {
     // old thoughts converted in actual line

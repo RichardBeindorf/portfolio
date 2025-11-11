@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "../styles/globals.css";
-import IOSScrollBlock from "./scrollBlocker";
 
 export const metadata: Metadata = {
   title: "RB Portfolio",
@@ -17,10 +16,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.png" sizes="any" />
       </head>
-      <body>
-        {/* <IOSScrollBlock /> */}
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

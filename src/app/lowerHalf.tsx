@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import Story from "./Subpages/story";
 import Passion from "./Subpages/passion";
-import { Dispatch, RefObject, useEffect, useRef, useState } from "react";
+import { RefObject, useRef } from "react";
 import Work from "./Subpages/work";
 import { PullVariants } from "./page";
 
