@@ -1,5 +1,3 @@
-import styled from "styled-components";
-
 export default function LeftArrow() {
   return (
     <svg
@@ -7,7 +5,7 @@ export default function LeftArrow() {
       height="20px"
       viewBox="0 0 400 400"
       fill="none"
-      transform="rotate(-45)matrix(-1, 0, 0, -1, 0, 0)"
+      style={{ transform: "rotate(0.38turn)" }}
     >
       <g>
         {" "}

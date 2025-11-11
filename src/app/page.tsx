@@ -87,7 +87,7 @@ const SmoothWrapper = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  height: 200vh;
+
   overflow-y: hidden;
   /* isolation: isolate; // needed for a color blend setting to work */
 

@@ -46,7 +46,7 @@ export function TopHalf({
           drawSVG: "0% 100%",
           duration: 5,
           ease: "power1.in",
-          delay: 11,
+          delay: 0,
         }
       );
       path.current = gsap.to(arrow.current, {
@@ -55,7 +55,7 @@ export function TopHalf({
           gsap.set(directionHelper.current, { visibility: "visible" });
         },
         duration: 5,
-        delay: 11,
+        delay: 0,
         ease: "power1.in",
         motionPath: {
           path: "#pathGroup",

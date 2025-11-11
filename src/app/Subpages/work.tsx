@@ -319,8 +319,6 @@ export default function Work({
         });
     }
 
-    console.log(positionsObj.work);
-
     switch (pullDirection) {
       case "mid":
         workMid.current.play();

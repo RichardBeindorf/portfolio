@@ -16,17 +16,17 @@
 }
 
 html,
-body,
-#root {
+body {
   max-width: 100vw;
-  height: 100%;
   scrollbar-width: none;
   /* prevents the viewport from bouncing outisde of bounds when we reach the end of the scroll window, needed because i am calculating the scroll position */
   overscroll-behavior: none;
 
-  /* HIER NICHT OVERFLOW EINFÜGEN, sonst buggy scrolling */
-  overflow-y: hidden;
-  touch-action: pan-y;
+  /* using all of this css too stop scrolling behavior */
+  height: 100%;
+  /* overflow: hidden; */
+  -webkit-overflow-scrolling: auto;
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
 body {
@@ -37,20 +37,12 @@ body {
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
 }
 
 a {
   color: inherit;
   text-decoration: none;
 }
-
-/* @media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-} */
 
 .introTitle {
   position: absolute;
@@ -74,9 +66,15 @@ a {
   overflow: hidden;
 }
 
-/* Scrollable container class you can use in markup */
+/* Scrollable container class to use in markup */
 .scrollable {
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* smooth native momentum on iOS */
-  overscroll-behavior: contain; /* prevent ancestors from receiving overscroll */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
+
+/* @media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+} */

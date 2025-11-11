@@ -18,7 +18,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" sizes="any" />
       </head>
       <body>
-        <IOSScrollBlock />
+        {/* <IOSScrollBlock /> */}
         {children}
       </body>
     </html>
