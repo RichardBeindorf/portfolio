@@ -75,7 +75,7 @@ export default function Story({
           Flip.from(self.state, {
             targets: tainer.current,
             duration: 2,
-            ease: "power4.out",
+            ease: "power1.in",
             delay: delayTime,
             absolute: true,
             onComplete: () => {
@@ -98,7 +98,7 @@ export default function Story({
             {
               height: targetHeight,
               duration: 2,
-              ease: "power4.out",
+              ease: "power1.in",
             },
             0
           );
@@ -266,7 +266,7 @@ export default function Story({
           left: "10%",
           top: "50%",
           duration: pullDuration,
-          ease: "power4.out",
+          ease: "power1.in",
         });
     }
 
@@ -283,7 +283,7 @@ export default function Story({
           left: "90%",
           top: "50%",
           duration: pullDuration,
-          ease: "power4.in",
+          ease: "power1.in",
         });
     }
 

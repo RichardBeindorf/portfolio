@@ -9,9 +9,12 @@ import LowerHalf from "./lowerHalf";
 import { TopHalf } from "./topHalf";
 import { permanentMarker } from "@/styles/font";
 
+export type PullVariants = "left" | "mid" | "right" | "default";
+
 export default function Home() {
   const [bottomScroll, setBottomScroll] = useState(false);
   const [resizeDelta, setResizeDelta] = useState<[number, number] | null>(null);
+  const [pullDirection, setPullDirection] = useState<PullVariants>("default");
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const titleRef = useRef(null);
   const drawDelay = 3000;
@@ -47,7 +50,11 @@ export default function Home() {
                 drawDelay={drawDelay}
                 resizeDelta={resizeDelta}
               />
-              <LowerHalf resizeDelta={resizeDelta?.[1]} />
+              <LowerHalf
+                resizeDelta={resizeDelta?.[1]}
+                pulldirectionProp={setPullDirection}
+                pullDirection={pullDirection}
+              />
             </>
           )}
           <CanvasWrapper>
@@ -61,6 +68,7 @@ export default function Home() {
               <InteractionHandler
                 lineApiRef={threeLineRef}
                 drawDelay={drawDelay}
+                pullDirection={pullDirection}
                 bottomScroll={(arr) => {
                   setBottomScroll(arr);
                 }}
@@ -79,6 +87,7 @@ const SmoothWrapper = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
+  height: 200vh;
   overflow-y: hidden;
   /* isolation: isolate; // needed for a color blend setting to work */
 

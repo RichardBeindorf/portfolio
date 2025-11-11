@@ -67,8 +67,8 @@ export default function Passion({
         tl.add(
           Flip.from(self.state, {
             targets: tainer.current,
-            duration: 2,
-            ease: "power4.out",
+            duration: 1,
+            ease: "power1.in",
             delay: delayTime,
             absolute: true,
             onComplete: () => {
@@ -90,8 +90,8 @@ export default function Passion({
             innerRef.current,
             {
               height: targetHeight,
-              duration: 2,
-              ease: "power4.out",
+              duration: 1,
+              ease: "power1.in",
             },
             0
           );
@@ -104,7 +104,7 @@ export default function Passion({
               keyframes: {
                 color: ["#262626", "#F24150"],
               },
-              duration: 2,
+              duration: 1,
               delay: delayTime,
             }),
             0
@@ -118,7 +118,7 @@ export default function Passion({
               keyframes: {
                 color: ["#F24150", "#262626"],
               },
-              duration: 2,
+              duration: 1,
             }),
             0
           );
@@ -281,7 +281,7 @@ export default function Passion({
           duration: pullDuration,
           top: "50%",
           rotate: 30,
-          ease: "power4.out",
+          ease: "power1.in",
           keyframes: {
             scale: [1, 1, 1, 1, 0.5, 0.2],
             // rotate: [0, 24, 13, 24, 0, 0, -15, 0],

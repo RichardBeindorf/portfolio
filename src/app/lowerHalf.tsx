@@ -5,9 +5,10 @@ import Story from "./Subpages/story";
 import Passion from "./Subpages/passion";
 import { Dispatch, RefObject, useRef, useState } from "react";
 import Work from "./Subpages/work";
+import { PullVariants } from "./page";
 
 export type TitleProps = {
-  pulldirectionProp: Dispatch<PullVariants>;
+  pulldirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
   currentWindow: RefObject<WindowStates>;
   isAnimating: RefObject<boolean>;
   pullDirection: string;
@@ -17,8 +18,6 @@ export type TitleProps = {
 
 type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";
 
-type PullVariants = "left" | "mid" | "right" | "default";
-
 const Container = styled.div`
   position: relative;
   min-height: 100vh;
@@ -27,10 +26,13 @@ const Container = styled.div`
 
 export default function LowerHalf({
   resizeDelta,
+  pulldirectionProp,
+  pullDirection,
 }: {
   resizeDelta: number | null;
+  pulldirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
+  pullDirection: PullVariants;
 }) {
-  const [pullDirection, setPullDirection] = useState<PullVariants>("default");
   const currentWindow = useRef<WindowStates>("initial");
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
   const isAnimating = useRef(true);
@@ -39,7 +41,7 @@ export default function LowerHalf({
   return (
     <Container>
       <Story
-        pulldirectionProp={(str: PullVariants) => setPullDirection(str)}
+        pulldirectionProp={pulldirectionProp}
         pullDirection={pullDirection}
         currentWindow={currentWindow}
         delayTime={pullDurationOrDelay}
@@ -47,7 +49,7 @@ export default function LowerHalf({
         resizeDelta={resizeDelta}
       />
       <Passion
-        pulldirectionProp={(str: PullVariants) => setPullDirection(str)}
+        pulldirectionProp={pulldirectionProp}
         pullDirection={pullDirection}
         currentWindow={currentWindow}
         delayTime={pullDurationOrDelay}
@@ -55,7 +57,7 @@ export default function LowerHalf({
         resizeDelta={resizeDelta}
       />
       <Work
-        pulldirectionProp={(str: PullVariants) => setPullDirection(str)}
+        pulldirectionProp={pulldirectionProp}
         pullDirection={pullDirection}
         currentWindow={currentWindow}
         delayTime={pullDurationOrDelay}

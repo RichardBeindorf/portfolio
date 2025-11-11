@@ -25,7 +25,6 @@ export default function Work({
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
   const [currentProject, setCurrentProject] = useState(0);
-  const [arrowColor, setArrowColor] = useState("#262626");
   gsap.registerPlugin(DrawSVGPlugin, Flip);
   const tainer = useRef(null);
   const title = useRef(null);
@@ -60,7 +59,7 @@ export default function Work({
     {
       title: "Building-Management System",
       description:
-        "My biggest project yet, designed and implemented in a complex environment. Unfortunately it is under NDA protection, but i got the permission to scetch a little mockup of it for you. This building management system enables the user to controll and monitor the status not just of stand-alone real estate but an entire fleet of it. I started with a redesign of the old system and then implemented it including a more maintainable algorithm to connect all buildings down to the last room with our complex backend. All rooms show information about temperature, humidity and co2 levels.",
+        "My biggest project yet, designed and implemented in a complex environment. Unfortunately it is under NDA protection, but i got the permission to scetch a little mockup of it for you. This building management system enables the user to controll and monitor the status not just of stand-alone real estate but an entire fleet of it. I started with a redesign of the old system and then implemented it including a more maintainable algorithm to connect all buildings down to the last room with our complex backend. All rooms show information about temperature, humidity and CO2 levels.",
       svg: [<BMSOne key={1} />, <BMSTwo key={2} />],
     },
     {
@@ -102,8 +101,8 @@ export default function Work({
         tl.add(
           Flip.from(self.state, {
             targets: tainer.current,
-            duration: 2,
-            ease: "power4.out",
+            duration: 1,
+            ease: "power1.in",
             delay: delayTime,
             absolute: true,
             onComplete: () => {
@@ -125,7 +124,7 @@ export default function Work({
             {
               height: targetHeight,
               duration: 0.1,
-              ease: "power4.out",
+              ease: "power1.in",
             },
             0
           );
@@ -138,7 +137,7 @@ export default function Work({
               keyframes: {
                 color: ["#262626", "#F24150"],
               },
-              duration: 2,
+              duration: 1,
               delay: delayTime,
             }),
             0
@@ -153,7 +152,7 @@ export default function Work({
               keyframes: {
                 color: ["#F24150", "#262626"],
               },
-              duration: 2,
+              duration: 1,
             }),
             0
           );
@@ -294,7 +293,7 @@ export default function Work({
         .to(tainer.current, {
           duration: pullDuration,
           top: "50%",
-          ease: "power4.out",
+          ease: "power1.in",
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],

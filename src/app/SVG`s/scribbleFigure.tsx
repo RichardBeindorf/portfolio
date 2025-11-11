@@ -22,7 +22,7 @@ export default function ScribbleFigure({
 
   let width = 147;
   let height = 201;
-
+  console.log(resizeWidth);
   if (resizeWidth < 1) {
     width = 147 * (resizeWidth * 0.8);
     height = 201 * (resizeWidth * 0.8);
