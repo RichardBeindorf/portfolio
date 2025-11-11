@@ -25,6 +25,7 @@ function ThreeLine({
   const points = useRef<THREE.Vector3[]>([]);
   const triggerThreshold = useRef<number[]>([]);
   const waveDist = useRef([]);
+  const maxValue = useRef<number>(500);
   const MAX_POINTS = 5000;
   const resizedWidth = resizeDelta < 1 ? resizeDelta : 1;
 
@@ -47,11 +48,15 @@ function ThreeLine({
       vector.unproject(camera);
       points.current.push(vector);
     }
+
+    setTimeout(() => {
+      maxValue.current = 50;
+    }, 10000);
   }, []);
 
   const line2Geometry = useMemo(() => {
     const geom = new LineGeometry();
-    geom.setPositions(new Float32Array(MAX_POINTS * 3));
+    geom.setPositions(new Float32Array(maxValue.current * 3));
     return geom;
   }, []);
 
@@ -86,9 +91,27 @@ function ThreeLine({
       return;
     }
 
+    //** **//
+    // Points Length Reducer After Max Range Exceeded //
+    //** **//
+
+    // console.log(points.current.length);
+
+    if (points.current.length > maxValue.current) {
+      let diff = points.current.length - maxValue.current;
+      while (diff > 0) {
+        diff--;
+        points.current.shift();
+        console.log("deletion!");
+      }
+    }
+
+    //** **//
+
     const worldPoints = points.current;
+
     const pointsToDraw = worldPoints.slice(
-      Math.max(0, worldPoints.length - MAX_POINTS)
+      Math.max(0, worldPoints.length - maxValue.current)
     );
 
     // distances will hold not the distance between sigular points but the overall distance to the point of origin accumulated
