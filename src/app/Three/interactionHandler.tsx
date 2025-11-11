@@ -1,15 +1,15 @@
 "use client";
 
 import gsap from "gsap";
-import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { useGSAP } from "@gsap/react";
+import { PullVariants } from "../page";
+import { useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ThreeLineMethods } from "@/app/Three/threeLine";
-import { PullVariants } from "../page";
 
 export default function InteractionHandler({
   lineApiRef,
@@ -27,27 +27,53 @@ export default function InteractionHandler({
   const lastPointerPosition = useRef({ x: 0, y: 0 });
   const currentHalf = useRef<"top" | "bottom">(null);
   const bouncyMovement = useRef(0); // das soll die zurúck gelegte Strecke sein bevor der richtige page scroll getriggered wurde. Diese Strecke muss ich auch wieder nach oben oder unten reseten
-  const pageScrollGuard = useRef(false);
-  const pullDirectionRef = useRef(pullDirection);
-  const fullHeight = size.height;
-  const viewportHeight = fullHeight / 2;
-
-  const detectDeviceType = () =>
+  const currentDeviceType = useRef(
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     )
       ? "Mobile"
-      : "Desktop";
+      : "Desktop"
+  );
 
-  // // keep ref up-to-date
+  const pageScrollGuard = useRef(false);
+  const fullHeight = size.height;
+  const viewportHeight = fullHeight / 2;
+  const smoother = useRef(null);
+
+  const currentScreen = useRef(null);
+
   useEffect(() => {
-    pullDirectionRef.current = pullDirection;
+    currentScreen.current = pullDirection;
   }, [pullDirection]);
+
+  // useEffect(() => {
+  //   gsap.registerPlugin(ScrollSmoother);
+  //   smoother.current = ScrollSmoother.create({
+  //     wrapper: "#smooth-wrapper",
+  //     content: "#smooth-content",
+  //     smooth: 1,
+  //     effects: false,
+  //     smoothTouch: 0.1,
+  //     normalizeScroll: true,
+  //     ignoreMobileResize: true,
+  //     ease: "sine.out",
+  //   });
+  // }, []);
 
   useGSAP(() => {
     if (!lineApiRef.current) return;
-
     gsap.registerPlugin(ScrollSmoother, ScrollToPlugin, ScrollTrigger);
+
+    smoother.current = ScrollSmoother.create({
+      wrapper: "#smooth-wrapper",
+      content: "#smooth-content",
+      smooth: 1,
+      effects: false,
+      smoothTouch: 0.1,
+      normalizeScroll: true,
+      ignoreMobileResize: true,
+      ease: "sine.out",
+    });
 
     // This is our function to add a point to the line.
     // It takes viewport coordinates and correctly converts them to 3D world space.
@@ -55,7 +81,7 @@ export default function InteractionHandler({
       if (!lineApiRef.current) return;
 
       const pointerXOnCanvas = clientX;
-      const pointerYOnCanvas = clientY + smoother.scrollTop();
+      const pointerYOnCanvas = clientY + smoother.current.scrollTop();
 
       const ndcX = (pointerXOnCanvas / size.width) * 2 - 1;
       const ndcY = -(pointerYOnCanvas / fullHeight) * 2 + 1;
@@ -65,20 +91,8 @@ export default function InteractionHandler({
       lineApiRef.current.addPoint(vector);
     };
 
-    const smoother = ScrollSmoother.create({
-      wrapper: "#smooth-wrapper",
-      content: "#smooth-content",
-      smooth: 1,
-      effects: false,
-      smoothTouch: 0.1,
-      normalizeScroll: true,
-      ignoreMobileResize: true,
-    });
-
-    let trigger;
-
     setTimeout(() => {
-      trigger = ScrollTrigger.observe({
+      ScrollTrigger.observe({
         target: window,
         type: "scroll, pointer", // We only need to listen to scroll and pointer events
         tolerance: 1,
@@ -94,18 +108,18 @@ export default function InteractionHandler({
 
         onMove: (self) => {
           if (
-            pullDirectionRef.current === "default" &&
-            detectDeviceType() === "Desktop"
+            currentScreen.current === "default" &&
+            currentDeviceType.current === "Desktop"
           ) {
             const currentPercLong = (100 / viewportHeight) * self.y; // cursor position in percent relative to viewport
             const currentPercent = Number(currentPercLong.toFixed(0));
-            const topViewportY = smoother.scrollTop();
+            const topViewportY = smoother.current.scrollTop();
             const bottomViewportY = topViewportY + viewportHeight;
             const pushBackPointTop = viewportHeight + viewportHeight / 8 - 1; // CHANGE THE PUSHBACK POINT TO ADJUST BOUNCE
             const pushBackPointBottom = viewportHeight - viewportHeight / 8; // CHANGE THE PUSHBACK POINT TO ADJUST BOUNCE
 
             // console.table({
-            //   bottomViewportY: smoother.scrollTop() + viewportHeight, // 1170.5
+            //   bottomViewportY: smoother.current.scrollTop() + viewportHeight, // 1170.5
             //   pushBackpoint: pushBackPointTop, // 1167
             //   bouncyMovement: bouncyMovement.current, // 132.5 based on cursor position but reduced a bit, represents the ammount we want to move
             //   breakPointCheck: breakPointCheck, // 1170.3
@@ -149,7 +163,7 @@ export default function InteractionHandler({
                   ) // dont want it to be negative or to be higher than our push back point
                 );
 
-                smoother.scrollTo(
+                smoother.current.scrollTo(
                   Math.min(distanceToPushBack, bouncyMovement.current), // checking again that we are below the push back point....
                   true
                 );
@@ -159,12 +173,18 @@ export default function InteractionHandler({
               /* TOP SCROLL PART */
               /** */
 
-              if (self.velocityY > 5000 && currentPercent > 90) {
+              if (
+                self.velocityY > 5000 &&
+                currentPercent > 90 &&
+                smoother.current &&
+                smoother.current.scrollTo &&
+                smoother.current.content
+              ) {
+                smoother.current.scrollTo(fullHeight, true);
+
                 // if the mouse is speedy enough and the cursor position is in the lower half we can trigger the page scroll
                 gsap.to(window, {
                   duration: 0.7,
-                  ease: "sine.out",
-                  scrollTo: { y: "max" },
                   onComplete: () => {
                     pageScrollGuard.current = false;
                     currentHalf.current = "bottom";
@@ -199,18 +219,25 @@ export default function InteractionHandler({
                   bouncyCalc
                 );
 
-                smoother.scrollTo(bouncyMovement.current, true);
+                smoother.current.scrollTo(bouncyMovement.current, true);
               }
 
               /** */
               /* BOTTOM SCROLL PART */
               /** */
 
-              if (self.velocityY < -10000 && currentPercent < 10) {
+              if (
+                self.velocityY < -10000 &&
+                currentPercent < 10 &&
+                smoother.current &&
+                smoother.current.scrollTo &&
+                smoother.current.content
+              ) {
+                smoother.current.scrollTo(0, true);
                 gsap.to(window, {
                   duration: 0.7,
-                  ease: "sine.out",
-                  scrollTo: { y: 0 },
+                  // ease: "sine.out",
+                  // scrollTo: { y: 0 },
                   onComplete: () => {
                     pageScrollGuard.current = false;
                     currentHalf.current = "top";
@@ -232,7 +259,7 @@ export default function InteractionHandler({
 
         // onScroll handles mouse wheel and touch-drag scrolling
         onWheel: () => {
-          if (pullDirectionRef.current === "default") {
+          if (currentScreen.current === "default") {
             const viewportHeight = fullHeight / 2;
             // When scrolling, draw a point at the LAST known pointer position.
             // This creates the effect of the line continuing while the page moves.
@@ -244,11 +271,11 @@ export default function InteractionHandler({
               pageScrollGuard.current = false;
             });
 
-            if (smoother.scrollTop() === 0) {
+            if (smoother.current.scrollTop() === 0) {
               currentHalf.current = "top";
             }
 
-            if (smoother.scrollTop() === viewportHeight) {
+            if (smoother.current.scrollTop() === viewportHeight) {
               // when the viewport is positioned flush bottom, we are at the bottom half (scrollY take the top pixel value of the viewport)
               currentHalf.current = "bottom";
             }
@@ -258,10 +285,6 @@ export default function InteractionHandler({
 
       //TIMEOUT END
     }, drawDelay + 2000);
-
-    return () => {
-      trigger.kill();
-    };
   }, []);
 
   return null;

@@ -5,7 +5,7 @@ export default function RightArrow() {
       height="20px"
       viewBox="0 0 400 400"
       fill="none"
-      transform="rotate(-45)"
+      style={{ transform: "rotate(0.88turn)" }}
     >
       <g>
         {" "}

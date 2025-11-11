@@ -295,8 +295,6 @@ export default function Passion({
         });
     }
 
-    console.log(positionsObj);
-
     switch (pullDirection) {
       case "mid":
         passionMid.current.play();
