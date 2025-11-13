@@ -3,7 +3,7 @@ import { ThoughtSVG } from "./SVG`s/thoughtSVG";
 import ScribbleFigure from "./SVG`s/scribbleFigure";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { DrawSVGPlugin, MotionPathPlugin } from "gsap/all";
+import { CustomEase, DrawSVGPlugin, MotionPathPlugin } from "gsap/all";
 import gsap from "gsap";
 
 interface TopHalfProps {
@@ -33,6 +33,11 @@ export function TopHalf({
   const helperViewport = `-10 -10 ${helperViewportHeight} ${helperViewportWidth}`;
 
   useGSAP(() => {
+    gsap.registerPlugin(CustomEase);
+    CustomEase.create(
+      "arrowEase1",
+      "M0,0 C0.487,0.616 0.7,0.615 0.791,0.615 0.881,0.615 0.958,1 1,1.012"
+    );
     if (directionHelper.current && arrow.current && !bottomScroll) {
       // Taking the maks path and apply it automaticly to the actual path!
       // Since i drew the path from left to right i have to bend over backwards to get it animated from right to left..
@@ -44,8 +49,8 @@ export function TopHalf({
         { drawSVG: "100% 100%" },
         {
           drawSVG: "0% 100%",
-          duration: 5,
-          ease: "power1.in",
+          duration: 3,
+          ease: "arrowEase1",
           delay: 0,
         }
       );
@@ -54,13 +59,13 @@ export function TopHalf({
           gsap.set(arrow.current, { visibility: "visible" });
           gsap.set(directionHelper.current, { visibility: "visible" });
         },
-        duration: 5,
+        duration: 3,
         delay: 0,
-        ease: "power1.in",
+        ease: "arrowEase1",
         motionPath: {
           path: "#pathGroup",
           align: "#pathGroup",
-          autoRotate: 180,
+          // autoRotate: 180,
           alignOrigin: [0.5, 0.65],
           start: 1.0,
           end: 0,
@@ -72,11 +77,10 @@ export function TopHalf({
       mask.current.kill();
       path.current.kill();
 
-      gsap.set(arrow.current, {
-        visibility: "hidden",
-      });
-      gsap.set(directionHelper.current, {
-        visibility: "hidden",
+      gsap.to(".helperWrapper", {
+        duration: 2,
+        opacity: 0,
+        ease: "power4.in",
       });
     }
   }, [bottomScroll]);
@@ -88,15 +92,15 @@ export function TopHalf({
         <ScribbleFigure drawDelay={drawDelay} resizeDelta={resizeDelta[0]} />
       </FigureWrapper>
 
-      <HelperWrapper>
+      <HelperWrapper className="helperWrapper">
         <DirectionHelper
-          height={helperHeight}
-          width={helperWidth}
+          height={350}
+          width={350}
           viewBox={helperViewport}
           ref={directionHelper}
         >
           <defs>
-            <mask id="helperMask" maskUnits="userSpaceOnUse">
+            {/* <mask id="helperMask" maskUnits="userSpaceOnUse">
               <path
                 id="maskPath"
                 d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320
@@ -106,14 +110,15 @@ export function TopHalf({
                 strokeLinecap="round"
                 strokeWidth="5px"
               />
-            </mask>
+            </mask> */}
           </defs>
           <g mask="url(#helperMask)">
             <path
               id="pathGroup"
               mask="url(#maskPath)"
-              d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320 295"
-              stroke="#c8c8c8"
+              // d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320 295"
+              d="M 200 350 C 210 60, 260 10, 260 5 C 290 -40, 340 100, 350 495"
+              stroke="#e3e2e2"
               strokeWidth="3px"
               strokeDasharray="17"
               fill="transparent"
@@ -124,20 +129,27 @@ export function TopHalf({
             />
           </g>
           {/* Just some helper points in case i need to work on the form again */}
-          {/* <circle cx={0} cy={350} r={3} fill="red" />
-          <circle cx={50} cy={55} r={3} fill="red" />
-          <circle cx={110} cy={330} r={3} fill="red" />
-          <circle cx={180} cy={-60} r={3} fill="red" />
-          <circle cx={320} cy={200} r={3} fill="red" />
-          <circle cx={320} cy={295} r={3} fill="red" /> */}
+          <circle cx={200} cy={350} r={3} fill="red" />
+          <circle cx={210} cy={60} r={3} fill="red" />
+          <circle cx={260} cy={10} r={3} fill="red" />
+          <circle cx={260} cy={5} r={3} fill="red" />
+          <circle cx={290} cy={0} r={3} fill="red" />
+          <circle cx={420} cy={395} r={3} fill="red" />
         </DirectionHelper>
         <Arrow
           ref={arrow}
-          height={arrowHeight}
-          width={arrowWidth}
-          viewBox="0 -10 20 20"
+          // height={arrowHeight}
+          // width={arrowWidth}
+          fill="#c8c8c8"
+          width="30px"
+          height="30px"
+          viewBox="0 0 35 35"
+          data-name="Layer 2"
+          id="a79254cb-3f14-4275-904f-2c1744762c58"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <path id="arrowPath" d="M 0 3 L 10 -4 L 10 10 z" fill="#c8c8c8" />
+          <path d="M17.5,34.75A12.9,12.9,0,0,1,4.61,21.86V13.14a12.89,12.89,0,0,1,25.78,0v8.72A12.9,12.9,0,0,1,17.5,34.75Zm0-32A10.4,10.4,0,0,0,7.11,13.14v8.72a10.39,10.39,0,0,0,20.78,0V13.14A10.4,10.4,0,0,0,17.5,2.75Z" />
+          <path d="M17.5,15.844a1.25,1.25,0,0,1-1.25-1.25V8.376a1.25,1.25,0,0,1,2.5,0v6.218A1.25,1.25,0,0,1,17.5,15.844Z" />
         </Arrow>
       </HelperWrapper>
     </TopWrapper>
@@ -171,6 +183,10 @@ const FigureWrapper = styled.div`
   align-items: center;
 `;
 
-const DirectionHelper = styled.svg``;
+const DirectionHelper = styled.svg`
+  opacity: 1;
+`;
 
-const Arrow = styled.svg``;
+const Arrow = styled.svg`
+  opacity: 1;
+`;

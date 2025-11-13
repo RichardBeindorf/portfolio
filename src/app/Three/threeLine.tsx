@@ -51,7 +51,7 @@ function ThreeLine({
 
     setTimeout(() => {
       maxValue.current = 50;
-    }, 10000);
+    }, 20000);
   }, []);
 
   const line2Geometry = useMemo(() => {
