@@ -24,8 +24,9 @@ export function ThoughtSVG({
   let height = 87;
 
   if (resizeWidth < 1) {
-    width = 87 * (resizeWidth * 0.8);
-    height = 87 * (resizeWidth * 0.8);
+    console.log("1 - resizeWidth", 1 - resizeWidth);
+    width = 87 * (1 - resizeWidth);
+    height = 87 * (1 - resizeWidth);
   }
 
   useEffect(() => {

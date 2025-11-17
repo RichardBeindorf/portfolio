@@ -24,8 +24,8 @@ export default function ScribbleFigure({
   let height = 201;
 
   if (resizeWidth < 1) {
-    width = 147 * (resizeWidth * 0.8);
-    height = 201 * (resizeWidth * 0.8);
+    width = 147 * (1 - resizeWidth);
+    height = 201 * (1 - resizeWidth);
   }
 
   useEffect(() => {
