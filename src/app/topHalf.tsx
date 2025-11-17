@@ -23,7 +23,8 @@ export function TopHalf({
   const mask = useRef<gsap.core.Tween | null>(null);
   const arrow = useRef(null);
 
-  const layoutSwitch = resizeDelta[0] !== null ? resizeDelta[0] : 1;
+  const layoutSwitch =
+    resizeDelta[0] < 1 && resizeDelta[0] > 0 ? 1 - resizeDelta[0] : 1;
   const helperHeight = `${350 * layoutSwitch}px`;
   const helperWidth = `${350 * layoutSwitch}px`;
   const arrowHeight = `${15 * layoutSwitch}px`;
