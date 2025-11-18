@@ -2,6 +2,7 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  cursor: pointer;
 }
 
 :root {
@@ -54,8 +55,8 @@ a {
   mix-blend-mode: normal;
   font-size: clamp(2vw, 3rem, 4.5vw);
   text-align: center;
-  cursor: pointer;
   z-index: 3;
+  cursor: default;
 }
 
 /* If you want the whole page locked physically (fallback) */

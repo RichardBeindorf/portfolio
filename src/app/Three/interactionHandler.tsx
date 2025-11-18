@@ -46,6 +46,7 @@ export default function InteractionHandler({
     currentScreen.current = pullDirection;
   }, [pullDirection]);
 
+  // Remnant of turning off scrolling - still in work
   // useEffect(() => {
   //   gsap.registerPlugin(ScrollSmoother);
   //   smoother.current = ScrollSmoother.create({

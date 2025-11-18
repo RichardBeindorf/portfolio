@@ -18,8 +18,7 @@ export default function ScribbleFigure({
   resizeDelta: number | null;
 }) {
   const scribbleRef = useRef(null);
-  const resizeWidth =
-    resizeDelta[0] < 1 && resizeDelta[0] > 0 ? 1 - resizeDelta[0] : 1;
+  const resizeWidth = resizeDelta < 1 && resizeDelta > 0 ? 1 - resizeDelta : 1;
 
   let width = 147;
   let height = 201;

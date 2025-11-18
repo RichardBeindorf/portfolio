@@ -13,7 +13,7 @@ export type PullVariants = "left" | "mid" | "right" | "default";
 
 export default function Home() {
   const [bottomScroll, setBottomScroll] = useState(false);
-  const [resizeDelta, setResizeDelta] = useState<[number, number] | null>(null);
+  const [resizeDelta, setResizeDelta] = useState<number | null>(null);
   const [pullDirection, setPullDirection] = useState<PullVariants>("default");
   const threeLineRef = useRef<ThreeLineMethods | null>(null);
   const titleRef = useRef(null);
@@ -22,14 +22,9 @@ export default function Home() {
   useEffect(() => {
     const startingWidth = window.innerWidth;
     const idealWidth = 1680;
-    const calc = (1 - startingWidth / idealWidth) * 0.5;
+    const calc = (1 - startingWidth / idealWidth) * 0.8;
 
-    console.log(calc);
-
-    setResizeDelta([
-      calc < 1 && calc > 0 ? calc : 1,
-      startingWidth / idealWidth,
-    ]);
+    setResizeDelta(calc < 1 && calc > 0 ? calc : 1);
 
     setTimeout(() => {
       titleRef.current.style.transition = "opacity 1s ease-out";
@@ -53,7 +48,7 @@ export default function Home() {
                 resizeDelta={resizeDelta}
               />
               <LowerHalf
-                resizeDelta={resizeDelta?.[1]}
+                resizeDelta={resizeDelta}
                 pulldirectionProp={setPullDirection}
                 pullDirection={pullDirection}
               />

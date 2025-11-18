@@ -9,7 +9,7 @@ import gsap from "gsap";
 interface TopHalfProps {
   bottomScroll: boolean;
   drawDelay: number;
-  resizeDelta: [number, number] | null;
+  resizeDelta: number | null;
 }
 
 export function TopHalf({
@@ -23,12 +23,12 @@ export function TopHalf({
   const mask = useRef<gsap.core.Tween | null>(null);
   const arrow = useRef(null);
 
-  const layoutSwitch =
-    resizeDelta[0] < 1 && resizeDelta[0] > 0 ? 1 - resizeDelta[0] : 1;
+  const layoutSwitch = resizeDelta < 1 && resizeDelta > 0 ? 1 - resizeDelta : 1;
   const helperHeight = `${350 * layoutSwitch}px`;
   const helperWidth = `${350 * layoutSwitch}px`;
-  const arrowHeight = `${15 * layoutSwitch}px`;
-  const arrowWidth = `${15 * layoutSwitch}px`;
+  const arrowHeight = `${30 * layoutSwitch}px`;
+  const arrowWidth = `${30 * layoutSwitch}px`;
+  const strokeWidth = `${2.5}px`;
   const helperViewportHeight = 550;
   const helperViewportWidth = 550;
   const helperViewport = `-10 -10 ${helperViewportHeight} ${helperViewportWidth}`;
@@ -49,20 +49,24 @@ export function TopHalf({
         "#maskPath",
         { drawSVG: "100% 100%" },
         {
-          drawSVG: "0% 100%",
-          duration: 3,
+          drawSVG: "5% 100%",
+          duration: 4.1,
+          repeat: 3,
+          repeatDelay: 4,
           ease: "arrowEase1",
-          delay: 0,
+          delay: (drawDelay / 1000) * 3,
         }
       );
       path.current = gsap.to(arrow.current, {
         onStart: () => {
-          gsap.set(arrow.current, { visibility: "visible" });
+          gsap.set(arrow.current, { visibility: "visible", opacity: 1 });
           gsap.set(directionHelper.current, { visibility: "visible" });
         },
-        duration: 3,
-        delay: 0,
+        duration: 4,
+        delay: (drawDelay / 1000) * 3,
         ease: "arrowEase1",
+        repeat: 3,
+        repeatDelay: 4,
         motionPath: {
           path: "#pathGroup",
           align: "#pathGroup",
@@ -89,29 +93,28 @@ export function TopHalf({
   return (
     <TopWrapper>
       <FigureWrapper>
-        <ThoughtSVG drawDelay={drawDelay} resizeDelta={resizeDelta[0]} />
-        <ScribbleFigure drawDelay={drawDelay} resizeDelta={resizeDelta[0]} />
+        <ThoughtSVG drawDelay={drawDelay} resizeDelta={resizeDelta} />
+        <ScribbleFigure drawDelay={drawDelay} resizeDelta={resizeDelta} />
       </FigureWrapper>
 
       <HelperWrapper className="helperWrapper">
         <DirectionHelper
-          height={350}
-          width={350}
+          height={helperHeight}
+          width={helperWidth}
           viewBox={helperViewport}
           ref={directionHelper}
         >
           <defs>
-            {/* <mask id="helperMask" maskUnits="userSpaceOnUse">
+            <mask id="helperMask" maskUnits="userSpaceOnUse">
               <path
                 id="maskPath"
-                d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320
-                  295"
+                d="M 200 350 C 210 60, 260 10, 260 5 C 290 -40, 340 100, 350 495"
                 stroke="#fff"
                 fill="none"
                 strokeLinecap="round"
-                strokeWidth="5px"
+                strokeWidth={strokeWidth}
               />
-            </mask> */}
+            </mask>
           </defs>
           <g mask="url(#helperMask)">
             <path
@@ -120,7 +123,7 @@ export function TopHalf({
               // d="M 0 350 C 50 55, 110 330, 110 330 C 180 -60, 320 200, 320 295"
               d="M 200 350 C 210 60, 260 10, 260 5 C 290 -40, 340 100, 350 495"
               stroke="#e3e2e2"
-              strokeWidth="3px"
+              strokeWidth={strokeWidth}
               strokeDasharray="17"
               fill="transparent"
               markerStart="url(#arrow)"
@@ -130,24 +133,20 @@ export function TopHalf({
             />
           </g>
           {/* Just some helper points in case i need to work on the form again */}
-          <circle cx={200} cy={350} r={3} fill="red" />
+          {/* <circle cx={200} cy={350} r={3} fill="red" />
           <circle cx={210} cy={60} r={3} fill="red" />
           <circle cx={260} cy={10} r={3} fill="red" />
           <circle cx={260} cy={5} r={3} fill="red" />
           <circle cx={290} cy={0} r={3} fill="red" />
-          <circle cx={420} cy={395} r={3} fill="red" />
+          <circle cx={420} cy={395} r={3} fill="red" /> */}
         </DirectionHelper>
         <Arrow
           ref={arrow}
-          // height={arrowHeight}
-          // width={arrowWidth}
+          height={arrowHeight}
+          width={arrowWidth}
           fill="#c8c8c8"
-          width="30px"
-          height="30px"
           viewBox="0 0 35 35"
           data-name="Layer 2"
-          id="a79254cb-3f14-4275-904f-2c1744762c58"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path d="M17.5,34.75A12.9,12.9,0,0,1,4.61,21.86V13.14a12.89,12.89,0,0,1,25.78,0v8.72A12.9,12.9,0,0,1,17.5,34.75Zm0-32A10.4,10.4,0,0,0,7.11,13.14v8.72a10.39,10.39,0,0,0,20.78,0V13.14A10.4,10.4,0,0,0,17.5,2.75Z" />
           <path d="M17.5,15.844a1.25,1.25,0,0,1-1.25-1.25V8.376a1.25,1.25,0,0,1,2.5,0v6.218A1.25,1.25,0,0,1,17.5,15.844Z" />
@@ -167,12 +166,13 @@ const TopWrapper = styled.div`
 `;
 
 const HelperWrapper = styled.div`
+  position: absolute;
+  bottom: -10%;
+  right: 15%;
   width: 100%;
-  align-self: flex-end;
-  visibility: visible;
   display: flex;
+  visibility: visible;
   justify-content: flex-end;
-  transform: translate(5%, 30%);
 `;
 
 const FigureWrapper = styled.div`
@@ -189,5 +189,5 @@ const DirectionHelper = styled.svg`
 `;
 
 const Arrow = styled.svg`
-  opacity: 1;
+  opacity: 0;
 `;
