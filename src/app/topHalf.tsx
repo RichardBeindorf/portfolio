@@ -9,7 +9,7 @@ import gsap from "gsap";
 interface TopHalfProps {
   bottomScroll: boolean;
   drawDelay: number;
-  resizeDelta: [number, number] | null;
+  resizeDelta: number | null;
 }
 
 export function TopHalf({
@@ -23,13 +23,12 @@ export function TopHalf({
   const mask = useRef<gsap.core.Tween | null>(null);
   const arrow = useRef(null);
 
-  const layoutSwitch =
-    resizeDelta[0] < 1 && resizeDelta[0] > 0 ? 1 - resizeDelta[0] : 1;
+  const layoutSwitch = resizeDelta < 1 && resizeDelta > 0 ? 1 - resizeDelta : 1;
   const helperHeight = `${350 * layoutSwitch}px`;
   const helperWidth = `${350 * layoutSwitch}px`;
   const arrowHeight = `${30 * layoutSwitch}px`;
   const arrowWidth = `${30 * layoutSwitch}px`;
-  const strokeWidth = `${2.5 * layoutSwitch}px`;
+  const strokeWidth = `${2.5}px`;
   const helperViewportHeight = 550;
   const helperViewportWidth = 550;
   const helperViewport = `-10 -10 ${helperViewportHeight} ${helperViewportWidth}`;
@@ -55,16 +54,16 @@ export function TopHalf({
           repeat: 3,
           repeatDelay: 4,
           ease: "arrowEase1",
-          delay: 0,
+          delay: (drawDelay / 1000) * 3,
         }
       );
       path.current = gsap.to(arrow.current, {
         onStart: () => {
-          gsap.set(arrow.current, { visibility: "visible" });
+          gsap.set(arrow.current, { visibility: "visible", opacity: 1 });
           gsap.set(directionHelper.current, { visibility: "visible" });
         },
         duration: 4,
-        delay: 0,
+        delay: (drawDelay / 1000) * 3,
         ease: "arrowEase1",
         repeat: 3,
         repeatDelay: 4,
@@ -94,8 +93,8 @@ export function TopHalf({
   return (
     <TopWrapper>
       <FigureWrapper>
-        <ThoughtSVG drawDelay={drawDelay} resizeDelta={resizeDelta[0]} />
-        <ScribbleFigure drawDelay={drawDelay} resizeDelta={resizeDelta[0]} />
+        <ThoughtSVG drawDelay={drawDelay} resizeDelta={resizeDelta} />
+        <ScribbleFigure drawDelay={drawDelay} resizeDelta={resizeDelta} />
       </FigureWrapper>
 
       <HelperWrapper className="helperWrapper">
@@ -190,5 +189,5 @@ const DirectionHelper = styled.svg`
 `;
 
 const Arrow = styled.svg`
-  opacity: 1;
+  opacity: 0;
 `;

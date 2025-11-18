@@ -41,8 +41,8 @@ export default function Work({
   const color = useRef("unset");
 
   const pullDuration = 1;
-  const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
-  const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
+  const underlineWidth = resizeDelta < 1 ? (650 * resizeDelta) / 2 : 650;
+  const strokeWidth = resizeDelta < 1 ? (2.5 * resizeDelta) / 2 : 2.5;
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 

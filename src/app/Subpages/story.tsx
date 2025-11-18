@@ -35,8 +35,8 @@ export default function Story({
   const innerRef = useRef(null);
 
   const pullDuration = 1;
-  const underlineWidth = resizeDelta < 1 ? 650 * resizeDelta : 650;
-  const strokeWidth = resizeDelta < 1 ? 2.5 * resizeDelta * 2 : 2.5;
+  const underlineWidth = resizeDelta < 1 ? (650 * resizeDelta) / 2 : 650;
+  const strokeWidth = resizeDelta < 1 ? (2.5 * resizeDelta) / 2 : 2.5;
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
