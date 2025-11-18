@@ -24,8 +24,6 @@ export default function Home() {
     const idealWidth = 1680;
     const calc = (1 - startingWidth / idealWidth) * 0.5;
 
-    console.log(calc);
-
     setResizeDelta([
       calc < 1 && calc > 0 ? calc : 1,
       startingWidth / idealWidth,
