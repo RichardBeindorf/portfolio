@@ -51,7 +51,7 @@ export default function LowerHalf({
       navigator.userAgent
     ) // testing for mobile device
   ) {
-    positions.current = { passion: "6%", story: "35%", work: "60%" };
+    positions.current = { passion: "6%", story: "35%", work: "70%" };
   } else {
     positions.current = { passion: "10%", story: "45%", work: "80%" };
   }

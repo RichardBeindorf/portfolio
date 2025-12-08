@@ -22,7 +22,7 @@ export default function Home() {
   useEffect(() => {
     const startingWidth = window.innerWidth;
     const idealWidth = 1680;
-    const calc = (1 - startingWidth / idealWidth) * 0.8;
+    const calc = (startingWidth / idealWidth) * 1.1;
 
     setResizeDelta(calc < 1 && calc > 0 ? calc : 1);
 
