@@ -96,8 +96,6 @@ function ThreeLine({
     // Points Length Reducer After Max Range Exceeded //
     //** **//
 
-    // console.log(points.current.length);
-
     if (points.current.length > maxValue.current) {
       let diff = points.current.length - maxValue.current;
       while (diff > 0) {

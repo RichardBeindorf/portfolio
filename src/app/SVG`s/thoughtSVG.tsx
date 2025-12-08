@@ -20,8 +20,6 @@ export function ThoughtSVG({
   const thoughtRef = useRef<SVGSVGElement | null>(null);
   const resizeWidth = resizeDelta < 1 && resizeDelta > 0 ? 1 - resizeDelta : 1;
 
-  console.log(resizeWidth, resizeDelta, resizeDelta < 1 && resizeDelta > 0);
-
   let width = 87;
   let height = 87;
 
