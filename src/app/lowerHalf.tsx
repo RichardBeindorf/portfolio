@@ -47,7 +47,7 @@ export default function LowerHalf({
   const pullDurationOrDelay = 1.2;
 
   if (
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     ) // testing for mobile device
   ) {
