@@ -8,7 +8,8 @@ import gsap from "gsap";
 import { entryData } from "@/data/storyEntries";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { TitleProps } from "../lowerHalf";
-import { InnerContainer } from "./passion";
+import StorySpacer from "./Spacer/storySpacer";
+// import { InnerContainer } from "./passion";
 
 export default function Story({
   pullDirection,
@@ -27,7 +28,6 @@ export default function Story({
   const color = useRef("unset");
   const underline = useRef(null);
   const isInitial = useRef(true);
-  const titleWrapper = useRef(null);
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
   const storyRight = useRef(null);
@@ -35,8 +35,10 @@ export default function Story({
   const innerRef = useRef(null);
 
   const pullDuration = 1;
-  const underlineWidth = resizeDelta < 1 ? (650 * resizeDelta) / 2 : 650;
-  const strokeWidth = resizeDelta < 1 ? (2.5 * resizeDelta) / 2 : 2.5;
+  const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
+  const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
+
+  let spacerHeight: number;
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -52,23 +54,21 @@ export default function Story({
       getState() {
         return Flip.getState(tainer.current);
       },
+
+      // Here we capture the intended final position and tell Flip where we want to animate to
       setState() {
         if (clicked) {
-          tainer.current.style.setProperty("position", "relative");
-          gsap.set(tainer.current, {
-            left: "10%",
-            top: "25%",
-          });
-        }
-        if (!clicked) {
-          tainer.current.style.setProperty("position", "absolute");
-
-          gsap.set(tainer.current, {
-            left: positionsObj.story,
-            top: "80%",
-          });
+          tainer.current.style.position = "relative";
+          tainer.current.style.left = "10%";
+          tainer.current.style.top = "15%";
+        } else {
+          tainer.current.style.position = "absolute";
+          tainer.current.style.left = "45%";
+          tainer.current.style.top = "80%";
         }
       },
+
+      // triggering the Flip and adding some additional animations
       animate(self) {
         const tl = gsap.timeline({ ease: "power1.in" });
         tl.add(
@@ -84,32 +84,35 @@ export default function Story({
                 setShowEntries(true);
               }
             },
-            props: "left, top",
           }),
           0
         );
 
         // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
-        if (innerRef.current) {
-          const targetHeight = clicked ? "auto" : title.current.clientHeight;
+        // if (innerRef.current) {
+        //   const targetHeight = clicked ? "auto" : title.current.clientHeight;
 
-          tl.to(
-            innerRef.current,
-            {
-              height: targetHeight,
-              duration: 1,
-              ease: "power1.in",
-            },
-            0
-          );
-        }
+        //   tl.to(
+        //     innerRef.current,
+        //     {
+        //       height: targetHeight,
+        //       duration: 1,
+        //       ease: "power1.in",
+        //     },
+        //     0
+        //   );
+        // }
 
+        // Previously changed the fonty size too but that caused some pixel ghosting on mobile
+        // now scaling the title seperately from the container and changing color
         if (clicked) {
           tl.add(
             gsap.to(title.current, {
+              scale: 2.25,
+              transformOrigin: "left bottom",
               keyframes: {
                 color: ["#262626", "#F24150"],
-                fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
+                // fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
               duration: 1,
               delay: delayTime,
@@ -121,9 +124,10 @@ export default function Story({
         if (isAnimating.current && !clicked && currentWindow.current[1] === 1) {
           tl.add(
             gsap.to(title.current, {
+              scale: 1,
               keyframes: {
                 color: ["#F24150", "#262626"],
-                fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
+                // fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
               duration: 1,
             }),
@@ -152,21 +156,21 @@ export default function Story({
     //**//
     /* ONLY ONCE PER CYCLE (Bounce animation) */
     //**//
-    const onStartBounce = contextSafe(() => {
-      gsap.to(title.current, {
-        delay: 0.7,
-        ease: "sine.in",
-        keyframes: {
-          scaleX: ["100%", "80%", "100%"],
-          rotate: [0, -10, 0],
-          easeEach: "none",
-        },
-      });
-    });
+    // const onStartBounce = contextSafe(() => {
+    //   gsap.to(title.current, {
+    //     delay: 0.7,
+    //     ease: "sine.in",
+    //     keyframes: {
+    //       scaleX: ["100%", "80%", "100%"],
+    //       rotate: [0, -10, 0],
+    //       easeEach: "none",
+    //     },
+    //   });
+    // });
 
-    if (currentWindow.current[1] === 1 && clicked) {
-      onStartBounce();
-    }
+    // if (currentWindow.current[1] === 1 && clicked) {
+    //   onStartBounce();
+    // }
 
     if (clicked) {
       color.current = "#F2F1E9";
@@ -175,9 +179,9 @@ export default function Story({
     }
   }, [clicked, currentWindow.current]);
 
-  //**//
+  /**/
   /* Staggered Animation of the Entries - Managed outside main GSAP context for clarity */
-  //**//
+  /**/
   useGSAP(
     () => {
       const items = entriesRef.current
@@ -203,6 +207,8 @@ export default function Story({
 
       if (entryStaggerAnimation.current) {
         if (showEntries) {
+          spacerHeight = tainer.current.clientHeight;
+          console.log(spacerHeight);
           entryStaggerAnimation.current.play();
         }
         if (!showEntries && isAnimating.current) {
@@ -220,16 +226,16 @@ export default function Story({
         }
       }
 
-      //**//
+      /**/
       /* Underline Animation */
-      //**//
+      /**/
 
       const drawUnderline = contextSafe(() => {
         gsap.from(underline.current, {
           drawSVG: "0",
           ease: "power1.in",
           delay: 0,
-          duration: 0.35,
+          duration: 0.65,
         });
       });
 
@@ -261,8 +267,8 @@ export default function Story({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.1],
-            top: ["80%", "80%", "50%", "50%"],
-            left: [positionsObj.story, positionsObj.passion],
+            y: ["80%", "80%", "50%", "50%"],
+            x: [positionsObj.story, positionsObj.passion],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
@@ -283,14 +289,14 @@ export default function Story({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.1],
-            top: ["80%", "80%", "50%", "50%"],
-            left: [positionsObj.story, positionsObj.work],
+            y: ["80%", "80%", "50%", "50%"],
+            x: [positionsObj.story, positionsObj.work],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
         });
     }
-
+    console.log(pullDirection);
     switch (pullDirection) {
       case "right":
         storyRight.current.play();
@@ -305,101 +311,130 @@ export default function Story({
   }, [pullDirection]);
 
   return (
-    <ChapterContainer $backgroundColor={color.current} ref={tainer}>
-      <InnerContainer ref={innerRef}>
-        <TitleWrapper ref={titleWrapper}>
-          <ChapterTitle
-            style={permanentMarker.style}
-            onClick={() => {
-              if (!isAnimating.current) {
-                const next = !clicked;
-
-                setClicked(next);
-                if (pullDirection === "default") {
-                  currentWindow.current = [0, 1, 0];
-                  pulldirectionProp("mid");
+    <ChapterContainer $backgroundColor={color.current}>
+      {/* <InnerContainer ref={innerRef}> */}
+      {/* Spacer: supposed to reserve space for the content that is about to come */}
+      <StorySpacer height={spacerHeight} />
+      <FlipStage>
+        <FlipItem ref={tainer}>
+          <TitleWrapper>
+            <ChapterTitle
+              style={permanentMarker.style}
+              onClick={() => {
+                if (!isAnimating.current) {
+                  const next = !clicked;
+                  setClicked(next);
+                  if (pullDirection === "default") {
+                    currentWindow.current = [0, 1, 0];
+                    pulldirectionProp("mid");
+                  }
+                  if (pullDirection === "mid") {
+                    pulldirectionProp("default");
+                  }
+                  isAnimating.current = true;
                 }
-                if (pullDirection === "mid") {
-                  pulldirectionProp("default");
-                }
+              }}
+              ref={title}
+            >
+              Story
+            </ChapterTitle>
 
-                isAnimating.current = true;
-              }
-            }}
-            ref={title}
-          >
-            Story
-          </ChapterTitle>
-          {clicked && !isAnimating.current ? (
-            <svg width={underlineWidth} height="20" className="underline">
-              <path
-                ref={underline}
-                d="M 0 0 Q 20 20, 500 0"
-                stroke="#262626"
-                strokeWidth={`${strokeWidth}px`}
-                fill="transparent"
-              />
-            </svg>
-          ) : null}
-        </TitleWrapper>
-        {showEntries && (
-          <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
-            <Intro style={oswald300.style}>
-              &#34;Lets say it seems{" "}
-              <em style={oswald500.style}>complicated</em>, but in the{" "}
-              <em style={oswald500.style}>end</em> it all makes sense&#34;
-            </Intro>
-            <EntryList>
-              {entryData.map((entry, i) => (
-                <EntryWrapper key={i}>
-                  <Bullet>&#47;&#47;</Bullet>
-                  <EntryText style={oswald300.style}>{entry[0]}</EntryText>
-                  {entry[1] === "now" ? (
+            {clicked && !isAnimating.current && (
+              <svg width={underlineWidth} height="20" className="underline">
+                <path
+                  ref={underline}
+                  d="M 0 0 Q 20 20, 500 0"
+                  stroke="#262626"
+                  strokeWidth={`${strokeWidth}px`}
+                  fill="transparent"
+                />
+              </svg>
+            )}
+          </TitleWrapper>
+
+          {showEntries && (
+            <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
+              <Intro style={oswald300.style}>
+                "Lets say it seems <em style={oswald500.style}>complicated</em>,
+                but in the <em style={oswald500.style}>end</em> it all makes
+                sense"
+              </Intro>
+              <EntryList>
+                {entryData.map((entry, i) => (
+                  <EntryWrapper key={i}>
+                    <Bullet>//</Bullet>
+                    <EntryText style={oswald300.style}>{entry[0]}</EntryText>
                     <Year
-                      style={{
-                        ...permanentMarker.style,
-                        color: "var(--textAccent)",
-                      }}
+                      style={
+                        entry[1] === "now"
+                          ? {
+                              ...permanentMarker.style,
+                              color: "var(--textAccent)",
+                            }
+                          : permanentMarker.style
+                      }
                     >
                       {entry[1]}
                     </Year>
-                  ) : (
-                    <Year style={permanentMarker.style}>{entry[1]}</Year>
-                  )}
-                </EntryWrapper>
-              ))}
-            </EntryList>
-          </StoryEntryWrapper>
-        )}
-      </InnerContainer>
+                  </EntryWrapper>
+                ))}
+              </EntryList>
+            </StoryEntryWrapper>
+          )}
+        </FlipItem>
+      </FlipStage>
+      {/* </InnerContainer> */}
     </ChapterContainer>
   );
 }
 
 const ChapterContainer = styled.section<{ $backgroundColor?: string }>`
-  position: absolute;
-  top: 80%;
-  left: 45%;
-  text-align: left;
-  width: max-content;
-  max-width: 80%;
-
-  mix-blend-mode: screen;
+  /* min-height: 100vh; wächst dynamisch mit Inhalten */
   padding: 15px;
-  border-radius: 15px;
+  width: 100%;
   background-color: ${(props) => props.$backgroundColor};
-  border: 0px solid black;
-  border-radius: 25px;
 
   @media (orientation: portrait) {
     left: 35%;
   }
 `;
 
+const InnerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const FlipStage = styled.div`
+  position: fixed; /* oder fixed */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+
+  /* position: fixed; /* NEU!! */
+  /* height: 100vh; /* NEU!! */
+  /* top: 50%; */
+  /* left: 45%; */
+  /* width: max-content;  */
+`;
+
+const FlipItem = styled.div`
+  position: absolute;
+  top: 80%;
+  left: 45%;
+
+  width: max-content;
+  max-width: 80vw;
+
+  pointer-events: auto;
+  will-change: transform;
+`;
+
 export const ChapterTitle = styled.h1`
   position: relative;
   color: var(--foreground);
-  mix-blend-mode: normal;
+
   font-size: var(--header);
   text-align: center;
   user-select: none;

@@ -18,15 +18,12 @@ export function ThoughtSVG({
   resizeDelta: number | null;
 }) {
   const thoughtRef = useRef<SVGSVGElement | null>(null);
-  const resizeWidth = resizeDelta < 1 && resizeDelta > 0 ? 1 - resizeDelta : 1;
 
-  let width = 87;
-  let height = 87;
+  const adjustedResize =
+    resizeDelta < 1 ? Math.min(resizeDelta * 1.85, 1) : resizeDelta;
 
-  if (resizeWidth < 1) {
-    width = 87 * (1 - resizeWidth);
-    height = 87 * (1 - resizeWidth);
-  }
+  const width = 87 * adjustedResize;
+  const height = 87 * adjustedResize;
 
   useEffect(() => {
     setTimeout(() => {

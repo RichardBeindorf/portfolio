@@ -34,8 +34,8 @@ export default function Passion({
   const passionMid = useRef(null);
 
   const pullDuration = 1;
-  const underlineWidth = resizeDelta < 1 ? (650 * resizeDelta) / 2 : 650;
-  const strokeWidth = resizeDelta < 1 ? (2.5 * resizeDelta) / 2 : 2.5;
+  const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
+  const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -413,7 +413,7 @@ const PassionContainer = styled.section<{ $backgroundColor: string }>`
   left: 6%;
   text-align: left;
   max-width: 1100px;
-  mix-blend-mode: screen;
+  /* mix-blend-mode: screen; */
 
   padding: 15px;
   border-radius: 15px;

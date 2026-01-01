@@ -41,8 +41,8 @@ export default function Work({
   const color = useRef("unset");
 
   const pullDuration = 1;
-  const underlineWidth = resizeDelta < 1 ? (650 * resizeDelta) / 2 : 650;
-  const strokeWidth = resizeDelta < 1 ? (2.5 * resizeDelta) / 2 : 2.5;
+  const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
+  const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 
@@ -86,14 +86,13 @@ export default function Work({
       },
       setState() {
         if (clicked) {
-          tainer.current.style.setProperty("position", "relative");
-          gsap.set(tainer.current, { left: "10%", top: "25%" });
-        } else if (!clicked) {
-          tainer.current.style.setProperty("position", "absolute");
-          gsap.set(tainer.current, {
-            left: positionsObj.work,
-            top: "50%",
-          });
+          tainer.current.style.position = "relative";
+          tainer.current.style.top = "25%";
+          tainer.current.style.left = "10%";
+        } else {
+          tainer.current.style.position = "absolute";
+          tainer.current.style.top = "50%";
+          tainer.current.style.left = positionsObj.work;
         }
       },
       animate(self) {
@@ -111,7 +110,6 @@ export default function Work({
                 setShowEntries(true);
               }
             },
-            props: "left, top",
           }),
           0
         );
@@ -132,9 +130,9 @@ export default function Work({
         if (clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
+              scale: 2.25,
               keyframes: {
                 color: ["#262626", "#F24150"],
-                fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
               duration: 1,
               delay: delayTime,
@@ -147,9 +145,9 @@ export default function Work({
         if (isAnimating.current && !clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
+              scale: 1,
               keyframes: {
                 color: ["#F24150", "#262626"],
-                fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
               duration: 1,
             }),
@@ -177,22 +175,22 @@ export default function Work({
   // Logic for click events on other titles, only click related
   const { contextSafe } = useGSAP(
     () => {
-      const onStartBounce = contextSafe(() => {
-        return gsap.to(title.current, {
-          delay: 0.7,
-          ease: "sine.in",
-          keyframes: {
-            scaleX: ["100%", "80%", "100%"],
-            // left: ["50%", "48%", "50%"],
-            rotate: [0, -10, 0],
-            easeEach: "none",
-          },
-        });
-      });
+      // const onStartBounce = contextSafe(() => {
+      //   return gsap.to(title.current, {
+      //     delay: 0.7,
+      //     ease: "sine.in",
+      //     keyframes: {
+      //       scaleX: ["100%", "80%", "100%"],
+      //       // left: ["50%", "48%", "50%"],
+      //       rotate: [0, -10, 0],
+      //       easeEach: "none",
+      //     },
+      //   });
+      // });
 
-      if (currentWindow.current[2] === 1 && clicked) {
-        onStartBounce();
-      }
+      // if (currentWindow.current[2] === 1 && clicked) {
+      //   onStartBounce();
+      // }
 
       if (clicked) {
         color.current = "#F2F1E9";
@@ -446,11 +444,11 @@ const WorkContainer = styled.section<{
   $backgroundColor: string;
   $position: string;
 }>`
+  position: absolute;
   top: 50%;
   left: ${(props) => props.$position};
-  position: absolute;
   max-width: 90%;
-  mix-blend-mode: screen;
+  /* mix-blend-mode: screen; */
 
   padding: 15px;
   background-color: ${(props) => props.$backgroundColor};

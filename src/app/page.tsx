@@ -60,7 +60,7 @@ export default function Home() {
               <ThreeLine
                 lineApiRef={threeLineRef}
                 drawDelay={drawDelay}
-                resizeDelta={resizeDelta?.[0]}
+                resizeDelta={resizeDelta}
               />
               <InteractionHandler
                 lineApiRef={threeLineRef}

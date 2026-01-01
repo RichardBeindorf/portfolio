@@ -212,16 +212,36 @@ export default function InteractionHandler({
               /** */
               /* BOTTOM BOUNCE PART */
               /** */
-              if (self.velocityY < 2000 && topViewportY > pushBackPointBottom) {
-                const bouncyCalc = self.y / 2 + viewportHeight * 0.87;
+              // if (self.velocityY < 2000 && topViewportY > pushBackPointBottom) {
+              //   if (currentPercent < 30) {
+              //     // This is the bounce on the top side, pushing us back in
+              //     const bouncyCalc = self.y / 2 + viewportHeight * 0.87;
+              //     bouncyMovement.current = Math.max(
+              //       pushBackPointBottom + 1,
+              //       bouncyCalc
+              //     );
 
-                bouncyMovement.current = Math.max(
-                  pushBackPointBottom + 1,
-                  bouncyCalc
-                );
+              //     smoother.current.scrollTo(bouncyMovement.current, true);
+              //   }
 
-                smoother.current.scrollTo(bouncyMovement.current, true);
-              }
+              //   // this keeps the view at the bottom of the screen so everything is in view most of the time
+              //   if (currentPercent >= 30) {
+              //     smoother.current.scrollTo(fullHeight, true);
+              //   }
+
+              //   // always locking the screen for either event
+              //   // THIS IS BROKEN, WE CANT SCROLL BACK UP NOW BEC ITS ALWAYS LOCKED
+              //   // NEED TO FIX PAGE HEIGHT FIRST
+              //   gsap.to(window, {
+              //     duration: 0.5,
+              //     onStart: () => {
+              //       pageScrollGuard.current = true;
+              //     },
+              //     onComplete: () => {
+              //       pageScrollGuard.current = false;
+              //     },
+              //   });
+              // }
 
               /** */
               /* BOTTOM SCROLL PART */
