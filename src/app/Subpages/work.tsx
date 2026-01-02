@@ -6,7 +6,13 @@ import styled from "styled-components";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
-import { ChapterTitle, Intro, TitleWrapper } from "./story";
+import {
+  ChapterTitle,
+  FlipItem,
+  FlipStage,
+  Intro,
+  TitleWrapper,
+} from "./story";
 import { TitleProps } from "../lowerHalf";
 import { InnerContainer } from "./passion";
 import LeftArrow from "../SVG`s/leftArrow";
@@ -91,7 +97,7 @@ export default function Work({
           tainer.current.style.left = "10%";
         } else {
           tainer.current.style.position = "absolute";
-          tainer.current.style.top = "50%";
+          tainer.current.style.top = "45%";
           tainer.current.style.left = positionsObj.work;
         }
       },
@@ -283,7 +289,7 @@ export default function Work({
         })
         .to(tainer.current, {
           duration: pullDuration,
-          top: "50%",
+          top: "45%",
           ease: "power1.in",
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
@@ -309,7 +315,7 @@ export default function Work({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["50%", "50%", "80%", "80%"],
+            top: ["45%", "45%", "80%", "80%"],
             left: [positionsObj.work, positionsObj.story],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -332,135 +338,132 @@ export default function Work({
 
   return (
     <WorkContainer
-      $backgroundColor={color.current}
-      $position={positionsObj.work}
+      // $backgroundColor={color.current}
+      // $position={positionsObj.work}
       ref={tainer}
-      data-flip-id="workTainer"
     >
-      <InnerContainer ref={innerRef}>
-        <TitleWrapper>
-          <Title
-            style={permanentMarker.style}
-            ref={title}
-            onClick={() => {
-              if (!isAnimating.current) {
-                const next = !clicked;
+      <TitleWrapper>
+        <Title
+          style={permanentMarker.style}
+          ref={title}
+          onClick={() => {
+            if (!isAnimating.current) {
+              const next = !clicked;
 
-                setClicked(next);
+              setClicked(next);
 
-                if (pullDirection === "default") {
-                  currentWindow.current = [0, 0, 1];
-                  pulldirectionProp("right");
-                }
-                if (pullDirection === "right") {
-                  pulldirectionProp("default");
-                }
-
-                isAnimating.current = true;
+              if (pullDirection === "default") {
+                currentWindow.current = [0, 0, 1];
+                pulldirectionProp("right");
               }
-            }}
-          >
-            Work
-          </Title>
-          {showEntries && (
-            <svg width={underlineWidth} height="20">
-              <path
-                ref={underline}
-                d="M 0 0 Q 20 20, 500 0"
-                stroke="#262626"
-                strokeWidth={`${strokeWidth}px`}
-                fill="transparent"
-              />
-            </svg>
-          )}
-        </TitleWrapper>
+              if (pullDirection === "right") {
+                pulldirectionProp("default");
+              }
 
+              isAnimating.current = true;
+            }
+          }}
+        >
+          Work
+        </Title>
         {showEntries && (
-          <WorkEntryWrapper ref={entriesRef}>
-            <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
-            <TopicWrapper>
-              <Topic style={permanentMarker.style}>
-                {projects[currentProject].title}
-              </Topic>
-              <DetailWrapper>
-                <Text style={oswald300.style}>
-                  {projects[currentProject].description}
-                </Text>
-                {projects[currentProject].iframe && (
-                  <IFrameWrapper>
-                    <IFrame src={projects[currentProject].iframe} />
-                  </IFrameWrapper>
-                )}
-                {/* Optional images */}
-                {projects[currentProject].images && (
-                  <ImageGallery>
-                    {projects[currentProject].images.map((src, idx) => (
-                      <PreviewImage key={idx} src={src} />
-                    ))}
-                  </ImageGallery>
-                )}
-                {projects[currentProject].svg && (
-                  <SVGWrapper>
-                    {projects[currentProject].svg.map((svg) => svg)}
-                  </SVGWrapper>
-                )}
-              </DetailWrapper>
-            </TopicWrapper>
-
-            <NavButtons>
-              <ButtonWrapper onClick={prevProject}>
-                <LeftArrow />
-                <button
-                  style={{
-                    ...permanentMarker.style,
-                    paddingLeft: "0.2rem",
-                    fontSize: "var(--inlineText)",
-                  }}
-                >
-                  Prev
-                </button>
-              </ButtonWrapper>
-              <ButtonWrapper onClick={nextProject}>
-                <button
-                  style={{
-                    ...permanentMarker.style,
-                    paddingRight: "0.2rem",
-                    fontSize: "var(--inlineText)",
-                  }}
-                >
-                  Next
-                </button>
-                <RightArrow />
-              </ButtonWrapper>
-            </NavButtons>
-          </WorkEntryWrapper>
+          <svg width={underlineWidth} height="20">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth={`${strokeWidth}px`}
+              fill="transparent"
+            />
+          </svg>
         )}
-      </InnerContainer>
+      </TitleWrapper>
+
+      {showEntries && (
+        <WorkEntryWrapper ref={entriesRef}>
+          <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
+          <TopicWrapper>
+            <Topic style={permanentMarker.style}>
+              {projects[currentProject].title}
+            </Topic>
+            <DetailWrapper>
+              <Text style={oswald300.style}>
+                {projects[currentProject].description}
+              </Text>
+              {projects[currentProject].iframe && (
+                <IFrameWrapper>
+                  <IFrame src={projects[currentProject].iframe} />
+                </IFrameWrapper>
+              )}
+              {/* Optional images */}
+              {projects[currentProject].images && (
+                <ImageGallery>
+                  {projects[currentProject].images.map((src, idx) => (
+                    <PreviewImage key={idx} src={src} />
+                  ))}
+                </ImageGallery>
+              )}
+              {projects[currentProject].svg && (
+                <SVGWrapper>
+                  {projects[currentProject].svg.map((svg) => svg)}
+                </SVGWrapper>
+              )}
+            </DetailWrapper>
+          </TopicWrapper>
+
+          <NavButtons>
+            <ButtonWrapper onClick={prevProject}>
+              <LeftArrow />
+              <button
+                style={{
+                  ...permanentMarker.style,
+                  paddingLeft: "0.2rem",
+                  fontSize: "var(--inlineText)",
+                }}
+              >
+                Prev
+              </button>
+            </ButtonWrapper>
+            <ButtonWrapper onClick={nextProject}>
+              <button
+                style={{
+                  ...permanentMarker.style,
+                  paddingRight: "0.2rem",
+                  fontSize: "var(--inlineText)",
+                }}
+              >
+                Next
+              </button>
+              <RightArrow />
+            </ButtonWrapper>
+          </NavButtons>
+        </WorkEntryWrapper>
+      )}
     </WorkContainer>
   );
 }
 
-const WorkContainer = styled.section<{
-  $backgroundColor: string;
-  $position: string;
-}>`
+const WorkContainer = styled.section`
   position: absolute;
-  top: 50%;
-  left: ${(props) => props.$position};
-  max-width: 90%;
-  /* mix-blend-mode: screen; */
+  top: 45%;
+  left: 85%;
 
-  padding: 15px;
-  background-color: ${(props) => props.$backgroundColor};
-  border: 0px solid black;
-  border-radius: 25px;
+  width: max-content;
+  max-width: 80vw;
+
+  pointer-events: auto;
+  will-change: transform;
+
+  /* @media (orientation: portrait) {
+    left: 35%;
+  } */
 `;
 
 const WorkEntryWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   gap: 0.5rem;
   cursor: pointer;
   padding: 0px;

@@ -313,113 +313,107 @@ export default function Passion({
   }, [pullDirection]);
 
   return (
-    <PassionContainer $backgroundColor={color.current} ref={tainer}>
+    <PassionContainer ref={tainer}>
       {/* This InnerContainer is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box when entries are closing*/}
-      <InnerContainer ref={innerRef}>
-        <TitleWrapper>
-          <Title
-            style={permanentMarker.style}
-            onClick={() => {
-              if (!isAnimating.current) {
-                const next = !clicked;
-                setClicked(next);
-                if (pullDirection === "default") {
-                  currentWindow.current = [1, 0, 0];
-                  pulldirectionProp("left");
-                }
-                if (pullDirection === "left") {
-                  pulldirectionProp("default");
-                }
-                isAnimating.current = true;
+      {/* <InnerContainer ref={innerRef}> */}
+      <TitleWrapper>
+        <Title
+          style={permanentMarker.style}
+          onClick={() => {
+            if (!isAnimating.current) {
+              const next = !clicked;
+              setClicked(next);
+              if (pullDirection === "default") {
+                currentWindow.current = [1, 0, 0];
+                pulldirectionProp("left");
               }
-            }}
-            ref={title}
-          >
-            Passion
-          </Title>
-          {clicked && !isAnimating.current ? (
-            <svg width={underlineWidth} height="20">
-              <path
-                ref={underline}
-                d="M 0 0 Q 20 20, 500 0"
-                stroke="#262626"
-                strokeWidth={`${strokeWidth}px`}
-                fill="transparent"
-              />
-            </svg>
-          ) : null}
-        </TitleWrapper>
+              if (pullDirection === "left") {
+                pulldirectionProp("default");
+              }
+              isAnimating.current = true;
+            }
+          }}
+          ref={title}
+        >
+          Passion
+        </Title>
+        {clicked && !isAnimating.current ? (
+          <svg width={underlineWidth} height="20">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth={`${strokeWidth}px`}
+              fill="transparent"
+            />
+          </svg>
+        ) : null}
+      </TitleWrapper>
 
-        <PassionContent className="contentWrapper">
-          {showEntries && (
-            <PassionEntryWrapper ref={entriesRef}>
-              <Subtitle style={permanentMarker.style}>
-                What is it that makes me passionate?
-              </Subtitle>
-              <TopicWrapper style={{ textAlign: "left" }}>
-                <Topic style={permanentMarker.style}>Creation</Topic>
-                <Text style={oswald300.style}>
-                  the realization of{" "}
-                  <Highlights style={oswald500.style}>
-                    endless possibilities
-                  </Highlights>{" "}
-                  is what made me obsessed with{" "}
-                  <Highlights style={oswald500.style}>programming</Highlights> -
-                  what great we can achieve when setting our minds to it
-                </Text>
-              </TopicWrapper>
-              <TopicWrapper style={{ textAlign: "right" }}>
-                <Topic style={permanentMarker.style}>life long learning</Topic>
-                <Text style={oswald300.style}>
-                  being able to keep learning is an{" "}
-                  <Highlights style={oswald500.style}>
-                    escape hatch out of mental stiffness
-                  </Highlights>{" "}
-                  - trying hard to understand new concepts opens my mind
-                </Text>
-              </TopicWrapper>
-              <TopicWrapper style={{ textAlign: "left" }}>
-                <Topic style={permanentMarker.style}>Mastery</Topic>
-                <Text style={oswald300.style}>
-                  trying to keep my perfectionism in the bottle and funneling
-                  the energy instead into{" "}
-                  <Highlights style={oswald500.style}>
-                    training skills
-                  </Highlights>{" "}
-                  rather than micro optimizations is pushing me - in sports,
-                  relationships and work
-                </Text>
-              </TopicWrapper>
-              <TopicWrapper style={{ textAlign: "right" }}>
-                <Topic style={permanentMarker.style}>Discovery</Topic>
-                <Text style={oswald300.style}>
-                  getting out of my{" "}
-                  <Highlights style={oswald500.style}>comfort areas</Highlights>{" "}
-                  - if it didn&#39;t scare me it probably didn&#39;t improve my
-                  life
-                </Text>
-              </TopicWrapper>
-            </PassionEntryWrapper>
-          )}
-        </PassionContent>
-      </InnerContainer>
+      <PassionContent className="contentWrapper">
+        {showEntries && (
+          <PassionEntryWrapper ref={entriesRef}>
+            <Subtitle style={permanentMarker.style}>
+              What is it that makes me passionate?
+            </Subtitle>
+            <TopicWrapper style={{ textAlign: "left" }}>
+              <Topic style={permanentMarker.style}>Creation</Topic>
+              <Text style={oswald300.style}>
+                the realization of{" "}
+                <Highlights style={oswald500.style}>
+                  endless possibilities
+                </Highlights>{" "}
+                is what made me obsessed with{" "}
+                <Highlights style={oswald500.style}>programming</Highlights> -
+                what great we can achieve when setting our minds to it
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "right" }}>
+              <Topic style={permanentMarker.style}>life long learning</Topic>
+              <Text style={oswald300.style}>
+                being able to keep learning is an{" "}
+                <Highlights style={oswald500.style}>
+                  escape hatch out of mental stiffness
+                </Highlights>{" "}
+                - trying hard to understand new concepts opens my mind
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "left" }}>
+              <Topic style={permanentMarker.style}>Mastery</Topic>
+              <Text style={oswald300.style}>
+                trying to keep my perfectionism in the bottle and funneling the
+                energy instead into{" "}
+                <Highlights style={oswald500.style}>training skills</Highlights>{" "}
+                rather than micro optimizations is pushing me - in sports,
+                relationships and work
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "right" }}>
+              <Topic style={permanentMarker.style}>Discovery</Topic>
+              <Text style={oswald300.style}>
+                getting out of my{" "}
+                <Highlights style={oswald500.style}>comfort areas</Highlights> -
+                if it didn&#39;t scare me it probably didn&#39;t improve my life
+              </Text>
+            </TopicWrapper>
+          </PassionEntryWrapper>
+        )}
+      </PassionContent>
+      {/* </InnerContainer> */}
     </PassionContainer>
   );
 }
 
-const PassionContainer = styled.section<{ $backgroundColor: string }>`
+const PassionContainer = styled.section`
   position: absolute;
-  top: 50%;
-  left: 6%;
-  text-align: left;
-  max-width: 1100px;
-  /* mix-blend-mode: screen; */
+  top: 45%;
+  left: 15%;
 
-  padding: 15px;
-  border-radius: 15px;
-  background-color: ${(props) => props.$backgroundColor};
-  border: 0px solid black;
-  border-radius: 25px;
+  width: max-content;
+  max-width: 80vw;
+
+  pointer-events: auto;
+  will-change: transform;
 `;
 
 export const InnerContainer = styled.div`

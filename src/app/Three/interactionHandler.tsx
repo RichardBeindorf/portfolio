@@ -19,7 +19,7 @@ export default function InteractionHandler({
 }: {
   lineApiRef: React.RefObject<ThreeLineMethods | null>;
   drawDelay: number;
-  bottomScroll: (arr) => void;
+  bottomScroll: React.Dispatch<React.SetStateAction<boolean>>;
   pullDirection: PullVariants;
 }) {
   const { size, camera } = useThree();

@@ -66,9 +66,7 @@ export default function Home() {
                 lineApiRef={threeLineRef}
                 drawDelay={drawDelay}
                 pullDirection={pullDirection}
-                bottomScroll={(arr) => {
-                  setBottomScroll(arr);
-                }}
+                bottomScroll={setBottomScroll}
               />
             </Canvas>
           </CanvasWrapper>
