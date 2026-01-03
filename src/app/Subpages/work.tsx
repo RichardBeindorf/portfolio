@@ -6,15 +6,8 @@ import styled from "styled-components";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
-import {
-  ChapterTitle,
-  FlipItem,
-  FlipStage,
-  Intro,
-  TitleWrapper,
-} from "./story";
+import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import { TitleProps } from "../lowerHalf";
-import { InnerContainer } from "./passion";
 import LeftArrow from "../SVG`s/leftArrow";
 import RightArrow from "../SVG`s/rightArrow";
 import BMSOne from "../SVG`s/bmsMockupOne";
@@ -339,7 +332,7 @@ export default function Work({
   return (
     <WorkContainer
       // $backgroundColor={color.current}
-      // $position={positionsObj.work}
+      $position={positionsObj.work}
       ref={tainer}
     >
       <TitleWrapper>
@@ -443,10 +436,10 @@ export default function Work({
   );
 }
 
-const WorkContainer = styled.section`
+const WorkContainer = styled.section<{ $position: string }>`
   position: absolute;
   top: 45%;
-  left: 85%;
+  left: ${(props) => props.$position || "80%"};
 
   width: max-content;
   max-width: 80vw;

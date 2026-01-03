@@ -313,7 +313,7 @@ export default function Passion({
   }, [pullDirection]);
 
   return (
-    <PassionContainer ref={tainer}>
+    <PassionContainer ref={tainer} $position={positionsObj.passion}>
       {/* This InnerContainer is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box when entries are closing*/}
       {/* <InnerContainer ref={innerRef}> */}
       <TitleWrapper>
@@ -404,10 +404,10 @@ export default function Passion({
   );
 }
 
-const PassionContainer = styled.section`
+const PassionContainer = styled.section<{ $position: string }>`
   position: absolute;
   top: 45%;
-  left: 15%;
+  left: left: ${(props) => props.$position || "15%"};;
 
   width: max-content;
   max-width: 80vw;

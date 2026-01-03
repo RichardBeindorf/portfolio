@@ -310,7 +310,7 @@ export default function Story({
   }, [pullDirection]);
 
   return (
-    <ChapterContainer ref={tainer}>
+    <ChapterContainer ref={tainer} $position={positionsObj.story}>
       {/* <InnerContainer ref={innerRef}> */}
       {/* Spacer: supposed to reserve space for the content that is about to come */}
       {/* <StorySpacer height={spacerHeight} /> */}
@@ -385,10 +385,10 @@ export default function Story({
   );
 }
 
-const ChapterContainer = styled.section`
+const ChapterContainer = styled.section<{ $position: string }>`
   position: absolute;
   top: 80%;
-  left: 45%;
+  left: ${(props) => props.$position || "45%"};
 
   width: max-content;
   max-width: 80vw;

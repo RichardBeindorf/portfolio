@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-export default function Spacer({ spacerHeight }) {
+export default function Spacer({ spacerHeight }: { spacerHeight: number }) {
   const spacerRef = useRef(null);
 
   console.log("new spacer height!", spacerHeight);
