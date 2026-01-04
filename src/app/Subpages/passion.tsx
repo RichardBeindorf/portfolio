@@ -17,6 +17,7 @@ export default function Passion({
   isAnimating,
   resizeDelta,
   positionsObj,
+  spacerHeight,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -52,17 +53,13 @@ export default function Passion({
       },
       setState() {
         if (clicked) {
-          tainer.current.style.setProperty("position", "relative");
-          gsap.set(tainer.current, { left: "10%", top: "25%", width: "80%" });
-        }
-        if (!clicked) {
-          tainer.current.style.setProperty("position", "absolute");
-
-          gsap.set(tainer.current, {
-            left: positionsObj.passion,
-            top: "50%",
-            width: "auto",
-          });
+          tainer.current.style.position = "relative";
+          tainer.current.style.left = "10%";
+          tainer.current.style.top = "15%";
+        } else {
+          tainer.current.style.position = "absolute";
+          tainer.current.style.left = positionsObj.passion;
+          tainer.current.style.top = "45%";
         }
       },
       animate(self) {
@@ -103,9 +100,10 @@ export default function Passion({
         if (clicked) {
           tl.add(
             gsap.to(title.current, {
+              scale: 2.25,
+              transformOrigin: "left bottom",
               keyframes: {
                 color: ["#262626", "#F24150"],
-                fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
               duration: 1,
               delay: delayTime,
@@ -117,9 +115,9 @@ export default function Passion({
         if (isAnimating.current && !clicked && currentWindow.current[0] === 1) {
           tl.add(
             gsap.to(title.current, {
+              scale: 1,
               keyframes: {
                 color: ["#F24150", "#262626"],
-                fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
               duration: 1,
             }),
@@ -150,21 +148,21 @@ export default function Passion({
       //**//
       /* ONLY ONCE PER CYCLE (Bounce animation) */
       //**//
-      const onStartBounce = contextSafe(() => {
-        gsap.to(title.current, {
-          delay: 0.7,
-          ease: "sine.in",
-          keyframes: {
-            scaleX: ["100%", "80%", "100%"],
-            // left: ["50%", "48%", "50%"],
-            rotate: [0, -10, 0],
-            easeEach: "none",
-          },
-        });
-      });
-      if (currentWindow.current[0] === 1 && clicked) {
-        onStartBounce();
-      }
+      // const onStartBounce = contextSafe(() => {
+      //   gsap.to(title.current, {
+      //     delay: 0.7,
+      //     ease: "sine.in",
+      //     keyframes: {
+      //       scaleX: ["100%", "80%", "100%"],
+      //       // left: ["45%", "48%", "45%"],
+      //       rotate: [0, -10, 0],
+      //       easeEach: "none",
+      //     },
+      //   });
+      // });
+      // if (currentWindow.current[0] === 1 && clicked) {
+      //   onStartBounce();
+      // }
 
       if (clicked) {
         color.current = "#F2F1E9";
@@ -199,6 +197,9 @@ export default function Passion({
           duration: 0.2,
           ease: "power2.out",
           paused: true,
+          onComplete: () => {
+            spacerHeight(tainer.current.getBoundingClientRect().height);
+          },
           onReverseComplete: () => {
             entryStaggerAnimation.current = null;
           },
@@ -266,7 +267,7 @@ export default function Passion({
             // first is start position
             // rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["50%", "50%", "80%", "80%"],
+            top: ["45%", "45%", "80%", "80%"],
             left: [positionsObj.passion, positionsObj.story],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -282,7 +283,7 @@ export default function Passion({
         })
         .to(tainer.current, {
           duration: pullDuration,
-          top: "50%",
+          top: "45%",
           rotate: 30,
           ease: "power1.in",
           keyframes: {
@@ -407,8 +408,7 @@ export default function Passion({
 const PassionContainer = styled.section<{ $position: string }>`
   position: absolute;
   top: 45%;
-  left: left: ${(props) => props.$position || "15%"};;
-
+  left: ${(props) => props.$position || "15%"};
   width: max-content;
   max-width: 80vw;
 
@@ -440,7 +440,7 @@ const PassionEntryWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: start;
-  /* align-items: start; */
+  align-items: start;
   gap: 0.5rem;
   cursor: pointer;
   padding: 0px;

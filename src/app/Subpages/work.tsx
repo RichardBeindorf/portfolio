@@ -21,6 +21,7 @@ export default function Work({
   isAnimating,
   resizeDelta,
   positionsObj,
+  spacerHeight,
 }: TitleProps) {
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -86,7 +87,7 @@ export default function Work({
       setState() {
         if (clicked) {
           tainer.current.style.position = "relative";
-          tainer.current.style.top = "25%";
+          tainer.current.style.top = "15%";
           tainer.current.style.left = "10%";
         } else {
           tainer.current.style.position = "absolute";
@@ -113,23 +114,24 @@ export default function Work({
           0
         );
 
-        if (innerRef.current) {
-          const targetHeight = clicked ? "auto" : title.current.clientHeight;
+        // if (innerRef.current) {
+        //   const targetHeight = clicked ? "auto" : title.current.clientHeight;
 
-          tl.to(
-            innerRef.current,
-            {
-              height: targetHeight,
-              duration: 0.1,
-            },
-            0
-          );
-        }
+        //   tl.to(
+        //     innerRef.current,
+        //     {
+        //       height: targetHeight,
+        //       duration: 0.1,
+        //     },
+        //     0
+        //   );
+        // }
 
-        if (clicked && currentWindow.current[2] === 1) {
+        if (clicked) {
           tl.add(
             gsap.to(title.current, {
               scale: 2.25,
+              transformOrigin: "left bottom",
               keyframes: {
                 color: ["#262626", "#F24150"],
               },
@@ -180,7 +182,7 @@ export default function Work({
       //     ease: "sine.in",
       //     keyframes: {
       //       scaleX: ["100%", "80%", "100%"],
-      //       // left: ["50%", "48%", "50%"],
+      //       // left: ["45%", "42%", "45%"],
       //       rotate: [0, -10, 0],
       //       easeEach: "none",
       //     },
@@ -222,6 +224,9 @@ export default function Work({
           duration: 0.2,
           ease: "power2.out",
           paused: true,
+          onComplete: () => {
+            spacerHeight(tainer.current.getBoundingClientRect().height);
+          },
           onReverseComplete: () => {
             entryStaggerAnimation.current = null;
           },

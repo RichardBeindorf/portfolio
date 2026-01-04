@@ -32,6 +32,7 @@ export default function Story({
   const storyRight = useRef(null);
   const storyLeft = useRef(null);
   const innerRef = useRef(null);
+  const midPosition = window.innerHeight * 0.35;
 
   const pullDuration = 1;
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
@@ -60,7 +61,7 @@ export default function Story({
           tainer.current.style.top = "15%";
         } else {
           tainer.current.style.position = "absolute";
-          tainer.current.style.left = "45%";
+          tainer.current.style.left = positionsObj.story;
           tainer.current.style.top = "80%";
         }
       },
@@ -266,8 +267,8 @@ export default function Story({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.1],
-            y: ["80%", "80%", "50%", "50%"],
-            x: [positionsObj.story, positionsObj.passion],
+            top: ["80%", "80%", "45%", "45%"],
+            left: [positionsObj.story, positionsObj.passion],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
@@ -288,8 +289,8 @@ export default function Story({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.1],
-            y: ["80%", "80%", "50%", "50%"],
-            x: [positionsObj.story, positionsObj.work],
+            y: [0, 0, -midPosition, -midPosition],
+            left: [positionsObj.story, positionsObj.work],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
           },
