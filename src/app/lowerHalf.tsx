@@ -52,6 +52,7 @@ export default function LowerHalf(props: {
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
   const isAnimating = useRef(true);
   const positions = useRef<PositionSwapper>(null);
+  const midAnimationValue = window.innerHeight * 0.35;
 
   const pullDurationOrDelay = 1.2;
 
