@@ -8,7 +8,6 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import { TitleProps } from "../lowerHalf";
-import { InnerContainer } from "./passion";
 import LeftArrow from "../SVG`s/leftArrow";
 import RightArrow from "../SVG`s/rightArrow";
 import BMSOne from "../SVG`s/bmsMockupOne";
@@ -22,6 +21,7 @@ export default function Work({
   isAnimating,
   resizeDelta,
   positionsObj,
+  spacerHeight,
 }: TitleProps) {
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -41,8 +41,8 @@ export default function Work({
   const color = useRef("unset");
 
   const pullDuration = 1;
-  const underlineWidth = resizeDelta < 1 ? (650 * resizeDelta) / 2 : 650;
-  const strokeWidth = resizeDelta < 1 ? (2.5 * resizeDelta) / 2 : 2.5;
+  const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
+  const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
 
   const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
 
@@ -86,14 +86,13 @@ export default function Work({
       },
       setState() {
         if (clicked) {
-          tainer.current.style.setProperty("position", "relative");
-          gsap.set(tainer.current, { left: "10%", top: "25%" });
-        } else if (!clicked) {
-          tainer.current.style.setProperty("position", "absolute");
-          gsap.set(tainer.current, {
-            left: positionsObj.work,
-            top: "50%",
-          });
+          tainer.current.style.position = "relative";
+          tainer.current.style.top = "15%";
+          tainer.current.style.left = "10%";
+        } else {
+          tainer.current.style.position = "absolute";
+          tainer.current.style.top = "45%";
+          tainer.current.style.left = positionsObj.work;
         }
       },
       animate(self) {
@@ -111,30 +110,30 @@ export default function Work({
                 setShowEntries(true);
               }
             },
-            props: "left, top",
           }),
           0
         );
 
-        if (innerRef.current) {
-          const targetHeight = clicked ? "auto" : title.current.clientHeight;
+        // if (innerRef.current) {
+        //   const targetHeight = clicked ? "auto" : title.current.clientHeight;
 
-          tl.to(
-            innerRef.current,
-            {
-              height: targetHeight,
-              duration: 0.1,
-            },
-            0
-          );
-        }
+        //   tl.to(
+        //     innerRef.current,
+        //     {
+        //       height: targetHeight,
+        //       duration: 0.1,
+        //     },
+        //     0
+        //   );
+        // }
 
-        if (clicked && currentWindow.current[2] === 1) {
+        if (clicked) {
           tl.add(
             gsap.to(title.current, {
+              scale: 2.25,
+              transformOrigin: "left bottom",
               keyframes: {
                 color: ["#262626", "#F24150"],
-                fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
               duration: 1,
               delay: delayTime,
@@ -147,9 +146,9 @@ export default function Work({
         if (isAnimating.current && !clicked && currentWindow.current[2] === 1) {
           tl.add(
             gsap.to(title.current, {
+              scale: 1,
               keyframes: {
                 color: ["#F24150", "#262626"],
-                fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
               duration: 1,
             }),
@@ -177,22 +176,22 @@ export default function Work({
   // Logic for click events on other titles, only click related
   const { contextSafe } = useGSAP(
     () => {
-      const onStartBounce = contextSafe(() => {
-        return gsap.to(title.current, {
-          delay: 0.7,
-          ease: "sine.in",
-          keyframes: {
-            scaleX: ["100%", "80%", "100%"],
-            // left: ["50%", "48%", "50%"],
-            rotate: [0, -10, 0],
-            easeEach: "none",
-          },
-        });
-      });
+      // const onStartBounce = contextSafe(() => {
+      //   return gsap.to(title.current, {
+      //     delay: 0.7,
+      //     ease: "sine.in",
+      //     keyframes: {
+      //       scaleX: ["100%", "80%", "100%"],
+      //       // left: ["45%", "42%", "45%"],
+      //       rotate: [0, -10, 0],
+      //       easeEach: "none",
+      //     },
+      //   });
+      // });
 
-      if (currentWindow.current[2] === 1 && clicked) {
-        onStartBounce();
-      }
+      // if (currentWindow.current[2] === 1 && clicked) {
+      //   onStartBounce();
+      // }
 
       if (clicked) {
         color.current = "#F2F1E9";
@@ -225,6 +224,9 @@ export default function Work({
           duration: 0.2,
           ease: "power2.out",
           paused: true,
+          onComplete: () => {
+            spacerHeight(tainer.current.getBoundingClientRect().height);
+          },
           onReverseComplete: () => {
             entryStaggerAnimation.current = null;
           },
@@ -285,7 +287,7 @@ export default function Work({
         })
         .to(tainer.current, {
           duration: pullDuration,
-          top: "50%",
+          top: "45%",
           ease: "power1.in",
           keyframes: {
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
@@ -311,7 +313,7 @@ export default function Work({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["50%", "50%", "80%", "80%"],
+            top: ["45%", "45%", "80%", "80%"],
             left: [positionsObj.work, positionsObj.story],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -334,135 +336,132 @@ export default function Work({
 
   return (
     <WorkContainer
-      $backgroundColor={color.current}
+      // $backgroundColor={color.current}
       $position={positionsObj.work}
       ref={tainer}
-      data-flip-id="workTainer"
     >
-      <InnerContainer ref={innerRef}>
-        <TitleWrapper>
-          <Title
-            style={permanentMarker.style}
-            ref={title}
-            onClick={() => {
-              if (!isAnimating.current) {
-                const next = !clicked;
+      <TitleWrapper>
+        <Title
+          style={permanentMarker.style}
+          ref={title}
+          onClick={() => {
+            if (!isAnimating.current) {
+              const next = !clicked;
 
-                setClicked(next);
+              setClicked(next);
 
-                if (pullDirection === "default") {
-                  currentWindow.current = [0, 0, 1];
-                  pulldirectionProp("right");
-                }
-                if (pullDirection === "right") {
-                  pulldirectionProp("default");
-                }
-
-                isAnimating.current = true;
+              if (pullDirection === "default") {
+                currentWindow.current = [0, 0, 1];
+                pulldirectionProp("right");
               }
-            }}
-          >
-            Work
-          </Title>
-          {showEntries && (
-            <svg width={underlineWidth} height="20">
-              <path
-                ref={underline}
-                d="M 0 0 Q 20 20, 500 0"
-                stroke="#262626"
-                strokeWidth={`${strokeWidth}px`}
-                fill="transparent"
-              />
-            </svg>
-          )}
-        </TitleWrapper>
+              if (pullDirection === "right") {
+                pulldirectionProp("default");
+              }
 
+              isAnimating.current = true;
+            }
+          }}
+        >
+          Work
+        </Title>
         {showEntries && (
-          <WorkEntryWrapper ref={entriesRef}>
-            <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
-            <TopicWrapper>
-              <Topic style={permanentMarker.style}>
-                {projects[currentProject].title}
-              </Topic>
-              <DetailWrapper>
-                <Text style={oswald300.style}>
-                  {projects[currentProject].description}
-                </Text>
-                {projects[currentProject].iframe && (
-                  <IFrameWrapper>
-                    <IFrame src={projects[currentProject].iframe} />
-                  </IFrameWrapper>
-                )}
-                {/* Optional images */}
-                {projects[currentProject].images && (
-                  <ImageGallery>
-                    {projects[currentProject].images.map((src, idx) => (
-                      <PreviewImage key={idx} src={src} />
-                    ))}
-                  </ImageGallery>
-                )}
-                {projects[currentProject].svg && (
-                  <SVGWrapper>
-                    {projects[currentProject].svg.map((svg) => svg)}
-                  </SVGWrapper>
-                )}
-              </DetailWrapper>
-            </TopicWrapper>
-
-            <NavButtons>
-              <ButtonWrapper onClick={prevProject}>
-                <LeftArrow />
-                <button
-                  style={{
-                    ...permanentMarker.style,
-                    paddingLeft: "0.2rem",
-                    fontSize: "var(--inlineText)",
-                  }}
-                >
-                  Prev
-                </button>
-              </ButtonWrapper>
-              <ButtonWrapper onClick={nextProject}>
-                <button
-                  style={{
-                    ...permanentMarker.style,
-                    paddingRight: "0.2rem",
-                    fontSize: "var(--inlineText)",
-                  }}
-                >
-                  Next
-                </button>
-                <RightArrow />
-              </ButtonWrapper>
-            </NavButtons>
-          </WorkEntryWrapper>
+          <svg width={underlineWidth} height="20">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth={`${strokeWidth}px`}
+              fill="transparent"
+            />
+          </svg>
         )}
-      </InnerContainer>
+      </TitleWrapper>
+
+      {showEntries && (
+        <WorkEntryWrapper ref={entriesRef}>
+          <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
+          <TopicWrapper>
+            <Topic style={permanentMarker.style}>
+              {projects[currentProject].title}
+            </Topic>
+            <DetailWrapper>
+              <Text style={oswald300.style}>
+                {projects[currentProject].description}
+              </Text>
+              {projects[currentProject].iframe && (
+                <IFrameWrapper>
+                  <IFrame src={projects[currentProject].iframe} />
+                </IFrameWrapper>
+              )}
+              {/* Optional images */}
+              {projects[currentProject].images && (
+                <ImageGallery>
+                  {projects[currentProject].images.map((src, idx) => (
+                    <PreviewImage key={idx} src={src} />
+                  ))}
+                </ImageGallery>
+              )}
+              {projects[currentProject].svg && (
+                <SVGWrapper>
+                  {projects[currentProject].svg.map((svg) => svg)}
+                </SVGWrapper>
+              )}
+            </DetailWrapper>
+          </TopicWrapper>
+
+          <NavButtons>
+            <ButtonWrapper onClick={prevProject}>
+              <LeftArrow />
+              <button
+                style={{
+                  ...permanentMarker.style,
+                  paddingLeft: "0.2rem",
+                  fontSize: "var(--inlineText)",
+                }}
+              >
+                Prev
+              </button>
+            </ButtonWrapper>
+            <ButtonWrapper onClick={nextProject}>
+              <button
+                style={{
+                  ...permanentMarker.style,
+                  paddingRight: "0.2rem",
+                  fontSize: "var(--inlineText)",
+                }}
+              >
+                Next
+              </button>
+              <RightArrow />
+            </ButtonWrapper>
+          </NavButtons>
+        </WorkEntryWrapper>
+      )}
     </WorkContainer>
   );
 }
 
-const WorkContainer = styled.section<{
-  $backgroundColor: string;
-  $position: string;
-}>`
-  top: 50%;
-  left: ${(props) => props.$position};
+const WorkContainer = styled.section<{ $position: string }>`
   position: absolute;
-  max-width: 90%;
-  mix-blend-mode: screen;
+  top: 45%;
+  left: ${(props) => props.$position || "80%"};
 
-  padding: 15px;
-  background-color: ${(props) => props.$backgroundColor};
-  border: 0px solid black;
-  border-radius: 25px;
+  width: max-content;
+  max-width: 80vw;
+
+  pointer-events: auto;
+  will-change: transform;
+
+  /* @media (orientation: portrait) {
+    left: 35%;
+  } */
 `;
 
 const WorkEntryWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   gap: 0.5rem;
   cursor: pointer;
   padding: 0px;

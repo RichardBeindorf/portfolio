@@ -17,6 +17,7 @@ export default function Passion({
   isAnimating,
   resizeDelta,
   positionsObj,
+  spacerHeight,
 }: TitleProps) {
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -34,8 +35,8 @@ export default function Passion({
   const passionMid = useRef(null);
 
   const pullDuration = 1;
-  const underlineWidth = resizeDelta < 1 ? (650 * resizeDelta) / 2 : 650;
-  const strokeWidth = resizeDelta < 1 ? (2.5 * resizeDelta) / 2 : 2.5;
+  const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
+  const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -52,17 +53,13 @@ export default function Passion({
       },
       setState() {
         if (clicked) {
-          tainer.current.style.setProperty("position", "relative");
-          gsap.set(tainer.current, { left: "10%", top: "25%", width: "80%" });
-        }
-        if (!clicked) {
-          tainer.current.style.setProperty("position", "absolute");
-
-          gsap.set(tainer.current, {
-            left: positionsObj.passion,
-            top: "50%",
-            width: "auto",
-          });
+          tainer.current.style.position = "relative";
+          tainer.current.style.left = "10%";
+          tainer.current.style.top = "15%";
+        } else {
+          tainer.current.style.position = "absolute";
+          tainer.current.style.left = positionsObj.passion;
+          tainer.current.style.top = "45%";
         }
       },
       animate(self) {
@@ -103,9 +100,10 @@ export default function Passion({
         if (clicked) {
           tl.add(
             gsap.to(title.current, {
+              scale: 2.25,
+              transformOrigin: "left bottom",
               keyframes: {
                 color: ["#262626", "#F24150"],
-                fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
               duration: 1,
               delay: delayTime,
@@ -117,9 +115,9 @@ export default function Passion({
         if (isAnimating.current && !clicked && currentWindow.current[0] === 1) {
           tl.add(
             gsap.to(title.current, {
+              scale: 1,
               keyframes: {
                 color: ["#F24150", "#262626"],
-                fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
               duration: 1,
             }),
@@ -150,21 +148,21 @@ export default function Passion({
       //**//
       /* ONLY ONCE PER CYCLE (Bounce animation) */
       //**//
-      const onStartBounce = contextSafe(() => {
-        gsap.to(title.current, {
-          delay: 0.7,
-          ease: "sine.in",
-          keyframes: {
-            scaleX: ["100%", "80%", "100%"],
-            // left: ["50%", "48%", "50%"],
-            rotate: [0, -10, 0],
-            easeEach: "none",
-          },
-        });
-      });
-      if (currentWindow.current[0] === 1 && clicked) {
-        onStartBounce();
-      }
+      // const onStartBounce = contextSafe(() => {
+      //   gsap.to(title.current, {
+      //     delay: 0.7,
+      //     ease: "sine.in",
+      //     keyframes: {
+      //       scaleX: ["100%", "80%", "100%"],
+      //       // left: ["45%", "48%", "45%"],
+      //       rotate: [0, -10, 0],
+      //       easeEach: "none",
+      //     },
+      //   });
+      // });
+      // if (currentWindow.current[0] === 1 && clicked) {
+      //   onStartBounce();
+      // }
 
       if (clicked) {
         color.current = "#F2F1E9";
@@ -199,6 +197,9 @@ export default function Passion({
           duration: 0.2,
           ease: "power2.out",
           paused: true,
+          onComplete: () => {
+            spacerHeight(tainer.current.getBoundingClientRect().height);
+          },
           onReverseComplete: () => {
             entryStaggerAnimation.current = null;
           },
@@ -266,7 +267,7 @@ export default function Passion({
             // first is start position
             // rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["50%", "50%", "80%", "80%"],
+            top: ["45%", "45%", "80%", "80%"],
             left: [positionsObj.passion, positionsObj.story],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -282,7 +283,7 @@ export default function Passion({
         })
         .to(tainer.current, {
           duration: pullDuration,
-          top: "50%",
+          top: "45%",
           rotate: 30,
           ease: "power1.in",
           keyframes: {
@@ -313,113 +314,106 @@ export default function Passion({
   }, [pullDirection]);
 
   return (
-    <PassionContainer $backgroundColor={color.current} ref={tainer}>
+    <PassionContainer ref={tainer} $position={positionsObj.passion}>
       {/* This InnerContainer is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box when entries are closing*/}
-      <InnerContainer ref={innerRef}>
-        <TitleWrapper>
-          <Title
-            style={permanentMarker.style}
-            onClick={() => {
-              if (!isAnimating.current) {
-                const next = !clicked;
-                setClicked(next);
-                if (pullDirection === "default") {
-                  currentWindow.current = [1, 0, 0];
-                  pulldirectionProp("left");
-                }
-                if (pullDirection === "left") {
-                  pulldirectionProp("default");
-                }
-                isAnimating.current = true;
+      {/* <InnerContainer ref={innerRef}> */}
+      <TitleWrapper>
+        <Title
+          style={permanentMarker.style}
+          onClick={() => {
+            if (!isAnimating.current) {
+              const next = !clicked;
+              setClicked(next);
+              if (pullDirection === "default") {
+                currentWindow.current = [1, 0, 0];
+                pulldirectionProp("left");
               }
-            }}
-            ref={title}
-          >
-            Passion
-          </Title>
-          {clicked && !isAnimating.current ? (
-            <svg width={underlineWidth} height="20">
-              <path
-                ref={underline}
-                d="M 0 0 Q 20 20, 500 0"
-                stroke="#262626"
-                strokeWidth={`${strokeWidth}px`}
-                fill="transparent"
-              />
-            </svg>
-          ) : null}
-        </TitleWrapper>
+              if (pullDirection === "left") {
+                pulldirectionProp("default");
+              }
+              isAnimating.current = true;
+            }
+          }}
+          ref={title}
+        >
+          Passion
+        </Title>
+        {clicked && !isAnimating.current ? (
+          <svg width={underlineWidth} height="20">
+            <path
+              ref={underline}
+              d="M 0 0 Q 20 20, 500 0"
+              stroke="#262626"
+              strokeWidth={`${strokeWidth}px`}
+              fill="transparent"
+            />
+          </svg>
+        ) : null}
+      </TitleWrapper>
 
-        <PassionContent className="contentWrapper">
-          {showEntries && (
-            <PassionEntryWrapper ref={entriesRef}>
-              <Subtitle style={permanentMarker.style}>
-                What is it that makes me passionate?
-              </Subtitle>
-              <TopicWrapper style={{ textAlign: "left" }}>
-                <Topic style={permanentMarker.style}>Creation</Topic>
-                <Text style={oswald300.style}>
-                  the realization of{" "}
-                  <Highlights style={oswald500.style}>
-                    endless possibilities
-                  </Highlights>{" "}
-                  is what made me obsessed with{" "}
-                  <Highlights style={oswald500.style}>programming</Highlights> -
-                  what great we can achieve when setting our minds to it
-                </Text>
-              </TopicWrapper>
-              <TopicWrapper style={{ textAlign: "right" }}>
-                <Topic style={permanentMarker.style}>life long learning</Topic>
-                <Text style={oswald300.style}>
-                  being able to keep learning is an{" "}
-                  <Highlights style={oswald500.style}>
-                    escape hatch out of mental stiffness
-                  </Highlights>{" "}
-                  - trying hard to understand new concepts opens my mind
-                </Text>
-              </TopicWrapper>
-              <TopicWrapper style={{ textAlign: "left" }}>
-                <Topic style={permanentMarker.style}>Mastery</Topic>
-                <Text style={oswald300.style}>
-                  trying to keep my perfectionism in the bottle and funneling
-                  the energy instead into{" "}
-                  <Highlights style={oswald500.style}>
-                    training skills
-                  </Highlights>{" "}
-                  rather than micro optimizations is pushing me - in sports,
-                  relationships and work
-                </Text>
-              </TopicWrapper>
-              <TopicWrapper style={{ textAlign: "right" }}>
-                <Topic style={permanentMarker.style}>Discovery</Topic>
-                <Text style={oswald300.style}>
-                  getting out of my{" "}
-                  <Highlights style={oswald500.style}>comfort areas</Highlights>{" "}
-                  - if it didn&#39;t scare me it probably didn&#39;t improve my
-                  life
-                </Text>
-              </TopicWrapper>
-            </PassionEntryWrapper>
-          )}
-        </PassionContent>
-      </InnerContainer>
+      <PassionContent className="contentWrapper">
+        {showEntries && (
+          <PassionEntryWrapper ref={entriesRef}>
+            <Subtitle style={permanentMarker.style}>
+              What is it that makes me passionate?
+            </Subtitle>
+            <TopicWrapper style={{ textAlign: "left" }}>
+              <Topic style={permanentMarker.style}>Creation</Topic>
+              <Text style={oswald300.style}>
+                the realization of{" "}
+                <Highlights style={oswald500.style}>
+                  endless possibilities
+                </Highlights>{" "}
+                is what made me obsessed with{" "}
+                <Highlights style={oswald500.style}>programming</Highlights> -
+                what great we can achieve when setting our minds to it
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "right" }}>
+              <Topic style={permanentMarker.style}>life long learning</Topic>
+              <Text style={oswald300.style}>
+                being able to keep learning is an{" "}
+                <Highlights style={oswald500.style}>
+                  escape hatch out of mental stiffness
+                </Highlights>{" "}
+                - trying hard to understand new concepts opens my mind
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "left" }}>
+              <Topic style={permanentMarker.style}>Mastery</Topic>
+              <Text style={oswald300.style}>
+                trying to keep my perfectionism in the bottle and funneling the
+                energy instead into{" "}
+                <Highlights style={oswald500.style}>training skills</Highlights>{" "}
+                rather than micro optimizations is pushing me - in sports,
+                relationships and work
+              </Text>
+            </TopicWrapper>
+            <TopicWrapper style={{ textAlign: "right" }}>
+              <Topic style={permanentMarker.style}>Discovery</Topic>
+              <Text style={oswald300.style}>
+                getting out of my{" "}
+                <Highlights style={oswald500.style}>comfort areas</Highlights> -
+                if it didn&#39;t scare me it probably didn&#39;t improve my life
+              </Text>
+            </TopicWrapper>
+          </PassionEntryWrapper>
+        )}
+      </PassionContent>
+      {/* </InnerContainer> */}
     </PassionContainer>
   );
 }
 
-const PassionContainer = styled.section<{ $backgroundColor: string }>`
+const PassionContainer = styled.section<{ $position: string }>`
   position: absolute;
-  top: 50%;
-  left: 6%;
-  text-align: left;
-  max-width: 1100px;
-  mix-blend-mode: screen;
+  top: 45%;
+  left: ${(props) => props.$position || "15%"};
+  width: max-content;
+  max-width: 80vw;
 
-  padding: 15px;
-  border-radius: 15px;
-  background-color: ${(props) => props.$backgroundColor};
-  border: 0px solid black;
-  border-radius: 25px;
+  pointer-events: auto;
+  will-change: transform;
 `;
 
 export const InnerContainer = styled.div`
@@ -446,7 +440,7 @@ const PassionEntryWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: start;
-  /* align-items: start; */
+  align-items: start;
   gap: 0.5rem;
   cursor: pointer;
   padding: 0px;

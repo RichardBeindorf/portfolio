@@ -3,9 +3,10 @@
 import styled from "styled-components";
 import Story from "./Subpages/story";
 import Passion from "./Subpages/passion";
-import { RefObject, useRef } from "react";
+import { RefObject, useRef, useState } from "react";
 import Work from "./Subpages/work";
 import { PullVariants } from "./page";
+import Spacer from "./Subpages/spacer";
 
 export type TitleProps = {
   pulldirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
@@ -15,6 +16,7 @@ export type TitleProps = {
   delayTime: number;
   resizeDelta: number | null;
   positionsObj: PositionSwapper;
+  spacerHeight: (arr: any) => void;
 };
 
 type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";
@@ -31,19 +33,27 @@ const Container = styled.div`
   width: 100%;
 `;
 
-export default function LowerHalf({
-  resizeDelta,
-  pulldirectionProp,
-  pullDirection,
-}: {
+const FlipStage = styled.div`
+  position: fixed;
+  top: 100vh;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+`;
+
+export default function LowerHalf(props: {
   resizeDelta: number | null;
   pulldirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
   pullDirection: PullVariants;
 }) {
+  const [spacerHeight, setSpacerHeight] = useState<number>(null);
   const currentWindow = useRef<WindowStates>("initial");
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
   const isAnimating = useRef(true);
   const positions = useRef<PositionSwapper>(null);
+  const midAnimationValue = window.innerHeight * 0.35;
+
   const pullDurationOrDelay = 1.2;
 
   if (
@@ -58,33 +68,33 @@ export default function LowerHalf({
 
   return (
     <Container>
-      <Story
-        pulldirectionProp={pulldirectionProp}
-        pullDirection={pullDirection}
-        currentWindow={currentWindow}
-        delayTime={pullDurationOrDelay}
-        isAnimating={isAnimating}
-        resizeDelta={resizeDelta}
-        positionsObj={positions.current}
-      />
-      <Passion
-        pulldirectionProp={pulldirectionProp}
-        pullDirection={pullDirection}
-        currentWindow={currentWindow}
-        delayTime={pullDurationOrDelay}
-        isAnimating={isAnimating}
-        resizeDelta={resizeDelta}
-        positionsObj={positions.current}
-      />
-      <Work
-        pulldirectionProp={pulldirectionProp}
-        pullDirection={pullDirection}
-        currentWindow={currentWindow}
-        delayTime={pullDurationOrDelay}
-        isAnimating={isAnimating}
-        resizeDelta={resizeDelta}
-        positionsObj={positions.current}
-      />
+      <Spacer spacerHeight={spacerHeight} />
+      <FlipStage>
+        <Story
+          currentWindow={currentWindow}
+          delayTime={pullDurationOrDelay}
+          isAnimating={isAnimating}
+          positionsObj={positions.current}
+          spacerHeight={setSpacerHeight}
+          {...props}
+        />
+        <Passion
+          currentWindow={currentWindow}
+          delayTime={pullDurationOrDelay}
+          isAnimating={isAnimating}
+          positionsObj={positions.current}
+          spacerHeight={setSpacerHeight}
+          {...props}
+        />
+        <Work
+          currentWindow={currentWindow}
+          delayTime={pullDurationOrDelay}
+          isAnimating={isAnimating}
+          positionsObj={positions.current}
+          spacerHeight={setSpacerHeight}
+          {...props}
+        />
+      </FlipStage>
     </Container>
   );
 }

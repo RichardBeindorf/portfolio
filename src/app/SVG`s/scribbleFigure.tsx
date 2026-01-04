@@ -18,15 +18,14 @@ export default function ScribbleFigure({
   resizeDelta: number | null;
 }) {
   const scribbleRef = useRef(null);
-  const resizeWidth = resizeDelta < 1 && resizeDelta > 0 ? 1 - resizeDelta : 1;
 
-  let width = 147;
-  let height = 201;
+  const adjustedResize =
+    resizeDelta < 1 ? Math.min(resizeDelta * 1.85, 1) : resizeDelta;
 
-  if (resizeWidth < 1) {
-    width = 147 * (1 - resizeWidth);
-    height = 201 * (1 - resizeWidth);
-  }
+  const width = 147 * adjustedResize;
+  const height = 201 * adjustedResize;
+
+  console.log(resizeDelta, adjustedResize);
 
   useEffect(() => {
     setTimeout(() => {

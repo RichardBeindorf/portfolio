@@ -60,15 +60,13 @@ export default function Home() {
               <ThreeLine
                 lineApiRef={threeLineRef}
                 drawDelay={drawDelay}
-                resizeDelta={resizeDelta?.[0]}
+                resizeDelta={resizeDelta}
               />
               <InteractionHandler
                 lineApiRef={threeLineRef}
                 drawDelay={drawDelay}
                 pullDirection={pullDirection}
-                bottomScroll={(arr) => {
-                  setBottomScroll(arr);
-                }}
+                bottomScroll={setBottomScroll}
               />
             </Canvas>
           </CanvasWrapper>

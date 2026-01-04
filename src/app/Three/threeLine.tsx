@@ -25,7 +25,10 @@ function ThreeLine({
   const triggerThreshold = useRef<number[]>([]);
   const waveDist = useRef([]);
   const maxValue = useRef<number>(500);
-  const resizedWidth = resizeDelta < 1 && resizeDelta > 0 ? 1 - resizeDelta : 1;
+
+  const adjustedResize =
+    resizeDelta < 1 ? Math.min(resizeDelta * 1.85, 1) : resizeDelta;
+  const lineWidth = 2.5 * adjustedResize;
 
   // const startingPos = new THREE.Vector3(0, 250, 0);
   // const MAX_POINTS = 5000;
@@ -64,7 +67,7 @@ function ThreeLine({
   const line2Material = useMemo(() => {
     const mat = new LineMaterial({
       color: "#F24150",
-      linewidth: 2.5 * resizedWidth,
+      linewidth: lineWidth,
       resolution: new THREE.Vector2(size.width, size.height),
       dashed: false,
       alphaToCoverage: true,
