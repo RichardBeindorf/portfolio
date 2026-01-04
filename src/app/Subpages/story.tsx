@@ -32,7 +32,6 @@ export default function Story({
   const storyRight = useRef(null);
   const storyLeft = useRef(null);
   const innerRef = useRef(null);
-  const midAnimationValue = window.innerHeight * 0.35;
 
   const pullDuration = 1;
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
@@ -253,6 +252,7 @@ export default function Story({
   );
 
   useGSAP(() => {
+    const midAnimationValue = -window.innerHeight * 0.35;
     if (!storyLeft.current) {
       storyLeft.current = gsap
         .timeline({
@@ -267,7 +267,7 @@ export default function Story({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.1],
-            top: ["80%", "80%", "45%", "45%"],
+            y: [0, 0, midAnimationValue, midAnimationValue],
             left: [positionsObj.story, positionsObj.passion],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
@@ -289,7 +289,7 @@ export default function Story({
             // first is start position
             rotate: [0, 24, 13, 24, 0, 0, -15, 0],
             scale: [1, 1, 1, 1, 0.5, 0.1],
-            y: [0, 0, -midAnimationValue, -midAnimationValue],
+            y: [0, 0, midAnimationValue, midAnimationValue],
             left: [positionsObj.story, positionsObj.work],
             opacity: [1, 1, 1, 1, 1, 1, 1, 0],
             easeEach: "none",
