@@ -278,48 +278,56 @@ export default function Work({
     }
   );
 
+  // Pull Animations: Defining Timelines
   useGSAP(() => {
-    if (!workLeft.current) {
-      workLeft.current = gsap
-        .timeline({
-          paused: true,
-          id: "workLeft",
-        })
-        .to(tainer.current, {
-          duration: pullDuration,
-          top: "45%",
-          ease: "power1.in",
-          keyframes: {
-            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            scale: [1, 1, 1, 1, 0.5, 0.2],
-            left: [positionsObj.work, positionsObj.passion],
-            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
-            easeEach: "none",
-          },
-        });
-    }
+    let yAnimationValue = window.innerHeight * 0.35;
+    let xMidValue = window.innerWidth * 0.3;
+    let xLeftValue = -window.innerWidth * 0.7;
 
-    if (!workMid.current) {
-      workMid.current = gsap
-        .timeline({
-          paused: true,
-          id: "workMid",
-        })
-        .to(tainer.current, {
-          duration: pullDuration,
-          ease: "power4.in",
-          keyframes: {
-            // 8 different phases maximum currently
-            // first is start position
-            rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["45%", "45%", "80%", "80%"],
-            left: [positionsObj.work, positionsObj.story],
-            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
-            easeEach: "none",
-          },
-        });
-    }
+    const sharedKeyframes = {
+      // 8 different phases maximum currently
+      // first is start position
+      rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+      scale: [1, 1, 1, 1, 0.5, 0.1],
+      opacity: [1, 1, 1, 1, 1, 1, 0, 0],
+      easeEach: "none",
+    };
+
+    workLeft.current = gsap
+      .timeline({
+        paused: true,
+        id: "workLeft",
+      })
+      .to(tainer.current, {
+        duration: pullDuration,
+        ease: "power1.in",
+        keyframes: {
+          ...sharedKeyframes,
+          x: [0, 0, xLeftValue, xLeftValue],
+        },
+      });
+
+    workMid.current = gsap
+      .timeline({
+        paused: true,
+        id: "workMid",
+      })
+      .to(tainer.current, {
+        duration: pullDuration,
+        ease: "power4.in",
+        keyframes: {
+          // 8 different phases maximum currently
+          // first is start position
+          ...sharedKeyframes,
+          y: [0, 0, yAnimationValue, yAnimationValue],
+          x: [0, 0, -xMidValue, -xMidValue],
+        },
+      });
+  }, []);
+
+  // Pull Animations: Controll Logic
+  useGSAP(() => {
+    if (!workMid.current || !workLeft.current) return;
 
     switch (pullDirection) {
       case "mid":

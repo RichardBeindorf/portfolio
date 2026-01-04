@@ -25,7 +25,7 @@ export default function ScribbleFigure({
   const width = 147 * adjustedResize;
   const height = 201 * adjustedResize;
 
-  console.log(resizeDelta, adjustedResize);
+  resizeDelta, adjustedResize;
 
   useEffect(() => {
     setTimeout(() => {

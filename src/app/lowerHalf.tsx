@@ -52,7 +52,6 @@ export default function LowerHalf(props: {
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
   const isAnimating = useRef(true);
   const positions = useRef<PositionSwapper>(null);
-  const midAnimationValue = window.innerHeight * 0.35;
 
   const pullDurationOrDelay = 1.2;
 
@@ -61,6 +60,7 @@ export default function LowerHalf(props: {
       navigator.userAgent
     ) // testing for mobile device
   ) {
+    // Positioning title in respect to the screen size
     positions.current = { passion: "6%", story: "35%", work: "70%" };
   } else {
     positions.current = { passion: "10%", story: "45%", work: "80%" };
