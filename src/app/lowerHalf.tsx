@@ -60,6 +60,7 @@ export default function LowerHalf(props: {
       navigator.userAgent
     ) // testing for mobile device
   ) {
+    // Positioning title in respect to the screen size
     positions.current = { passion: "6%", story: "35%", work: "70%" };
   } else {
     positions.current = { passion: "10%", story: "45%", work: "80%" };
