@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { TitleProps } from "../lowerHalf";
+import { mx_bilerp_0 } from "three/src/nodes/materialx/lib/mx_noise.js";
 
 export default function Passion({
   pullDirection,
@@ -251,50 +252,56 @@ export default function Passion({
     }
   );
 
+  // Pull Animations: Defining Timelines
   useGSAP(() => {
-    if (!passionMid.current) {
-      passionMid.current = gsap
-        .timeline({
-          paused: true,
-          id: "passionMid",
-        })
-        .to(tainer.current, {
-          duration: pullDuration,
-          rotate: 30,
-          ease: "power1.in",
-          keyframes: {
-            // 8 different phases maximum currently
-            // first is start position
-            // rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            scale: [1, 1, 1, 1, 0.5, 0.2],
-            top: ["45%", "45%", "80%", "80%"],
-            left: [positionsObj.passion, positionsObj.story],
-            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
-            easeEach: "none",
-          },
-        });
-    }
+    let yAnimationValue = window.innerHeight * 0.35;
+    let xRightValue = window.innerWidth * 0.65;
+    let xMidValue = window.innerWidth * 0.3;
 
-    if (!passionRight.current) {
-      passionRight.current = gsap
-        .timeline({
-          paused: true,
-          id: "passionRight",
-        })
-        .to(tainer.current, {
-          duration: pullDuration,
-          top: "45%",
-          rotate: 30,
-          ease: "power1.in",
-          keyframes: {
-            scale: [1, 1, 1, 1, 0.5, 0.2],
-            // rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-            left: [positionsObj.passion, positionsObj.work],
-            opacity: [1, 1, 1, 1, 1, 1, 1, 0],
-            easeEach: "none",
-          },
-        });
-    }
+    const sharedKeyframes = {
+      // 8 different phases maximum currently
+      // first is start position
+      rotate: [0, 24, 13, 24, 0, 0, -15, 0],
+      scale: [1, 1, 1, 1, 0.5, 0.1],
+      opacity: [1, 1, 1, 1, 1, 1, 0, 0],
+      easeEach: "none",
+    };
+
+    passionRight.current = gsap
+      .timeline({
+        paused: true,
+        id: "passionRight",
+      })
+      .to(tainer.current, {
+        duration: pullDuration,
+        ease: "power1.in",
+        keyframes: {
+          ...sharedKeyframes,
+          x: [0, 0, xRightValue, xRightValue],
+        },
+      });
+
+    passionMid.current = gsap
+      .timeline({
+        paused: true,
+        id: "passionMid",
+      })
+      .to(tainer.current, {
+        duration: pullDuration,
+        ease: "power4.in",
+        keyframes: {
+          // 8 different phases maximum currently
+          // first is start position
+          ...sharedKeyframes,
+          y: [0, 0, yAnimationValue, yAnimationValue],
+          x: [0, 0, xMidValue, xMidValue],
+        },
+      });
+  }, []);
+
+  // Pull Animations: Controll Logic
+  useGSAP(() => {
+    if (!passionRight.current || !passionMid.current) return;
 
     switch (pullDirection) {
       case "mid":
