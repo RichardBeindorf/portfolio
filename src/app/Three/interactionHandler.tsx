@@ -46,21 +46,6 @@ export default function InteractionHandler({
     currentScreen.current = pullDirection;
   }, [pullDirection]);
 
-  // Remnant of turning off scrolling - still in work
-  // useEffect(() => {
-  //   gsap.registerPlugin(ScrollSmoother);
-  //   smoother.current = ScrollSmoother.create({
-  //     wrapper: "#smooth-wrapper",
-  //     content: "#smooth-content",
-  //     smooth: 1,
-  //     effects: false,
-  //     smoothTouch: 0.1,
-  //     normalizeScroll: true,
-  //     ignoreMobileResize: true,
-  //     ease: "sine.out",
-  //   });
-  // }, []);
-
   useGSAP(() => {
     if (!lineApiRef.current) return;
     gsap.registerPlugin(ScrollSmoother, ScrollToPlugin, ScrollTrigger);
@@ -123,7 +108,6 @@ export default function InteractionHandler({
             //   bottomViewportY: smoother.current.scrollTop() + viewportHeight, // 1170.5
             //   pushBackpoint: pushBackPointTop, // 1167
             //   bouncyMovement: bouncyMovement.current, // 132.5 based on cursor position but reduced a bit, represents the ammount we want to move
-            //   breakPointCheck: breakPointCheck, // 1170.3
             // });
 
             // if the user does not push hard enough the page "bounces" or scrolls back up and stays stuck at that half
@@ -212,36 +196,36 @@ export default function InteractionHandler({
               /** */
               /* BOTTOM BOUNCE PART */
               /** */
-              // if (self.velocityY < 2000 && topViewportY > pushBackPointBottom) {
-              //   if (currentPercent < 30) {
-              //     // This is the bounce on the top side, pushing us back in
-              //     const bouncyCalc = self.y / 2 + viewportHeight * 0.87;
-              //     bouncyMovement.current = Math.max(
-              //       pushBackPointBottom + 1,
-              //       bouncyCalc
-              //     );
+              if (self.velocityY < 2000 && topViewportY > pushBackPointBottom) {
+                if (currentPercent < 30) {
+                  // This is the bounce on the top side, pushing us back in
+                  const bouncyCalc = self.y / 2 + viewportHeight * 0.87;
+                  bouncyMovement.current = Math.max(
+                    pushBackPointBottom + 1,
+                    bouncyCalc
+                  );
 
-              //     smoother.current.scrollTo(bouncyMovement.current, true);
-              //   }
+                  smoother.current.scrollTo(bouncyMovement.current, true);
+                }
 
-              //   // this keeps the view at the bottom of the screen so everything is in view most of the time
-              //   if (currentPercent >= 30) {
-              //     smoother.current.scrollTo(fullHeight, true);
-              //   }
+                // this keeps the view at the bottom of the screen so everything is in view most of the time
+                if (currentPercent >= 30) {
+                  smoother.current.scrollTo(fullHeight, true);
+                }
 
-              //   // always locking the screen for either event
-              //   // THIS IS BROKEN, WE CANT SCROLL BACK UP NOW BEC ITS ALWAYS LOCKED
-              //   // NEED TO FIX PAGE HEIGHT FIRST
-              //   gsap.to(window, {
-              //     duration: 0.5,
-              //     onStart: () => {
-              //       pageScrollGuard.current = true;
-              //     },
-              //     onComplete: () => {
-              //       pageScrollGuard.current = false;
-              //     },
-              //   });
-              // }
+                // always locking the screen for either event
+                // THIS IS BROKEN, WE CANT SCROLL BACK UP NOW BEC ITS ALWAYS LOCKED
+                // NEED TO FIX PAGE HEIGHT FIRST
+                gsap.to(window, {
+                  duration: 0.5,
+                  onStart: () => {
+                    pageScrollGuard.current = true;
+                  },
+                  onComplete: () => {
+                    pageScrollGuard.current = false;
+                  },
+                });
+              }
 
               /** */
               /* BOTTOM SCROLL PART */

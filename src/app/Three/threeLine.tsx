@@ -6,9 +6,15 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import * as THREE from "three";
+import gsap from "gsap";
+import { Observer } from "gsap/all";
 
 export interface ThreeLineMethods {
   addPoint: (point: THREE.Vector3) => void;
+}
+
+interface moveYEvent extends Event {
+  movementY: number;
 }
 
 function ThreeLine({
@@ -25,6 +31,18 @@ function ThreeLine({
   const triggerThreshold = useRef<number[]>([]);
   const waveDist = useRef([]);
   const maxValue = useRef<number>(500);
+  gsap.registerPlugin(Observer);
+
+  Observer.create({
+    target: window, // can be any element (selector text is fine)
+    type: "pointer,touch", // comma-delimited list of what to listen for
+    onMove: (self) => {
+      if (self.event instanceof MouseEvent && self.event?.movementY < 20) {
+        console.log(self.event);
+      }
+      Event;
+    },
+  });
 
   const adjustedResize =
     resizeDelta < 1 ? Math.min(resizeDelta * 1.85, 1) : resizeDelta;
@@ -41,8 +59,9 @@ function ThreeLine({
     //     points.current.push(thought);
     //   }
     // });
+
+    // Logic for setting up line starting position
     if (points.current) {
-      // Logic for setting up line starting position
       const offset = 0.95;
       const topHalfYMidPoint = (size.height / 4) * offset;
       const topHalfXMidPoint = size.width / 2;
@@ -106,8 +125,6 @@ function ThreeLine({
         points.current.shift();
       }
     }
-
-    //** **//
 
     const worldPoints = points.current;
 
@@ -181,6 +198,7 @@ function ThreeLine({
     //** **//
     // Threshold mechanic //
     //** **//
+
     // get the difference in height / velocity
     let pastY = currentY; // Default to currentY to get a diff of 0
     if (worldPoints.length >= 5) {
