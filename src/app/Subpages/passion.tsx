@@ -1,25 +1,25 @@
 "use client";
 
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import styled from "styled-components";
 import { TitleWrapper } from "./story";
-import { oswald300, oswald500, permanentMarker } from "@/styles/font";
-import { useLayoutEffect, useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
+import { TitleConfig } from "../lowerHalf";
 import { DrawSVGPlugin, Flip } from "gsap/all";
-import { TitleProps } from "../lowerHalf";
-import { mx_bilerp_0 } from "three/src/nodes/materialx/lib/mx_noise.js";
+import { useLayoutEffect, useRef, useState } from "react";
+import { oswald300, oswald500, permanentMarker } from "@/styles/font";
 
-export default function Passion({
-  pullDirection,
-  pulldirectionProp,
-  currentWindow,
-  delayTime,
-  isAnimating,
-  resizeDelta,
-  positionsObj,
-  spacerHeight,
-}: TitleProps) {
+export default function Passion({ config }: TitleConfig) {
+  const {
+    pullDirection,
+    pullDirectionProp,
+    currentWindow,
+    delayTime,
+    isAnimating,
+    resizeDelta,
+    positionsObj,
+    spacerHeight,
+  } = config;
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
   gsap.registerPlugin(DrawSVGPlugin, Flip);
@@ -38,6 +38,22 @@ export default function Passion({
   const pullDuration = 1;
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
   const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
+
+  function handleClick() {
+    if (!isAnimating.current) {
+      const next = !clicked;
+      setClicked(next);
+      if (pullDirection === "default") {
+        currentWindow.current = [1, 0, 0];
+        pullDirectionProp("left");
+      }
+      if (pullDirection === "left") {
+        spacerHeight(0);
+        pullDirectionProp("default");
+      }
+      isAnimating.current = true;
+    }
+  }
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -325,24 +341,7 @@ export default function Passion({
       {/* This InnerContainer is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box when entries are closing*/}
       {/* <InnerContainer ref={innerRef}> */}
       <TitleWrapper>
-        <Title
-          style={permanentMarker.style}
-          onClick={() => {
-            if (!isAnimating.current) {
-              const next = !clicked;
-              setClicked(next);
-              if (pullDirection === "default") {
-                currentWindow.current = [1, 0, 0];
-                pulldirectionProp("left");
-              }
-              if (pullDirection === "left") {
-                pulldirectionProp("default");
-              }
-              isAnimating.current = true;
-            }
-          }}
-          ref={title}
-        >
+        <Title style={permanentMarker.style} onClick={handleClick} ref={title}>
           Passion
         </Title>
         {clicked && !isAnimating.current ? (

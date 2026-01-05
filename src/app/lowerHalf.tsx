@@ -1,23 +1,27 @@
 "use client";
 
-import styled from "styled-components";
-import Story from "./Subpages/story";
-import Passion from "./Subpages/passion";
-import { RefObject, useRef, useState } from "react";
 import Work from "./Subpages/work";
+import Story from "./Subpages/story";
 import { PullVariants } from "./page";
 import Spacer from "./Subpages/spacer";
+import styled from "styled-components";
+import Passion from "./Subpages/passion";
+import { RefObject, useMemo, useRef, useState } from "react";
 
-export type TitleProps = {
-  pulldirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
+interface TitleProps {
+  pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
   currentWindow: RefObject<WindowStates>;
   isAnimating: RefObject<boolean>;
   pullDirection: string;
   delayTime: number;
   resizeDelta: number | null;
   positionsObj: PositionSwapper;
-  spacerHeight: (arr: any) => void;
-};
+  spacerHeight: (spacerHeight: number) => void;
+}
+
+export interface TitleConfig {
+  config: TitleProps;
+}
 
 type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";
 
@@ -26,6 +30,61 @@ type PositionSwapper = {
   story: string;
   work: string;
 };
+
+type LowerHalfProps = {
+  resizeDelta: number | null;
+  pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
+  pullDirection: PullVariants;
+};
+
+export default function LowerHalf({
+  resizeDelta,
+  pullDirectionProp,
+  pullDirection,
+}: LowerHalfProps) {
+  const [spacerHeight, setSpacerHeight] = useState<number>(null);
+  const currentWindow = useRef<WindowStates>("initial");
+  // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
+  const isAnimating = useRef(true);
+  const positionsObj = useRef<PositionSwapper>(null);
+  const delayTime = 1.2;
+
+  if (
+    /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    ) // testing for mobile device
+  ) {
+    // Positioning title in respect to the screen size
+    positionsObj.current = { passion: "6%", story: "35%", work: "70%" };
+  } else {
+    positionsObj.current = { passion: "10%", story: "45%", work: "80%" };
+  }
+
+  const titleConfig: TitleProps = useMemo(
+    () => ({
+      delayTime,
+      resizeDelta,
+      isAnimating,
+      pullDirection,
+      currentWindow,
+      pullDirectionProp,
+      spacerHeight: setSpacerHeight,
+      positionsObj: positionsObj.current,
+    }),
+    [pullDirection, resizeDelta]
+  );
+
+  return (
+    <Container>
+      <Spacer spacerHeight={spacerHeight} />
+      <FlipStage>
+        <Story config={titleConfig} />
+        <Passion config={titleConfig} />
+        <Work config={titleConfig} />
+      </FlipStage>
+    </Container>
+  );
+}
 
 const Container = styled.div`
   position: relative;
@@ -41,60 +100,3 @@ const FlipStage = styled.div`
   height: 100vh;
   pointer-events: none;
 `;
-
-export default function LowerHalf(props: {
-  resizeDelta: number | null;
-  pulldirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
-  pullDirection: PullVariants;
-}) {
-  const [spacerHeight, setSpacerHeight] = useState<number>(null);
-  const currentWindow = useRef<WindowStates>("initial");
-  // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
-  const isAnimating = useRef(true);
-  const positions = useRef<PositionSwapper>(null);
-
-  const pullDurationOrDelay = 1.2;
-
-  if (
-    /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    ) // testing for mobile device
-  ) {
-    // Positioning title in respect to the screen size
-    positions.current = { passion: "6%", story: "35%", work: "70%" };
-  } else {
-    positions.current = { passion: "10%", story: "45%", work: "80%" };
-  }
-
-  return (
-    <Container>
-      <Spacer spacerHeight={spacerHeight} />
-      <FlipStage>
-        <Story
-          currentWindow={currentWindow}
-          delayTime={pullDurationOrDelay}
-          isAnimating={isAnimating}
-          positionsObj={positions.current}
-          spacerHeight={setSpacerHeight}
-          {...props}
-        />
-        <Passion
-          currentWindow={currentWindow}
-          delayTime={pullDurationOrDelay}
-          isAnimating={isAnimating}
-          positionsObj={positions.current}
-          spacerHeight={setSpacerHeight}
-          {...props}
-        />
-        <Work
-          currentWindow={currentWindow}
-          delayTime={pullDurationOrDelay}
-          isAnimating={isAnimating}
-          positionsObj={positions.current}
-          spacerHeight={setSpacerHeight}
-          {...props}
-        />
-      </FlipStage>
-    </Container>
-  );
-}
