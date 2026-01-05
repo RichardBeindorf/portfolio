@@ -25,8 +25,6 @@ export default function ScribbleFigure({
   const width = 147 * adjustedResize;
   const height = 201 * adjustedResize;
 
-  resizeDelta, adjustedResize;
-
   useEffect(() => {
     setTimeout(() => {
       scribbleRef.current.style.transition = "opacity 3s ease-in";
