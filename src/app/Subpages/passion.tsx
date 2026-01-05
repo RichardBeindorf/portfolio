@@ -336,6 +336,7 @@ export default function Passion({
                 pulldirectionProp("left");
               }
               if (pullDirection === "left") {
+                spacerHeight(0);
                 pulldirectionProp("default");
               }
               isAnimating.current = true;

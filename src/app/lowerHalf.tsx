@@ -16,7 +16,7 @@ export type TitleProps = {
   delayTime: number;
   resizeDelta: number | null;
   positionsObj: PositionSwapper;
-  spacerHeight: (arr: any) => void;
+  spacerHeight: (spacerHeight: number) => void;
 };
 
 type WindowStates = [0, 0, 0] | [1, 0, 0] | [0, 0, 1] | [0, 1, 0] | "initial";

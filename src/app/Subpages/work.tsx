@@ -106,6 +106,7 @@ export default function Work({
         pulldirectionProp("right");
       }
       if (pullDirection === "right") {
+        spacerHeight(0);
         pulldirectionProp("default");
       }
 

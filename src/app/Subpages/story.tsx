@@ -327,8 +327,8 @@ export default function Story({
                 pulldirectionProp("mid");
               }
               if (pullDirection === "mid") {
-                pulldirectionProp("default");
                 spacerHeight(0);
+                pulldirectionProp("default");
               }
               isAnimating.current = true;
             }
