@@ -55,7 +55,15 @@ export default function Work({
       title: "App-Hub",
       description:
         "I had the honor of creating the first customer-related entry point for Buildlinx. The App-Hub connects all customers with the Buildlinx universe and accumulates all necessary applications for users and devs based on roles and rights.",
-      images: ["/AppHubOne.png", "/AppHubTwo.png"],
+      imageSrc: ["/AppHubOne806.jpg", "/AppHubTwo822.jpg"],
+      imageSrcSet: [
+        "/AppHubOne355.jpg 355w, /AppHubOne806.jpg 806w, /AppHubOne1612.jpg 1612w, /AppHubOne3224.jpg 3224w",
+        "/AppHubTwo362.jpg 362w, /AppHubTwo822.jpg 822w, /AppHubTwo1644.jpg 1644w, /AppHubTwo3288.jpg 3288w",
+      ],
+      imageSizes: [
+        "(max-width: 412px) 355px, (max-width: 1000px) 806px, (max-width: 1921px) 1612px",
+        "(max-width: 412px) 362px, (max-width: 1000px) 822px, (max-width: 1921px) 1644px",
+      ],
     },
     {
       title: "Building-Management System",
@@ -70,6 +78,40 @@ export default function Work({
       iframe: "https://activities-app-kappa.vercel.app/",
     },
   ];
+
+  function handleClick() {
+    preload("/AppHubOne806.jpg", {
+      as: "image",
+      imageSrcSet:
+        "/AppHubOne355.jpg 355w, /AppHubOne806.jpg 806w, /AppHubOne1612.jpg 1612w, /AppHubOne3224.jpg 3224w",
+      imageSizes:
+        "(max-width: 412px) 355px, (max-width: 1000px) 806px, (max-width: 1921px) 1612px",
+    });
+
+    preload("/AppHubTwo822.jpg", {
+      as: "image",
+      imageSrcSet:
+        "/AppHubTwo362.jpg 362w, /AppHubTwo822.jpg 822w, /AppHubTwo1644.jpg 1644w, /AppHubTwo3288.jpg 3288w",
+      imageSizes:
+        "(max-width: 412px) 362px, (max-width: 1000px) 822px, (max-width: 1921px) 1644px",
+    });
+
+    if (!isAnimating.current) {
+      const next = !clicked;
+
+      setClicked(next);
+
+      if (pullDirection === "default") {
+        currentWindow.current = [0, 0, 1];
+        pulldirectionProp("right");
+      }
+      if (pullDirection === "right") {
+        pulldirectionProp("default");
+      }
+
+      isAnimating.current = true;
+    }
+  }
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -350,27 +392,7 @@ export default function Work({
       ref={tainer}
     >
       <TitleWrapper>
-        <Title
-          style={permanentMarker.style}
-          ref={title}
-          onClick={() => {
-            if (!isAnimating.current) {
-              const next = !clicked;
-
-              setClicked(next);
-
-              if (pullDirection === "default") {
-                currentWindow.current = [0, 0, 1];
-                pulldirectionProp("right");
-              }
-              if (pullDirection === "right") {
-                pulldirectionProp("default");
-              }
-
-              isAnimating.current = true;
-            }
-          }}
-        >
+        <Title style={permanentMarker.style} ref={title} onClick={handleClick}>
           Work
         </Title>
         {showEntries && (
@@ -403,10 +425,15 @@ export default function Work({
                 </IFrameWrapper>
               )}
               {/* Optional images */}
-              {projects[currentProject].images && (
+              {projects[currentProject].imageSrc && (
                 <ImageGallery>
-                  {projects[currentProject].images.map((src, idx) => (
-                    <PreviewImage key={idx} src={src} />
+                  {projects[currentProject].imageSrc.map((src, idx) => (
+                    <PreviewImage
+                      key={idx}
+                      src={src}
+                      srcSet={projects[currentProject].imageSrcSet[idx]}
+                      sizes={projects[currentProject].imageSizes[idx]}
+                    />
                   ))}
                 </ImageGallery>
               )}
