@@ -1,14 +1,14 @@
 "use client";
 
-import styled from "styled-components";
-import Story from "./Subpages/story";
-import Passion from "./Subpages/passion";
-import { RefObject, useMemo, useRef, useState } from "react";
 import Work from "./Subpages/work";
+import Story from "./Subpages/story";
 import { PullVariants } from "./page";
 import Spacer from "./Subpages/spacer";
+import styled from "styled-components";
+import Passion from "./Subpages/passion";
+import { RefObject, useMemo, useRef, useState } from "react";
 
-export interface TitleProps {
+interface TitleProps {
   pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
   currentWindow: RefObject<WindowStates>;
   isAnimating: RefObject<boolean>;
@@ -31,30 +31,17 @@ type PositionSwapper = {
   work: string;
 };
 
-const Container = styled.div`
-  position: relative;
-  min-height: 100vh;
-  width: 100%;
-`;
-
-const FlipStage = styled.div`
-  position: fixed;
-  top: 100vh;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  pointer-events: none;
-`;
+type LowerHalfProps = {
+  resizeDelta: number | null;
+  pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
+  pullDirection: PullVariants;
+};
 
 export default function LowerHalf({
   resizeDelta,
   pullDirectionProp,
   pullDirection,
-}: {
-  resizeDelta: number | null;
-  pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
-  pullDirection: PullVariants;
-}) {
+}: LowerHalfProps) {
   const [spacerHeight, setSpacerHeight] = useState<number>(null);
   const currentWindow = useRef<WindowStates>("initial");
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
@@ -98,3 +85,18 @@ export default function LowerHalf({
     </Container>
   );
 }
+
+const Container = styled.div`
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+`;
+
+const FlipStage = styled.div`
+  position: fixed;
+  top: 100vh;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+`;
