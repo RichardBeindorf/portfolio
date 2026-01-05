@@ -49,7 +49,7 @@ export default function Home() {
               />
               <LowerHalf
                 resizeDelta={resizeDelta}
-                pulldirectionProp={setPullDirection}
+                pullDirectionProp={setPullDirection}
                 pullDirection={pullDirection}
               />
             </>

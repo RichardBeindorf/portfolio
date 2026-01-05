@@ -1,24 +1,25 @@
 "use client";
 
-import styled from "styled-components";
-import { permanentMarker, oswald300, oswald500 } from "../../styles/font";
-import { useLayoutEffect, useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { entryData } from "@/data/storyEntries";
+import { useGSAP } from "@gsap/react";
+import styled from "styled-components";
+import { TitleConfig } from "../lowerHalf";
 import { DrawSVGPlugin, Flip } from "gsap/all";
-import { TitleProps } from "../lowerHalf";
+import { entryData } from "@/data/storyEntries";
+import { useLayoutEffect, useRef, useState } from "react";
+import { permanentMarker, oswald300, oswald500 } from "../../styles/font";
 
-export default function Story({
-  pullDirection,
-  pulldirectionProp,
-  currentWindow,
-  delayTime,
-  isAnimating,
-  resizeDelta,
-  positionsObj,
-  spacerHeight,
-}: TitleProps) {
+export default function Story({ config }: TitleConfig) {
+  const {
+    pullDirection,
+    pullDirectionProp,
+    currentWindow,
+    delayTime,
+    isAnimating,
+    resizeDelta,
+    positionsObj,
+    spacerHeight,
+  } = config;
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
   gsap.registerPlugin(DrawSVGPlugin, Flip);
@@ -36,6 +37,22 @@ export default function Story({
   const pullDuration = 1;
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
   const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
+
+  function handleClick() {
+    if (!isAnimating.current) {
+      const next = !clicked;
+      setClicked(next);
+      if (pullDirection === "default") {
+        currentWindow.current = [0, 1, 0];
+        pullDirectionProp("mid");
+      }
+      if (pullDirection === "mid") {
+        spacerHeight(0);
+        pullDirectionProp("default");
+      }
+      isAnimating.current = true;
+    }
+  }
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -318,21 +335,7 @@ export default function Story({
       <TitleWrapper>
         <ChapterTitle
           style={permanentMarker.style}
-          onClick={() => {
-            if (!isAnimating.current) {
-              const next = !clicked;
-              setClicked(next);
-              if (pullDirection === "default") {
-                currentWindow.current = [0, 1, 0];
-                pulldirectionProp("mid");
-              }
-              if (pullDirection === "mid") {
-                spacerHeight(0);
-                pulldirectionProp("default");
-              }
-              isAnimating.current = true;
-            }
-          }}
+          onClick={handleClick}
           ref={title}
         >
           Story

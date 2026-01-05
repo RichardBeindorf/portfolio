@@ -1,29 +1,30 @@
 "use client";
 
 import gsap from "gsap";
+import { preload } from "react-dom";
 import { useGSAP } from "@gsap/react";
 import styled from "styled-components";
+import { TitleConfig } from "../lowerHalf";
+import LeftArrow from "../SVG`s/leftArrow";
+import BMSOne from "../SVG`s/bmsMockupOne";
+import BMSTwo from "../SVG`s/bmsMockupTwo";
+import RightArrow from "../SVG`s/rightArrow";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, Intro, TitleWrapper } from "./story";
-import { TitleProps } from "../lowerHalf";
-import LeftArrow from "../SVG`s/leftArrow";
-import RightArrow from "../SVG`s/rightArrow";
-import BMSOne from "../SVG`s/bmsMockupOne";
-import BMSTwo from "../SVG`s/bmsMockupTwo";
-import { preload } from "react-dom";
 
-export default function Work({
-  pullDirection,
-  pulldirectionProp,
-  currentWindow,
-  delayTime,
-  isAnimating,
-  resizeDelta,
-  positionsObj,
-  spacerHeight,
-}: TitleProps) {
+export default function Work({ config }: TitleConfig) {
+  const {
+    pullDirection,
+    pullDirectionProp,
+    currentWindow,
+    delayTime,
+    isAnimating,
+    resizeDelta,
+    positionsObj,
+    spacerHeight,
+  } = config;
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
   const [currentProject, setCurrentProject] = useState(0);
@@ -103,11 +104,11 @@ export default function Work({
 
       if (pullDirection === "default") {
         currentWindow.current = [0, 0, 1];
-        pulldirectionProp("right");
+        pullDirectionProp("right");
       }
       if (pullDirection === "right") {
         spacerHeight(0);
-        pulldirectionProp("default");
+        pullDirectionProp("default");
       }
 
       isAnimating.current = true;
