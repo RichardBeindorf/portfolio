@@ -12,6 +12,7 @@ import LeftArrow from "../SVG`s/leftArrow";
 import RightArrow from "../SVG`s/rightArrow";
 import BMSOne from "../SVG`s/bmsMockupOne";
 import BMSTwo from "../SVG`s/bmsMockupTwo";
+import { preload } from "react-dom";
 
 export default function Work({
   pullDirection,
