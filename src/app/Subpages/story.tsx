@@ -32,7 +32,6 @@ export default function Story({ config }: TitleConfig) {
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
   const storyRight = useRef(null);
   const storyLeft = useRef(null);
-  const innerRef = useRef(null);
 
   const pullDuration = 1;
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
@@ -53,6 +52,13 @@ export default function Story({ config }: TitleConfig) {
       isAnimating.current = true;
     }
   }
+
+  useLayoutEffect(() => {
+    if (tainer.current) {
+      const minWidthTitle = tainer.current.clientWidth;
+      tainer.current.style.minWidth = minWidthTitle + 10 + "px";
+    }
+  }, []);
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
