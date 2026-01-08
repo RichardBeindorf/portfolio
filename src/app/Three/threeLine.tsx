@@ -71,7 +71,6 @@ function ThreeLine({
       onMove: (self) => {
         // when the mouse strikes upward and has a high delta we trigger a wave
         if (self.event instanceof MouseEvent && self.event?.movementY < -20) {
-          console.log(self.event?.movementY);
           triggerThreshold.current = [];
           // remembering when we had the first trigger
           triggerThreshold.current.push(points.current.length);

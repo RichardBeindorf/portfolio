@@ -159,29 +159,49 @@ export default function Work({ config }: TitleConfig) {
           0
         );
 
-        // if (innerRef.current) {
-        //   const targetHeight = clicked ? "auto" : title.current.clientHeight;
-
-        //   tl.to(
-        //     innerRef.current,
-        //     {
-        //       height: targetHeight,
-        //       duration: 0.1,
-        //     },
-        //     0
-        //   );
-        // }
-
         if (clicked) {
+          // Bounce when other titles crash in
           tl.add(
             gsap.to(title.current, {
-              scale: 2.25,
+              duration: 0.35,
+              delay: 0.65,
+              ease: "sine.in",
+              transformOrigin: "right center",
+              keyframes: {
+                scaleX: [1.0, 0.7, 1.0],
+                skewY: [0, 10, 0],
+                easeEach: "none",
+              },
+            }),
+            0
+          );
+
+          // Second Bounce = Passion crashing into Work
+          tl.add(
+            gsap.to(title.current, {
+              duration: 0.2,
+              delay: 1.22,
+              ease: "sine.in",
+              transformOrigin: "right center",
+              keyframes: {
+                scaleX: [1.0, 0.9, 1.0],
+                skewY: [0, 10, 0],
+                easeEach: "none",
+              },
+            }),
+            0
+          );
+
+          tl.add(
+            gsap.to(title.current, {
+              duration: 1,
+              delay: delayTime,
+              scaleX: 2.25,
+              scaleY: 2.25,
               transformOrigin: "left bottom",
               keyframes: {
                 color: ["#262626", "#F24150"],
               },
-              duration: 1,
-              delay: delayTime,
             }),
             0
           );
@@ -207,6 +227,9 @@ export default function Work({ config }: TitleConfig) {
         if (!clicked) {
           setShowEntries(false);
           currentWindow.current = [0, 0, 0];
+          color.current = "#F2F1E9";
+        } else {
+          color.current = "transparent";
         }
       },
     });
@@ -218,41 +241,8 @@ export default function Work({ config }: TitleConfig) {
     };
   }, [clicked]);
 
-  // Logic for click events on other titles, only click related
-  const { contextSafe } = useGSAP(
-    () => {
-      // const onStartBounce = contextSafe(() => {
-      //   return gsap.to(title.current, {
-      //     delay: 0.7,
-      //     ease: "sine.in",
-      //     keyframes: {
-      //       scaleX: ["100%", "80%", "100%"],
-      //       // left: ["45%", "42%", "45%"],
-      //       rotate: [0, -10, 0],
-      //       easeEach: "none",
-      //     },
-      //   });
-      // });
-
-      // if (currentWindow.current[2] === 1 && clicked) {
-      //   onStartBounce();
-      // }
-
-      if (clicked) {
-        color.current = "#F2F1E9";
-      } else {
-        color.current = "transparent";
-      }
-    },
-    {
-      scope: tainer,
-      dependencies: [clicked],
-      revertOnUpdate: false,
-    }
-  );
-
   // Logic for animating content of this title, only entries related
-  useGSAP(
+  const { contextSafe } = useGSAP(
     () => {
       const items = entriesRef.current
         ? entriesRef.current.querySelectorAll("div")
@@ -333,8 +323,8 @@ export default function Work({ config }: TitleConfig) {
       // 8 different phases maximum currently
       // first is start position
       rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-      scale: [1, 1, 1, 1, 0.5, 0.1],
-      opacity: [1, 1, 1, 1, 1, 1, 0, 0],
+      scale: [1, 1, 0.5, 0.2, 0.1],
+      opacity: [1, 1, 1, 1, 0.5, 0, 0, 0],
       easeEach: "none",
     };
 
@@ -548,6 +538,7 @@ const IFrame = styled.iframe`
 
 const Title = styled(ChapterTitle)`
   text-align: left;
+  transform-origin: right;
 `;
 
 // const Highlights = styled.span`

@@ -47,7 +47,7 @@ export default function LowerHalf({
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
   const isAnimating = useRef(true);
   const positionsObj = useRef<PositionSwapper>(null);
-  const delayTime = 1.2;
+  const delayTime = 1.3;
 
   if (
     /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
