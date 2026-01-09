@@ -13,10 +13,6 @@ export interface ThreeLineMethods {
   addPoint: (point: THREE.Vector3) => void;
 }
 
-interface moveYEvent extends Event {
-  movementY: number;
-}
-
 function ThreeLine({
   lineApiRef,
   resizeDelta,
