@@ -1,9 +1,9 @@
+import gsap from "gsap";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
 import styled from "styled-components";
 import { ThoughtSVG } from "./SVG`s/thoughtSVG";
 import ScribbleFigure from "./SVG`s/scribbleFigure";
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
 
 interface TopHalfProps {
   bottomScroll: boolean;
@@ -19,15 +19,15 @@ export function TopHalf({
   mobileTest,
 }: TopHalfProps) {
   const mouseIcon = useRef(null);
-  let layoutSwitch;
-  if (resizeDelta < 1 && resizeDelta > 0 && !mobileTest)
-    layoutSwitch = Math.min(resizeDelta, 1);
-  if (resizeDelta < 1 && resizeDelta > 0 && mobileTest)
-    // on mobile only
-    layoutSwitch = Math.min(resizeDelta * 2.3, 1);
+
+  const layoutSwitch = !mobileTest
+    ? Math.min(resizeDelta, 1)
+    : Math.min(resizeDelta * 2.3, 1); // on mobile only
 
   const arrowHeight = `${40 * layoutSwitch}px`;
   const arrowWidth = `${40 * layoutSwitch}px`;
+
+  console.log(layoutSwitch);
 
   useGSAP(() => {
     if (mouseIcon.current && !bottomScroll) {
@@ -36,7 +36,7 @@ export function TopHalf({
         repeat: -1,
         yoyo: true,
         yPercent: 200,
-        // delay: (drawDelay / 1000) * 3,
+        delay: (drawDelay / 1000) * 3,
         ease: "power1.in",
         onStart: () => {
           gsap.set(mouseIcon.current, { visibility: "visible", opacity: 1 });
@@ -112,7 +112,7 @@ const FigureWrapper = styled.div`
 `;
 
 const MouseIcon = styled.svg`
-  opacity: 1;
+  opacity: 0;
 `;
 
 /**

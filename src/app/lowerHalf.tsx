@@ -53,7 +53,7 @@ export default function LowerHalf({
 
   if (mobileTest) {
     // Positioning title in respect to the screen size
-    positionsObj.current = { passion: "6%", story: "35%", work: "70%" };
+    positionsObj.current = { passion: "6%", story: "40%", work: "70%" };
   } else {
     positionsObj.current = { passion: "10%", story: "45%", work: "80%" };
   }

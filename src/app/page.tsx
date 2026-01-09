@@ -1,13 +1,14 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import CameraSetup from "./Three/cameraSetup";
-import { Canvas } from "@react-three/fiber";
-import InteractionHandler from "./Three/interactionHandler";
-import ThreeLine, { ThreeLineMethods } from "@/app/Three/threeLine";
+
 import LowerHalf from "./lowerHalf";
 import { TopHalf } from "./topHalf";
+import styled from "styled-components";
+import { Canvas } from "@react-three/fiber";
+import CameraSetup from "./Three/cameraSetup";
 import { permanentMarker } from "@/styles/font";
+import { useEffect, useRef, useState } from "react";
+import InteractionHandler from "./Three/interactionHandler";
+import ThreeLine, { ThreeLineMethods } from "@/app/Three/threeLine";
 
 export type PullVariants = "left" | "mid" | "right" | "default";
 
@@ -22,8 +23,6 @@ export default function Home() {
   const mobileTest = /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
   );
-
-  console.log(mobileTest);
 
   useEffect(() => {
     const startingWidth = window.innerWidth;
