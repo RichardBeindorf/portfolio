@@ -35,12 +35,14 @@ type LowerHalfProps = {
   resizeDelta: number | null;
   pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
   pullDirection: PullVariants;
+  mobileTest: boolean;
 };
 
 export default function LowerHalf({
   resizeDelta,
   pullDirectionProp,
   pullDirection,
+  mobileTest,
 }: LowerHalfProps) {
   const [spacerHeight, setSpacerHeight] = useState<number>(null);
   const currentWindow = useRef<WindowStates>("initial");
@@ -49,11 +51,7 @@ export default function LowerHalf({
   const positionsObj = useRef<PositionSwapper>(null);
   const delayTime = 1.3;
 
-  if (
-    /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    ) // testing for mobile device
-  ) {
+  if (mobileTest) {
     // Positioning title in respect to the screen size
     positionsObj.current = { passion: "6%", story: "35%", work: "70%" };
   } else {

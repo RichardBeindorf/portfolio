@@ -19,6 +19,12 @@ export default function Home() {
   const titleRef = useRef(null);
   const drawDelay = 3000;
 
+  const mobileTest = /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+
+  console.log(mobileTest);
+
   useEffect(() => {
     const startingWidth = window.innerWidth;
     const idealWidth = 1680;
@@ -46,11 +52,13 @@ export default function Home() {
                 bottomScroll={bottomScroll}
                 drawDelay={drawDelay}
                 resizeDelta={resizeDelta}
+                mobileTest={mobileTest}
               />
               <LowerHalf
                 resizeDelta={resizeDelta}
                 pullDirectionProp={setPullDirection}
                 pullDirection={pullDirection}
+                mobileTest={mobileTest}
               />
             </>
           )}
