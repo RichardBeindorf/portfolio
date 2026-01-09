@@ -30,12 +30,11 @@ export default function Passion({ config }: TitleConfig) {
   const isInitial = useRef(true);
   const entriesRef = useRef<HTMLDivElement>(null);
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
-  const innerRef = useRef(null);
 
   const passionRight = useRef(null);
   const passionMid = useRef(null);
 
-  const pullDuration = 1;
+  const pullDuration = 1.5;
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
   const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
 
@@ -86,7 +85,7 @@ export default function Passion({ config }: TitleConfig) {
             targets: tainer.current,
             duration: 1,
             ease: "power1.in",
-            delay: delayTime,
+            delay: delayTime - 0.5,
             absolute: true,
             onComplete: () => {
               isAnimating.current = false;
@@ -94,36 +93,37 @@ export default function Passion({ config }: TitleConfig) {
                 setShowEntries(true);
               }
             },
-            props: "left, top",
           }),
           0
         );
 
-        // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
-        if (innerRef.current) {
-          const targetHeight = clicked ? "auto" : title.current.clientHeight;
-
-          tl.to(
-            innerRef.current,
-            {
-              height: targetHeight,
-              duration: 1,
-              ease: "power1.in",
-            },
-            0
-          );
-        }
-
         if (clicked) {
+          // Bounce when other titles crash in
           tl.add(
             gsap.to(title.current, {
-              scale: 2.25,
+              duration: 0.35,
+              delay: 0.65,
+              ease: "sine.in",
+              transformOrigin: "left center",
+              keyframes: {
+                scaleX: [1.0, 0.6, 1.0],
+                skewY: [0, -10, 0],
+                easeEach: "none",
+              },
+            }),
+            0
+          );
+
+          tl.add(
+            gsap.to(title.current, {
+              duration: 1,
+              delay: delayTime,
+              scaleX: 2.25,
+              scaleY: 2.25,
               transformOrigin: "left bottom",
               keyframes: {
                 color: ["#262626", "#F24150"],
               },
-              duration: 1,
-              delay: delayTime,
             }),
             0
           );
@@ -146,8 +146,10 @@ export default function Passion({ config }: TitleConfig) {
       onStart() {
         if (!clicked) {
           setShowEntries(false);
-
+          color.current = "transparent";
           currentWindow.current = [0, 0, 0];
+        } else {
+          color.current = "#F2F1E9";
         }
         isAnimating.current = true;
       },
@@ -160,44 +162,10 @@ export default function Passion({ config }: TitleConfig) {
     };
   }, [clicked]);
 
-  const { contextSafe } = useGSAP(
-    () => {
-      //**//
-      /* ONLY ONCE PER CYCLE (Bounce animation) */
-      //**//
-      // const onStartBounce = contextSafe(() => {
-      //   gsap.to(title.current, {
-      //     delay: 0.7,
-      //     ease: "sine.in",
-      //     keyframes: {
-      //       scaleX: ["100%", "80%", "100%"],
-      //       // left: ["45%", "48%", "45%"],
-      //       rotate: [0, -10, 0],
-      //       easeEach: "none",
-      //     },
-      //   });
-      // });
-      // if (currentWindow.current[0] === 1 && clicked) {
-      //   onStartBounce();
-      // }
-
-      if (clicked) {
-        color.current = "#F2F1E9";
-      } else {
-        color.current = "transparent";
-      }
-    },
-    {
-      scope: tainer,
-      dependencies: [clicked],
-      revertOnUpdate: false,
-    }
-  );
-
   //**//
   /* Staggered Animation of the Entries - Managed outside main GSAP context for clarity */
   //**//
-  useGSAP(
+  const { contextSafe } = useGSAP(
     () => {
       const items = entriesRef.current
         ? entriesRef.current.querySelectorAll("div")
@@ -277,9 +245,9 @@ export default function Passion({ config }: TitleConfig) {
     const sharedKeyframes = {
       // 8 different phases maximum currently
       // first is start position
-      rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-      scale: [1, 1, 1, 1, 0.5, 0.1],
-      opacity: [1, 1, 1, 1, 1, 1, 0, 0],
+      rotate: [0, 13, 20, 0, 0, -15, 0],
+      scale: [1, 1, 0.5, 0.2, 0.1],
+      opacity: [1, 1, 1, 1, 0.5, 0, 0, 0],
       easeEach: "none",
     };
 
@@ -304,7 +272,8 @@ export default function Passion({ config }: TitleConfig) {
       })
       .to(tainer.current, {
         duration: pullDuration,
-        ease: "power4.in",
+        delay: 0.85,
+        ease: "power3.out",
         keyframes: {
           // 8 different phases maximum currently
           // first is start position

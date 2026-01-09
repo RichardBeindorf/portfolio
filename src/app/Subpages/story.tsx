@@ -32,7 +32,6 @@ export default function Story({ config }: TitleConfig) {
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null); // To store the entry stagger animation
   const storyRight = useRef(null);
   const storyLeft = useRef(null);
-  const innerRef = useRef(null);
 
   const pullDuration = 1;
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
@@ -53,6 +52,14 @@ export default function Story({ config }: TitleConfig) {
       isAnimating.current = true;
     }
   }
+
+  // Using this to give the Title more space so it doesnt cut of on smaller screens
+  useLayoutEffect(() => {
+    if (tainer.current) {
+      const minWidthTitle = tainer.current.clientWidth;
+      tainer.current.style.minWidth = minWidthTitle + 10 + "px";
+    }
+  }, []);
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -90,7 +97,7 @@ export default function Story({ config }: TitleConfig) {
             targets: tainer.current,
             duration: 1,
             ease: "power1.in",
-            delay: delayTime,
+            delay: delayTime + 0.1,
             absolute: true,
             onComplete: () => {
               isAnimating.current = false;
@@ -102,48 +109,65 @@ export default function Story({ config }: TitleConfig) {
           0
         );
 
-        // this is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box
-        // if (innerRef.current) {
-        //   const targetHeight = clicked ? "auto" : title.current.clientHeight;
-
-        //   tl.to(
-        //     innerRef.current,
-        //     {
-        //       height: targetHeight,
-        //       duration: 1,
-        //       ease: "power1.in",
-        //     },
-        //     0
-        //   );
-        // }
-
-        // Previously changed the fonty size too but that caused some pixel ghosting on mobile
-        // now scaling the title seperately from the container and changing color
+        // First Bounce = Work crashing into Story
         if (clicked) {
           tl.add(
             gsap.to(title.current, {
-              scale: 2.25,
+              duration: 0.35,
+              delay: 0.85,
+              ease: "sine.in",
+              transformOrigin: "left center",
+              keyframes: {
+                scaleX: [1.0, 0.9, 1.0],
+                skewY: [0, -10, 0],
+                easeEach: "none",
+              },
+            }),
+            0
+          );
+
+          // Second Bounce = Passion crashing into Story
+          tl.add(
+            gsap.to(title.current, {
+              duration: 0.2,
+              delay: 1.22,
+              ease: "sine.in",
+              transformOrigin: "right center",
+              keyframes: {
+                scaleX: [1.0, 0.9, 1.0],
+                skewY: [0, -10, 0],
+                easeEach: "none",
+              },
+            }),
+            0
+          );
+
+          tl.add(
+            gsap.to(title.current, {
+              duration: 1,
+              delay: delayTime,
+              scaleX: 2.25,
+              scaleY: 2.25,
               transformOrigin: "left bottom",
               keyframes: {
                 color: ["#262626", "#F24150"],
-                // fontSize: ["clamp(2vw, 3rem, 8.5vw)", "clamp(8vw, 6rem, 11vw)"],
               },
-              duration: 1,
-              delay: delayTime,
             }),
             0
           );
         }
+
         // clicked to close title but we are not done animating
         if (isAnimating.current && !clicked && currentWindow.current[1] === 1) {
           tl.add(
             gsap.to(title.current, {
+              duration: 1,
+              delay: delayTime + 0.5,
               scale: 1,
               keyframes: {
                 color: ["#F24150", "#262626"],
                 // fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
-              duration: 1,
             }),
             0
           );
@@ -154,7 +178,11 @@ export default function Story({ config }: TitleConfig) {
         if (!clicked) {
           setShowEntries(false);
           currentWindow.current = [0, 0, 0];
+          color.current = "transparent";
+        } else {
+          color.current = "#F2F1E9";
         }
+
         isAnimating.current = true;
       },
     });
@@ -166,37 +194,10 @@ export default function Story({ config }: TitleConfig) {
     };
   }, [clicked]);
 
-  const { contextSafe } = useGSAP(() => {
-    //**//
-    /* ONLY ONCE PER CYCLE (Bounce animation) */
-    //**//
-    // const onStartBounce = contextSafe(() => {
-    //   gsap.to(title.current, {
-    //     delay: 0.7,
-    //     ease: "sine.in",
-    //     keyframes: {
-    //       scaleX: ["100%", "80%", "100%"],
-    //       rotate: [0, -10, 0],
-    //       easeEach: "none",
-    //     },
-    //   });
-    // });
-
-    // if (currentWindow.current[1] === 1 && clicked) {
-    //   onStartBounce();
-    // }
-
-    if (clicked) {
-      color.current = "#F2F1E9";
-    } else {
-      color.current = "transparent";
-    }
-  }, [clicked, currentWindow.current]);
-
   /**/
   /* Staggered Animation of the Entries - Managed outside main GSAP context for clarity */
   /**/
-  useGSAP(
+  const { contextSafe } = useGSAP(
     () => {
       const items = entriesRef.current
         ? entriesRef.current.querySelectorAll("div")
@@ -278,9 +279,9 @@ export default function Story({ config }: TitleConfig) {
       // 8 different phases maximum currently
       // first is start position
       rotate: [0, 24, 13, 24, 0, 0, -15, 0],
-      scale: [1, 1, 1, 1, 0.5, 0.1],
       y: [0, 0, yAnimationValue, yAnimationValue],
-      opacity: [1, 1, 1, 1, 1, 1, 0, 0],
+      scale: [1, 1, 0.5, 0.2, 0.1],
+      opacity: [1, 1, 1, 1, 0.5, 0, 0, 0],
       easeEach: "none",
     };
 
