@@ -35,27 +35,25 @@ type LowerHalfProps = {
   resizeDelta: number | null;
   pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
   pullDirection: PullVariants;
+  mobileTest: boolean;
 };
 
 export default function LowerHalf({
   resizeDelta,
   pullDirectionProp,
   pullDirection,
+  mobileTest,
 }: LowerHalfProps) {
   const [spacerHeight, setSpacerHeight] = useState<number>(null);
   const currentWindow = useRef<WindowStates>("initial");
   // Animating should actually be false, but it seems to have slipped through and now stuff gets broken if i swap it. Just keep it, doesnt change a thing really.
   const isAnimating = useRef(true);
   const positionsObj = useRef<PositionSwapper>(null);
-  const delayTime = 1.2;
+  const delayTime = 1.3;
 
-  if (
-    /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    ) // testing for mobile device
-  ) {
+  if (mobileTest) {
     // Positioning title in respect to the screen size
-    positionsObj.current = { passion: "6%", story: "35%", work: "70%" };
+    positionsObj.current = { passion: "6%", story: "40%", work: "70%" };
   } else {
     positionsObj.current = { passion: "10%", story: "45%", work: "80%" };
   }

@@ -6,9 +6,15 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import * as THREE from "three";
+import gsap from "gsap";
+import { Observer } from "gsap/all";
 
 export interface ThreeLineMethods {
   addPoint: (point: THREE.Vector3) => void;
+}
+
+interface moveYEvent extends Event {
+  movementY: number;
 }
 
 function ThreeLine({
@@ -25,6 +31,7 @@ function ThreeLine({
   const triggerThreshold = useRef<number[]>([]);
   const waveDist = useRef([]);
   const maxValue = useRef<number>(500);
+  gsap.registerPlugin(Observer);
 
   const adjustedResize =
     resizeDelta < 1 ? Math.min(resizeDelta * 1.85, 1) : resizeDelta;
@@ -41,8 +48,9 @@ function ThreeLine({
     //     points.current.push(thought);
     //   }
     // });
+
+    // Logic for setting up line starting position
     if (points.current) {
-      // Logic for setting up line starting position
       const offset = 0.95;
       const topHalfYMidPoint = (size.height / 4) * offset;
       const topHalfXMidPoint = size.width / 2;
@@ -52,6 +60,23 @@ function ThreeLine({
       vector.unproject(camera);
       points.current.push(vector);
     }
+
+    //** **//
+    // Wave Trigger Mechanic
+    //** **//
+
+    Observer.create({
+      target: window,
+      type: "pointer,touch",
+      onMove: (self) => {
+        // when the mouse strikes upward and has a high delta we trigger a wave
+        if (self.event instanceof MouseEvent && self.event?.movementY < -20) {
+          triggerThreshold.current = [];
+          // remembering when we had the first trigger
+          triggerThreshold.current.push(points.current.length);
+        }
+      },
+    });
 
     setTimeout(() => {
       maxValue.current = 50;
@@ -107,8 +132,6 @@ function ThreeLine({
       }
     }
 
-    //** **//
-
     const worldPoints = points.current;
 
     const pointsToDraw = worldPoints.slice(
@@ -117,15 +140,28 @@ function ThreeLine({
 
     // distances will hold not the distance between sigular points but the overall distance to the point of origin accumulated
     const distances = [0];
-    const height = size.height;
-    const currentY = worldPoints[worldPoints.length - 1].y;
-    const percentNew = (100 / height) * currentY; // higher === smaler value and lower === bigger value
-    let diff = 0;
 
     for (let i = 1; i < pointsToDraw.length; i++) {
       distances.push(
         distances[i - 1] + pointsToDraw[i].distanceTo(pointsToDraw[i - 1])
       );
+    }
+
+    /**
+     * Wave Counter
+     **/
+
+    if (triggerThreshold.current.length > 0) {
+      const lastThreshold =
+        triggerThreshold.current[triggerThreshold.current.length - 1];
+
+      // Waiting until trigger is fully done
+      if (points.current.length >= lastThreshold + 5) {
+        const lastPointDistance = distances[distances.length - 1] || 0;
+        waveDist.current.push(lastPointDistance);
+        //resetting the threshold after
+        triggerThreshold.current = [];
+      }
     }
 
     //** **//
@@ -175,40 +211,6 @@ function ThreeLine({
         // add new point in between
         pointsToDraw.splice(pointsToDraw.length - 1, 0, firstNewPoint);
         pointsToDraw.splice(pointsToDraw.length - 1, 0, secondNewPoint);
-      }
-    }
-
-    //** **//
-    // Threshold mechanic //
-    //** **//
-    // get the difference in height / velocity
-    let pastY = currentY; // Default to currentY to get a diff of 0
-    if (worldPoints.length >= 5) {
-      pastY = worldPoints[worldPoints.length - 5].y;
-    }
-
-    const percentLast = (100 / height) * pastY;
-    diff = Math.abs(percentNew - percentLast);
-
-    // If the cursor strikes high enough it will cause a wave!
-    // When we trigger the wave we want to remember the point where we started
-    // and then start counting down, traveling backwarts through the line
-    if (diff > 3) {
-      triggerThreshold.current = [];
-      // remembering when we had the first trigger
-      triggerThreshold.current.push(worldPoints.length);
-    }
-
-    if (triggerThreshold.current.length > 0) {
-      const lastThreshold =
-        triggerThreshold.current[triggerThreshold.current.length - 1];
-
-      // Waiting until trigger is fully done
-      if (worldPoints.length >= lastThreshold + 5) {
-        const lastPointDistance = distances[distances.length - 1] || 0;
-        waveDist.current.push(lastPointDistance);
-        //resetting the threshold after
-        triggerThreshold.current = [];
       }
     }
 
