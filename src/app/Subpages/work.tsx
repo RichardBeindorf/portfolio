@@ -66,7 +66,7 @@ export default function Work({ config }: TitleConfig) {
     {
       title: "Building-Management System",
       description:
-        "My biggest project yet, designed and implemented in a complex environment. Unfortunately it is under NDA protection, but i got the permission to scetch a little mockup of it for you. This building management system enables the user to controll and monitor the status not just of stand-alone real estate but an entire fleet of it. I started with a redesign of the old system and then implemented it including a more maintainable algorithm to connect all buildings down to the last room with our complex backend. All rooms show information about temperature, humidity and CO2 levels.",
+        "My biggest (NDA protected) project yet, designed and implemented in a complex technical environment. The BMS enables users to controll and monitor the status of an entire realestade fleet. I started with a redesign of the old system and then implemented it including a more maintainable algorithm to connect all buildings down to the last room with our complex backend. All rooms show information about temperature, humidity and CO2 levels.",
       svg: [<BMSOne key={1} />, <BMSTwo key={2} />],
     },
     {

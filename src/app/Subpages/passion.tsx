@@ -418,6 +418,7 @@ const TopicWrapper = styled.div`
 
 const Subtitle = styled.div`
   width: max-content;
+  max-width: 95vw;
   font-size: var(--subTitle);
   color: var(--foreground);
 `;

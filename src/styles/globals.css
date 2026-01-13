@@ -12,8 +12,8 @@
   --textAccent: #f24150;
 
   --header: clamp(2vw, 3rem, 8.5vw);
-  --subTitle: clamp(2vw, 2rem, 4.5vw);
-  --inlineText: clamp(1vw, 1.3rem, 3vw);
+  --subTitle: clamp(2vw, 2rem, 5.2vw);
+  --inlineText: clamp(1rem, 1.7vw, 4vw);
 }
 
 html,
