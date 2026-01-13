@@ -18,7 +18,6 @@ export default function Work({ config }: TitleConfig) {
   const {
     pullDirection,
     pullDirectionProp,
-    currentWindow,
     delayTime,
     isAnimating,
     resizeDelta,
@@ -32,7 +31,6 @@ export default function Work({ config }: TitleConfig) {
   const tainer = useRef(null);
   const title = useRef(null);
   const isInitial = useRef(true);
-  const innerRef = useRef(null);
 
   const workLeft = useRef(null);
   const workMid = useRef(null);
@@ -40,7 +38,6 @@ export default function Work({ config }: TitleConfig) {
   const entryStaggerAnimation = useRef<gsap.core.Tween | null>(null);
   const entriesRef = useRef(null);
   const underline = useRef(null);
-  const color = useRef("unset");
 
   const pullDuration = 1;
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
@@ -103,7 +100,6 @@ export default function Work({ config }: TitleConfig) {
       setClicked(next);
 
       if (pullDirection === "default") {
-        currentWindow.current = [0, 0, 1];
         pullDirectionProp("right");
       }
       if (pullDirection === "right") {
@@ -117,8 +113,8 @@ export default function Work({ config }: TitleConfig) {
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
-    // Skip the first render
     if (isInitial.current) {
+      // Skip the first render
       isInitial.current = false;
       return;
     }
@@ -208,7 +204,7 @@ export default function Work({ config }: TitleConfig) {
         }
 
         // clicked to close title but we are not done animating
-        if (isAnimating.current && !clicked && currentWindow.current[2] === 1) {
+        if (!clicked) {
           tl.add(
             gsap.to(title.current, {
               scale: 1,
@@ -226,10 +222,6 @@ export default function Work({ config }: TitleConfig) {
         isAnimating.current = true;
         if (!clicked) {
           setShowEntries(false);
-          currentWindow.current = [0, 0, 0];
-          color.current = "#F2F1E9";
-        } else {
-          color.current = "transparent";
         }
       },
     });
@@ -302,9 +294,8 @@ export default function Work({ config }: TitleConfig) {
 
       if (showEntries && !isAnimating.current && underline.current) {
         drawUnderline();
-      } else {
-        //still have to reverse the underline
       }
+      //still have to reverse the underline
     },
     {
       scope: tainer,
@@ -374,6 +365,7 @@ export default function Work({ config }: TitleConfig) {
       case "default":
         if (workMid.current.progress() === 1) workMid.current.reverse();
         if (workLeft.current.progress() === 1) workLeft.current.reverse();
+        if (clicked) setClicked(false); // User clicks outside the title box to leave the screen
     }
   }, [pullDirection]);
 
@@ -478,11 +470,8 @@ const WorkContainer = styled.section<{ $position: string }>`
   max-width: 80vw;
 
   pointer-events: auto;
+  -webkit-tap-highlight-color: transparent; // stop the background highlight in safar browser when clicked/tapped
   will-change: transform;
-
-  /* @media (orientation: portrait) {
-    left: 35%;
-  } */
 `;
 
 const WorkEntryWrapper = styled.div`

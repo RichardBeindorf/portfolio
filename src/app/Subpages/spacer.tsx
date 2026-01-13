@@ -1,6 +1,10 @@
 import { useRef } from "react";
 
-export default function Spacer({ spacerHeight }: { spacerHeight: number }) {
+export default function Spacer({
+  spacerHeight,
+  pullDirectionProp,
+  pullDirection,
+}) {
   const spacerRef = useRef(null);
   // calculating top 15% since the parent has to have height auto so it can grow
   const topValue = window.innerHeight * 0.15 + "px";
@@ -10,11 +14,31 @@ export default function Spacer({ spacerHeight }: { spacerHeight: number }) {
       ? (spacerRef.current.style.height = spacerHeight * 1.3 + "px")
       : (spacerRef.current.style.height = "0px");
   }
+
+  function handleClick(e) {
+    console.log(e);
+    if (e.target !== e.currentTarget) return;
+
+    if (
+      pullDirection === "mid" ||
+      pullDirection === "left" ||
+      pullDirection === "right"
+    )
+      pullDirectionProp("default");
+    console.log("clicked container");
+  }
+
   return (
     <div
+      onClick={handleClick}
       id="spacer"
       ref={spacerRef}
       style={{ position: "relative", top: topValue }}
     />
   );
 }
+
+// : {
+//   spacerHeight: number;
+//   onClick: (e: any) => void;
+// }

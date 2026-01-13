@@ -27,8 +27,6 @@ export function TopHalf({
   const arrowHeight = `${40 * layoutSwitch}px`;
   const arrowWidth = `${40 * layoutSwitch}px`;
 
-  console.log(layoutSwitch);
-
   useGSAP(() => {
     if (mouseIcon.current && !bottomScroll) {
       gsap.to(mouseIcon.current, {

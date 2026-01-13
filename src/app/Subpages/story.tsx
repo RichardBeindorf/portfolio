@@ -13,7 +13,6 @@ export default function Story({ config }: TitleConfig) {
   const {
     pullDirection,
     pullDirectionProp,
-    currentWindow,
     delayTime,
     isAnimating,
     resizeDelta,
@@ -25,7 +24,6 @@ export default function Story({ config }: TitleConfig) {
   gsap.registerPlugin(DrawSVGPlugin, Flip);
   const title = useRef(null);
   const tainer = useRef(null);
-  const color = useRef("unset");
   const underline = useRef(null);
   const isInitial = useRef(true);
   const entriesRef = useRef<HTMLDivElement>(null);
@@ -42,7 +40,6 @@ export default function Story({ config }: TitleConfig) {
       const next = !clicked;
       setClicked(next);
       if (pullDirection === "default") {
-        currentWindow.current = [0, 1, 0];
         pullDirectionProp("mid");
       }
       if (pullDirection === "mid") {
@@ -53,13 +50,13 @@ export default function Story({ config }: TitleConfig) {
     }
   }
 
-  // Using this to give the Title more space so it doesnt cut of on smaller screens
-  useLayoutEffect(() => {
-    if (tainer.current) {
-      const minWidthTitle = tainer.current.clientWidth;
-      tainer.current.style.minWidth = minWidthTitle + 10 + "px";
-    }
-  }, []);
+  // // Using this to give the Title more space so it doesnt cut of on smaller screens
+  // useLayoutEffect(() => {
+  //   if (tainer.current) {
+  //     const minWidthTitle = tainer.current.clientWidth;
+  //     tainer.current.style.minWidth = minWidthTitle + 10 + "px";
+  //   }
+  // }, []);
 
   // useLayoutEffect used too avoid the colliding of Flip and React re-rendering, which can lead to Flip getting completed instantly
   useLayoutEffect(() => {
@@ -158,15 +155,14 @@ export default function Story({ config }: TitleConfig) {
         }
 
         // clicked to close title but we are not done animating
-        if (isAnimating.current && !clicked && currentWindow.current[1] === 1) {
+        if (!clicked) {
           tl.add(
             gsap.to(title.current, {
               duration: 1,
-              delay: delayTime + 0.5,
+              delay: 0.5,
               scale: 1,
               keyframes: {
                 color: ["#F24150", "#262626"],
-                // fontSize: ["clamp(8vw, 6rem, 11vw)", "clamp(2vw, 3rem, 8.5vw)"],
               },
             }),
             0
@@ -177,12 +173,7 @@ export default function Story({ config }: TitleConfig) {
       onStart() {
         if (!clicked) {
           setShowEntries(false);
-          currentWindow.current = [0, 0, 0];
-          color.current = "transparent";
-        } else {
-          color.current = "#F2F1E9";
         }
-
         isAnimating.current = true;
       },
     });
@@ -258,9 +249,8 @@ export default function Story({ config }: TitleConfig) {
 
       if (showEntries && !isAnimating.current && underline.current) {
         drawUnderline();
-      } else {
-        // still have to reverse the underline
       }
+      // still have to reverse the underline
     },
     {
       scope: tainer,
@@ -317,6 +307,7 @@ export default function Story({ config }: TitleConfig) {
   // Pull Animations: Controll Logic
   useGSAP(() => {
     if (!storyLeft.current || !storyRight.current) return;
+
     switch (pullDirection) {
       case "right":
         storyRight.current.play();
@@ -327,12 +318,12 @@ export default function Story({ config }: TitleConfig) {
       case "default":
         if (storyRight.current.progress() === 1) storyRight.current.reverse();
         if (storyLeft.current.progress() === 1) storyLeft.current.reverse();
+        if (clicked) setClicked(false); // User clicks outside the title box to leave the screen
     }
   }, [pullDirection]);
 
   return (
     <ChapterContainer ref={tainer} $position={positionsObj.story}>
-      {/* <InnerContainer ref={innerRef}> */}
       <TitleWrapper>
         <ChapterTitle
           style={permanentMarker.style}
@@ -383,8 +374,6 @@ export default function Story({ config }: TitleConfig) {
           </EntryList>
         </StoryEntryWrapper>
       )}
-
-      {/* </InnerContainer> */}
     </ChapterContainer>
   );
 }
@@ -398,6 +387,7 @@ const ChapterContainer = styled.section<{ $position: string }>`
   max-width: 80vw;
 
   pointer-events: auto;
+  -webkit-tap-highlight-color: transparent; // stop the background highlight in safar browser when clicked/tapped
   will-change: transform;
 `;
 
@@ -409,6 +399,7 @@ export const ChapterTitle = styled.h1`
   text-align: center;
   user-select: none;
 
+  padding-right: 10px; // needed for mobile screens so the Y does not get cut off
   &:hover {
     cursor: pointer;
   }

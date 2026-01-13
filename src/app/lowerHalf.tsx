@@ -72,9 +72,25 @@ export default function LowerHalf({
     [pullDirection, resizeDelta]
   );
 
+  function handleClick(e) {
+    if (e.target !== e.currentTarget) return;
+
+    if (
+      pullDirection === "mid" ||
+      pullDirection === "left" ||
+      pullDirection === "right"
+    )
+      pullDirectionProp("default");
+    console.log("clicked container");
+  }
+
   return (
-    <Container>
-      <Spacer spacerHeight={spacerHeight} />
+    <Container onClick={handleClick}>
+      <Spacer
+        spacerHeight={spacerHeight}
+        pullDirectionProp={pullDirectionProp}
+        pullDirection={pullDirection}
+      />
       <FlipStage>
         <Story config={titleConfig} />
         <Passion config={titleConfig} />

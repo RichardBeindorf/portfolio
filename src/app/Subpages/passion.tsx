@@ -13,7 +13,6 @@ export default function Passion({ config }: TitleConfig) {
   const {
     pullDirection,
     pullDirectionProp,
-    currentWindow,
     delayTime,
     isAnimating,
     resizeDelta,
@@ -25,7 +24,7 @@ export default function Passion({ config }: TitleConfig) {
   gsap.registerPlugin(DrawSVGPlugin, Flip);
   const title = useRef(null);
   const tainer = useRef(null);
-  const color = useRef("unset");
+
   const underline = useRef(null);
   const isInitial = useRef(true);
   const entriesRef = useRef<HTMLDivElement>(null);
@@ -43,7 +42,6 @@ export default function Passion({ config }: TitleConfig) {
       const next = !clicked;
       setClicked(next);
       if (pullDirection === "default") {
-        currentWindow.current = [1, 0, 0];
         pullDirectionProp("left");
       }
       if (pullDirection === "left") {
@@ -129,7 +127,7 @@ export default function Passion({ config }: TitleConfig) {
           );
         }
         // clicked to close title but we are not done animating
-        if (isAnimating.current && !clicked && currentWindow.current[0] === 1) {
+        if (!clicked) {
           tl.add(
             gsap.to(title.current, {
               scale: 1,
@@ -146,10 +144,6 @@ export default function Passion({ config }: TitleConfig) {
       onStart() {
         if (!clicked) {
           setShowEntries(false);
-          color.current = "transparent";
-          currentWindow.current = [0, 0, 0];
-        } else {
-          color.current = "#F2F1E9";
         }
         isAnimating.current = true;
       },
@@ -225,8 +219,6 @@ export default function Passion({ config }: TitleConfig) {
 
       if (showEntries && !isAnimating.current && underline.current) {
         drawUnderline();
-      } else {
-        // still have to reverse the underline
       }
     },
     {
@@ -296,19 +288,15 @@ export default function Passion({ config }: TitleConfig) {
         passionRight.current.play();
         break;
       case "default":
-        if (passionMid.current.progress() === 1) {
-          passionMid.current.reverse();
-        }
-        if (passionRight.current.progress() === 1) {
+        if (passionMid.current.progress() === 1) passionMid.current.reverse();
+        if (passionRight.current.progress() === 1)
           passionRight.current.reverse();
-        }
+        if (clicked) setClicked(false); // User clicks outside the title box to leave the screen
     }
   }, [pullDirection]);
 
   return (
     <PassionContainer ref={tainer} $position={positionsObj.passion}>
-      {/* This InnerContainer is manages the container height while dodging a battle with the flip, so the rest of the viewport is not overshadowed by an empty box when entries are closing*/}
-      {/* <InnerContainer ref={innerRef}> */}
       <TitleWrapper>
         <Title style={permanentMarker.style} onClick={handleClick} ref={title}>
           Passion
@@ -375,7 +363,6 @@ export default function Passion({ config }: TitleConfig) {
           </PassionEntryWrapper>
         )}
       </PassionContent>
-      {/* </InnerContainer> */}
     </PassionContainer>
   );
 }
@@ -388,6 +375,7 @@ const PassionContainer = styled.section<{ $position: string }>`
   max-width: 80vw;
 
   pointer-events: auto;
+  -webkit-tap-highlight-color: transparent; // stop the background highlight in safar browser when clicked/tapped
   will-change: transform;
 `;
 
