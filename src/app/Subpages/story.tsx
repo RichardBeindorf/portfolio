@@ -8,6 +8,7 @@ import { DrawSVGPlugin, Flip } from "gsap/all";
 import { entryData } from "@/data/storyEntries";
 import { useLayoutEffect, useRef, useState } from "react";
 import { permanentMarker, oswald300, oswald500 } from "../../styles/font";
+import handlePopStateChange from "@/util/popStateHandler";
 
 export default function Story({ config }: TitleConfig) {
   const {
@@ -41,6 +42,7 @@ export default function Story({ config }: TitleConfig) {
       setClicked(next);
       if (pullDirection === "default") {
         pullDirectionProp("mid");
+        window.history.pushState({ name: "mid" }, "pushing mid", "#mid");
       }
       if (pullDirection === "mid") {
         spacerHeight(0);
@@ -64,6 +66,17 @@ export default function Story({ config }: TitleConfig) {
       isInitial.current = false;
       isAnimating.current = false;
       return;
+    }
+
+    if (clicked) {
+      // Everytime a title got clicked i want to listen to the browser wanting to got back in history
+      window.addEventListener("popstate", (event) => {
+        handlePopStateChange(event, pullDirectionProp, clicked, setClicked);
+      });
+    } else {
+      window.removeEventListener("popstate", (event) => {
+        handlePopStateChange(event, pullDirectionProp, clicked, setClicked);
+      });
     }
 
     // first create (or get the existing) batch by id
@@ -103,7 +116,7 @@ export default function Story({ config }: TitleConfig) {
               }
             },
           }),
-          0
+          0,
         );
 
         // First Bounce = Work crashing into Story
@@ -120,7 +133,7 @@ export default function Story({ config }: TitleConfig) {
                 easeEach: "none",
               },
             }),
-            0
+            0,
           );
 
           // Second Bounce = Passion crashing into Story
@@ -136,7 +149,7 @@ export default function Story({ config }: TitleConfig) {
                 easeEach: "none",
               },
             }),
-            0
+            0,
           );
 
           tl.add(
@@ -150,7 +163,7 @@ export default function Story({ config }: TitleConfig) {
                 color: ["#262626", "#F24150"],
               },
             }),
-            0
+            0,
           );
         }
 
@@ -165,7 +178,7 @@ export default function Story({ config }: TitleConfig) {
                 color: ["#F24150", "#262626"],
               },
             }),
-            0
+            0,
           );
         }
       },
@@ -256,7 +269,7 @@ export default function Story({ config }: TitleConfig) {
       scope: tainer,
       dependencies: [showEntries],
       revertOnUpdate: false,
-    }
+    },
   );
 
   // Pull Animations: Defining Timelines
@@ -307,6 +320,8 @@ export default function Story({ config }: TitleConfig) {
   // Pull Animations: Controll Logic
   useGSAP(() => {
     if (!storyLeft.current || !storyRight.current) return;
+
+    console.log("STORY PULL DIRECTION CHANGE  ");
 
     switch (pullDirection) {
       case "right":
@@ -446,14 +461,18 @@ const EntryWrapper = styled.div`
   cursor: pointer;
   padding: 0px;
   background-color: rgba(242, 241, 233, 0);
-  transition: padding 1s ease-in, background-color 1s ease-in,
+  transition:
+    padding 1s ease-in,
+    background-color 1s ease-in,
     font-size 1s ease-in;
 
   &:hover {
     padding: 5px;
     background-color: rgba(242, 241, 233, 1);
     font-size: clamp(1vw, 1.1rem, 2vw);
-    transition: padding 0.5s ease-out, background-color 0.5s ease-out,
+    transition:
+      padding 0.5s ease-out,
+      background-color 0.5s ease-out,
       font-size 0.5s ease-out;
   }
 `;

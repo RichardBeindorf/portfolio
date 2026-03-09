@@ -21,13 +21,17 @@ export default function Home() {
   const drawDelay = 3000;
 
   const mobileTest = /Android|iPhone|iPad|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
+    navigator.userAgent,
   );
+
+  // window.addEventListener("popstate", handlePopStateChange);
 
   useEffect(() => {
     const startingWidth = window.innerWidth;
     const idealWidth = 1680;
     const calc = (startingWidth / idealWidth) * 1.1;
+
+    // window.history.pushState({ name: "default" }, "page load init", "#default");
 
     setResizeDelta(calc < 1 && calc > 0 ? calc : 1);
 

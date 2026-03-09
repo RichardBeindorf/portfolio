@@ -16,7 +16,6 @@ export default function Spacer({
   }
 
   function handleClick(e) {
-    console.log(e);
     if (e.target !== e.currentTarget) return;
 
     if (
@@ -25,7 +24,6 @@ export default function Spacer({
       pullDirection === "right"
     )
       pullDirectionProp("default");
-    console.log("clicked container");
   }
 
   return (
@@ -37,8 +35,3 @@ export default function Spacer({
     />
   );
 }
-
-// : {
-//   spacerHeight: number;
-//   onClick: (e: any) => void;
-// }

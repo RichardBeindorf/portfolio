@@ -69,7 +69,7 @@ export default function LowerHalf({
       spacerHeight: setSpacerHeight,
       positionsObj: positionsObj.current,
     }),
-    [pullDirection, resizeDelta]
+    [pullDirection, resizeDelta],
   );
 
   function handleClick(e) {
@@ -81,7 +81,6 @@ export default function LowerHalf({
       pullDirection === "right"
     )
       pullDirectionProp("default");
-    console.log("clicked container");
   }
 
   return (

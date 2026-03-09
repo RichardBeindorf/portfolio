@@ -13,6 +13,7 @@ import { DrawSVGPlugin, Flip } from "gsap/all";
 import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, Intro, TitleWrapper } from "./story";
+import handlePopStateChange from "@/util/popStateHandler";
 
 export default function Work({ config }: TitleConfig) {
   const {
@@ -101,6 +102,7 @@ export default function Work({ config }: TitleConfig) {
 
       if (pullDirection === "default") {
         pullDirectionProp("right");
+        window.history.pushState({ name: "right" }, "pushing right", "#right");
       }
       if (pullDirection === "right") {
         spacerHeight(0);
@@ -117,6 +119,29 @@ export default function Work({ config }: TitleConfig) {
       // Skip the first render
       isInitial.current = false;
       return;
+    }
+
+    if (clicked) {
+      // Everytime a title got clicked i want to listen to the browser wanting to got back in history
+      window.addEventListener("popstate", (event) => {
+        handlePopStateChange(
+          event,
+          pullDirectionProp,
+          clicked,
+          setClicked,
+          spacerHeight,
+        );
+      });
+    } else {
+      window.removeEventListener("popstate", (event) => {
+        handlePopStateChange(
+          event,
+          pullDirectionProp,
+          clicked,
+          setClicked,
+          spacerHeight,
+        );
+      });
     }
 
     // first create (or get the existing) batch by id
@@ -152,7 +177,7 @@ export default function Work({ config }: TitleConfig) {
               }
             },
           }),
-          0
+          0,
         );
 
         if (clicked) {
@@ -169,7 +194,7 @@ export default function Work({ config }: TitleConfig) {
                 easeEach: "none",
               },
             }),
-            0
+            0,
           );
 
           // Second Bounce = Passion crashing into Work
@@ -185,7 +210,7 @@ export default function Work({ config }: TitleConfig) {
                 easeEach: "none",
               },
             }),
-            0
+            0,
           );
 
           tl.add(
@@ -199,7 +224,7 @@ export default function Work({ config }: TitleConfig) {
                 color: ["#262626", "#F24150"],
               },
             }),
-            0
+            0,
           );
         }
 
@@ -213,7 +238,7 @@ export default function Work({ config }: TitleConfig) {
               },
               duration: 1,
             }),
-            0
+            0,
           );
         }
       },
@@ -301,7 +326,7 @@ export default function Work({ config }: TitleConfig) {
       scope: tainer,
       dependencies: [showEntries],
       revertOnUpdate: false,
-    }
+    },
   );
 
   // Pull Animations: Defining Timelines
@@ -565,6 +590,7 @@ const ButtonWrapper = styled.div`
 
 const ImageGallery = styled.div`
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 1.7rem;
   margin-top: 1rem;
@@ -592,6 +618,7 @@ const PreviewImage = styled.img`
 
 const SVGWrapper = styled.div`
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 1.7rem;
   margin-top: 1rem;

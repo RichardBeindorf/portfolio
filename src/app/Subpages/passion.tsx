@@ -8,6 +8,7 @@ import { TitleConfig } from "../lowerHalf";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, oswald500, permanentMarker } from "@/styles/font";
+import handlePopStateChange from "@/util/popStateHandler";
 
 export default function Passion({ config }: TitleConfig) {
   const {
@@ -43,6 +44,7 @@ export default function Passion({ config }: TitleConfig) {
       setClicked(next);
       if (pullDirection === "default") {
         pullDirectionProp("left");
+        window.history.pushState({ name: "left" }, "pushing left", "#left");
       }
       if (pullDirection === "left") {
         spacerHeight(0);
@@ -57,6 +59,17 @@ export default function Passion({ config }: TitleConfig) {
     if (isInitial.current) {
       isInitial.current = false;
       return;
+    }
+
+    if (clicked) {
+      // Everytime a title got clicked i want to listen to the browser wanting to got back in history
+      window.addEventListener("popstate", (event) => {
+        handlePopStateChange(event, pullDirectionProp, clicked, setClicked);
+      });
+    } else {
+      window.removeEventListener("popstate", (event) => {
+        handlePopStateChange(event, pullDirectionProp, clicked, setClicked);
+      });
     }
 
     // first create (or get the existing) batch by id
@@ -92,7 +105,7 @@ export default function Passion({ config }: TitleConfig) {
               }
             },
           }),
-          0
+          0,
         );
 
         if (clicked) {
@@ -109,7 +122,7 @@ export default function Passion({ config }: TitleConfig) {
                 easeEach: "none",
               },
             }),
-            0
+            0,
           );
 
           tl.add(
@@ -123,7 +136,7 @@ export default function Passion({ config }: TitleConfig) {
                 color: ["#262626", "#F24150"],
               },
             }),
-            0
+            0,
           );
         }
         // clicked to close title but we are not done animating
@@ -136,7 +149,7 @@ export default function Passion({ config }: TitleConfig) {
               },
               duration: 1,
             }),
-            0
+            0,
           );
         }
       },
@@ -225,7 +238,7 @@ export default function Passion({ config }: TitleConfig) {
       scope: tainer,
       dependencies: [showEntries],
       revertOnUpdate: false,
-    }
+    },
   );
 
   // Pull Animations: Defining Timelines
