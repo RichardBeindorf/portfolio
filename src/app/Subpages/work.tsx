@@ -97,6 +97,35 @@ export default function Work({ config }: TitleConfig) {
       ],
       url: "https://activities-app-kappa.vercel.app/",
     },
+    {
+      title: "CineKitchen",
+      description:
+        "My case study on creating an original take for a cinema app. *work in progress* - next features: route and arrival planning, admin board, ticket ordering/shop and more!",
+      iframe: "https://cinekitchen.vercel.app/",
+      features: [
+        "User authentication using NextAuth credentials with sessions and JWT, persisting user data in a SQLite database via Prisma.",
+        "Shareable movie lists that allow friends to collaboratively choose and recommend films for group cinema plans.",
+        "Movie data fetched from an external API and cached in a local database to avoid slow third-party requests.",
+        "Alternative movie discovery interface using a swipeable card stack instead of traditional list browsing.",
+        "Modern frontend architecture built with React, Redux Toolkit & RTK for state management, and Tailwind CSS.",
+        "Node/Express backend serving the frontend and handling data synchronization with the external movie API.",
+        "Skeleton loading states to provide smooth UX during backend cold starts.",
+      ],
+      technical: [
+        "API data is cached locally to avoid slow third-party responses.",
+        "Feature-based Redux structure separates UI state and server state.",
+      ],
+      url: "https://cinekitchen.vercel.app/",
+      // imageSrc: ["/AppHubOne806.jpg", "/AppHubTwo822.jpg"],
+      // imageSrcSet: [
+      //   "/AppHubOne355.jpg 355w, /AppHubOne806.jpg 806w, /AppHubOne1612.jpg 1612w, /AppHubOne3224.jpg 3224w",
+      //   "/AppHubTwo362.jpg 362w, /AppHubTwo822.jpg 822w, /AppHubTwo1644.jpg 1644w, /AppHubTwo3288.jpg 3288w",
+      // ],
+      // imageSizes: [
+      //   "(max-width: 412px) 355px, (max-width: 1000px) 806px, (max-width: 1921px) 1612px",
+      //   "(max-width: 412px) 362px, (max-width: 1000px) 822px, (max-width: 1921px) 1644px",
+      // ],
+    },
   ];
 
   function handleClick() {
@@ -550,18 +579,19 @@ const TopicWrapper = styled.div`
 const DetailWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 25px;
+  margin-top: 2rem;
 `;
 
 const FeaturesWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 1rem;
+  margin-top: 5px;
+  line-height: 2rem;
 `;
 
 const FeatureEntry = styled.p`
-  margin: 10px 0px 10px 0;
   font-size: var(--inlineText);
 `;
 
@@ -583,6 +613,7 @@ const IFrameWrapper = styled.div`
   height: 476px; /* 768 * 0.7 */
   overflow: hidden;
   border-radius: 15px;
+  justify-self: center;
 `;
 
 const IFrame = styled.iframe`
@@ -637,6 +668,7 @@ const ImageGallery = styled.div`
   @media only screen and (max-width: 400px) {
     flex-direction: column;
   }
+  justify-self: center;
 `;
 
 const PreviewImage = styled.img`
@@ -653,6 +685,7 @@ const PreviewImage = styled.img`
   @media only screen and (max-width: 400px) {
     width: 80vw;
   }
+  justify-self: center;
 `;
 
 const SVGWrapper = styled.div`
@@ -665,4 +698,5 @@ const SVGWrapper = styled.div`
   @media only screen and (max-width: 400px) {
     flex-direction: column;
   }
+  justify-self: center;
 `;
