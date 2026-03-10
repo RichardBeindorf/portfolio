@@ -5,6 +5,7 @@ export default function handlePopStateChange(
   pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>,
   clicked: boolean,
   setClicked: React.Dispatch<React.SetStateAction<boolean>>,
+  pullDirection: PullVariants,
   spacerHeight?: (spacerHeight: number) => void,
 ) {
   event.preventDefault();
@@ -16,23 +17,9 @@ export default function handlePopStateChange(
   const next = !clicked;
   setClicked(next);
 
-  console.log("popped", event.state.name);
-
-  switch (event.state.name) {
-    case "mid":
-      pullDirectionProp("mid");
-      break;
-    case "left":
-      pullDirectionProp("left");
-      break;
-    case "right":
-      pullDirectionProp("right");
-      break;
-    case undefined:
-    case "default":
-      pullDirectionProp("default");
-      break;
-    default:
-      console.log(`couldnt find event name: ${event.state.name}`);
+  if (pullDirection === "default") {
+    pullDirectionProp(event.state.name);
+  } else {
+    pullDirectionProp("default");
   }
 }

@@ -64,11 +64,23 @@ export default function Passion({ config }: TitleConfig) {
     if (clicked) {
       // Everytime a title got clicked i want to listen to the browser wanting to got back in history
       window.addEventListener("popstate", (event) => {
-        handlePopStateChange(event, pullDirectionProp, clicked, setClicked);
+        handlePopStateChange(
+          event,
+          pullDirectionProp,
+          clicked,
+          setClicked,
+          pullDirection,
+        );
       });
     } else {
       window.removeEventListener("popstate", (event) => {
-        handlePopStateChange(event, pullDirectionProp, clicked, setClicked);
+        handlePopStateChange(
+          event,
+          pullDirectionProp,
+          clicked,
+          setClicked,
+          pullDirection,
+        );
       });
     }
 

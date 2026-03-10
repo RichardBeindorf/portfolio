@@ -14,6 +14,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, Intro, TitleWrapper } from "./story";
 import handlePopStateChange from "@/util/popStateHandler";
+import { features } from "process";
 
 export default function Work({ config }: TitleConfig) {
   const {
@@ -54,6 +55,13 @@ export default function Work({ config }: TitleConfig) {
       title: "App-Hub",
       description:
         "I had the honor of creating the first customer-related entry point for Buildlinx. The App-Hub connects all customers with the Buildlinx universe and accumulates all necessary applications for users and devs based on roles and rights.",
+      features: [
+        "Implemented a role-based authentication and authorization system",
+        "Developed a personalized dashboard as the application entry point",
+        "Created a custom UI/UX design",
+        "Built animated application cards with expandable additional information",
+      ],
+      url: "dashboard.buildlinx.io/overview",
       imageSrc: ["/AppHubOne806.jpg", "/AppHubTwo822.jpg"],
       imageSrcSet: [
         "/AppHubOne355.jpg 355w, /AppHubOne806.jpg 806w, /AppHubOne1612.jpg 1612w, /AppHubOne3224.jpg 3224w",
@@ -69,12 +77,25 @@ export default function Work({ config }: TitleConfig) {
       description:
         "My biggest (NDA protected) project yet, designed and implemented in a complex technical environment. The BMS enables users to controll and monitor the status of an entire realestade fleet. I started with a redesign of the old system and then implemented it including a more maintainable algorithm to connect all buildings down to the last room with our complex backend. All rooms show information about temperature, humidity and CO2 levels.",
       svg: [<BMSOne key={1} />, <BMSTwo key={2} />],
+      features: [
+        "Developed a centralized heating management system for public buildings in Hamburg",
+        "Implemented hierarchical visualizations ranging from city-wide maps down to individual room layouts",
+        "Built real-time temperature control with monitoring for humidity, CO₂, and additional environmental metrics",
+        "Modernized a legacy user interface into a responsive and user-friendly design",
+      ],
     },
     {
       title: "Leapout",
       description:
         "This was my first major milestone, a fully functional Activity App with location planning, activity database, weather report and much more!",
       iframe: "https://activities-app-kappa.vercel.app/",
+      features: [
+        "Optimized database queries to deliver relevant search results",
+        "Implemented an interactive activity map with dynamic location-based filtering",
+        "Integrated an image API for automatic activity image retrieval",
+        "Designed an intuitive UX focused on usability and quality assurance",
+      ],
+      url: "https://activities-app-kappa.vercel.app/",
     },
   ];
 
@@ -129,6 +150,7 @@ export default function Work({ config }: TitleConfig) {
           pullDirectionProp,
           clicked,
           setClicked,
+          pullDirection,
           spacerHeight,
         );
       });
@@ -139,6 +161,7 @@ export default function Work({ config }: TitleConfig) {
           pullDirectionProp,
           clicked,
           setClicked,
+          pullDirection,
           spacerHeight,
         );
       });
@@ -395,11 +418,7 @@ export default function Work({ config }: TitleConfig) {
   }, [pullDirection]);
 
   return (
-    <WorkContainer
-      // $backgroundColor={color.current}
-      $position={positionsObj.work}
-      ref={tainer}
-    >
+    <WorkContainer $position={positionsObj.work} ref={tainer}>
       <TitleWrapper>
         <Title style={permanentMarker.style} ref={title} onClick={handleClick}>
           Work
@@ -424,10 +443,11 @@ export default function Work({ config }: TitleConfig) {
             <Topic style={permanentMarker.style}>
               {projects[currentProject].title}
             </Topic>
+            <Text style={oswald300.style}>
+              {projects[currentProject].description}
+            </Text>
             <DetailWrapper>
-              <Text style={oswald300.style}>
-                {projects[currentProject].description}
-              </Text>
+              {/* If we have an iFrame version */}
               {projects[currentProject].iframe && (
                 <IFrameWrapper>
                   <IFrame src={projects[currentProject].iframe} />
@@ -446,11 +466,23 @@ export default function Work({ config }: TitleConfig) {
                   ))}
                 </ImageGallery>
               )}
+              {/* SVG visiulisation of the project */}
               {projects[currentProject].svg && (
                 <SVGWrapper>
                   {projects[currentProject].svg.map((svg) => svg)}
                 </SVGWrapper>
               )}
+              {/* Featuer and details about the project */}
+              <FeaturesWrapper>
+                <h2 style={permanentMarker.style}>Features</h2>
+                <div>
+                  {projects[currentProject].features.map((feature, index) => (
+                    <FeatureEntry style={oswald300.style} key={index}>
+                      {feature}
+                    </FeatureEntry>
+                  ))}
+                </div>
+              </FeaturesWrapper>
             </DetailWrapper>
           </TopicWrapper>
 
@@ -505,7 +537,6 @@ const WorkEntryWrapper = styled.div`
   justify-content: flex-start;
   align-items: flex-start;
   gap: 0.5rem;
-  cursor: pointer;
   padding: 0px;
   background-color: var(--background);
 `;
@@ -517,9 +548,21 @@ const TopicWrapper = styled.div`
 `;
 
 const DetailWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+`;
+
+const FeaturesWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
+  margin-top: 1rem;
+`;
+
+const FeatureEntry = styled.p`
+  margin: 10px 0px 10px 0;
+  font-size: var(--inlineText);
 `;
 
 const Topic = styled.h3`
@@ -554,10 +597,6 @@ const Title = styled(ChapterTitle)`
   text-align: left;
   transform-origin: right;
 `;
-
-// const Highlights = styled.span`
-//   color: var(--textAccent);
-// `;
 
 const NavButtons = styled.div`
   display: flex;

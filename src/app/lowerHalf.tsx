@@ -12,7 +12,7 @@ interface TitleProps {
   pullDirectionProp: React.Dispatch<React.SetStateAction<PullVariants>>;
   currentWindow: RefObject<WindowStates>;
   isAnimating: RefObject<boolean>;
-  pullDirection: string;
+  pullDirection: PullVariants;
   delayTime: number;
   resizeDelta: number | null;
   positionsObj: PositionSwapper;
