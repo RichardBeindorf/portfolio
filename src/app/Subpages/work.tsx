@@ -12,9 +12,8 @@ import RightArrow from "../SVG`s/rightArrow";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
-import { ChapterTitle, Intro, TitleWrapper } from "./story";
+import { ChapterTitle, TitleWrapper } from "./story";
 import handlePopStateChange from "@/util/popStateHandler";
-import { features } from "process";
 
 export default function Work({ config }: TitleConfig) {
   const {
@@ -45,10 +44,15 @@ export default function Work({ config }: TitleConfig) {
   const underlineWidth = 650 * Math.min(resizeDelta * 1.5, 1);
   const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
 
-  const nextProject = () => setCurrentProject((p) => (p + 1) % projects.length);
+  const nextProject = () => {
+    spacerHeight(tainer.current.getBoundingClientRect().height);
+    setCurrentProject((p) => (p + 1) % projects.length);
+  };
 
-  const prevProject = () =>
+  const prevProject = () => {
+    spacerHeight(tainer.current.getBoundingClientRect().height);
     setCurrentProject((p) => (p - 1 + projects.length) % projects.length);
+  };
 
   const projects = [
     {
@@ -100,20 +104,20 @@ export default function Work({ config }: TitleConfig) {
     {
       title: "CineKitchen",
       description:
-        "My case study on creating an original take for a cinema app. *work in progress* - next features: route and arrival planning, admin board, ticket ordering/shop and more!",
+        "My take on a cinema app, enabling users to plan a movie night with ease. *work in progress* - next features: route and arrival planning, admin board, ticket ordering/shop and more!",
       iframe: "https://cinekitchen.vercel.app/",
       features: [
-        "User authentication using NextAuth credentials with sessions and JWT, persisting user data in a SQLite database via Prisma.",
-        "Shareable movie lists that allow friends to collaboratively choose and recommend films for group cinema plans.",
-        "Movie data fetched from an external API and cached in a local database to avoid slow third-party requests.",
-        "Alternative movie discovery interface using a swipeable card stack instead of traditional list browsing.",
-        "Modern frontend architecture built with React, Redux Toolkit & RTK for state management, and Tailwind CSS.",
-        "Node/Express backend serving the frontend and handling data synchronization with the external movie API.",
-        "Skeleton loading states to provide smooth UX during backend cold starts.",
+        "Authentication with NextAuth (credentials, sessions & JWT) using Prisma and SQLite.",
+        "Shareable movie lists for collaborative group movie planning.",
+        "Movie data synced from an external API and served from a local SQLite database to avoid slow requests.",
+        "Swipeable card-stack interface for discovering movies.",
+        "React frontend with Redux Toolkit and Tailwind CSS.",
+        "Node/Express backend handling API integration and data sync.",
+        "Skeleton loading states to smooth backend cold starts.",
       ],
       technical: [
-        "API data is cached locally to avoid slow third-party responses.",
-        "Feature-based Redux structure separates UI state and server state.",
+        "Slow third-party responses: Caching API data locally.",
+        "Scalable statemanagement: Feature-based Redux structure separates UI state and server state.",
       ],
       url: "https://cinekitchen.vercel.app/",
       // imageSrc: ["/AppHubOne806.jpg", "/AppHubTwo822.jpg"],
@@ -467,7 +471,6 @@ export default function Work({ config }: TitleConfig) {
 
       {showEntries && (
         <WorkEntryWrapper ref={entriesRef}>
-          <Intro style={permanentMarker.style}>What have I done ... ?</Intro>
           <TopicWrapper>
             <Topic style={permanentMarker.style}>
               {projects[currentProject].title}
@@ -503,7 +506,9 @@ export default function Work({ config }: TitleConfig) {
               )}
               {/* Featuer and details about the project */}
               <FeaturesWrapper>
-                <h2 style={permanentMarker.style}>Features</h2>
+                <FeaturesTitle style={permanentMarker.style}>
+                  Features
+                </FeaturesTitle>
                 <div>
                   {projects[currentProject].features.map((feature, index) => (
                     <FeatureEntry style={oswald300.style} key={index}>
@@ -581,6 +586,10 @@ const DetailWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 25px;
   margin-top: 2rem;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const FeaturesWrapper = styled.div`
@@ -588,16 +597,21 @@ const FeaturesWrapper = styled.div`
   flex-direction: column;
   gap: 10px;
   margin-top: 5px;
-  line-height: 2rem;
 `;
 
 const FeatureEntry = styled.p`
   font-size: var(--inlineText);
+  margin: 10px 0px 10px 0px;
+  line-height: 1.5rem;
+`;
+
+const FeaturesTitle = styled.h1`
+  color: var(--textAccent);
 `;
 
 const Topic = styled.h3`
   font-size: var(--subTitle);
-  color: var(--textAccent);
+  color: var(--foreground);
 `;
 
 const Text = styled.p`
