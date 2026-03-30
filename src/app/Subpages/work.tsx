@@ -77,6 +77,28 @@ export default function Work({ config }: TitleConfig) {
       ],
     },
     {
+      title: "CineKitchen",
+      description:
+        "My take on a cinema app, enabling users to plan a movie night with ease. *work in progress* - next features: showtimes, route and arrival planning, admin board, ticket ordering/shop and more!",
+      iframe: "https://cinekitchen.vercel.app/",
+      url: "https://cinekitchen.vercel.app/",
+      gitHub:
+        "https://gitlab.com/RichardBeindorf1/CineMatik/-/tree/48e9149eeb566e55a636cf487a1c2799bf928212/",
+      features: [
+        "Authentication with NextAuth (credentials, sessions & JWT) using Prisma and SQLite.",
+        "Shareable movie lists for collaborative group movie planning.",
+        "Movie data synced from an external API and served from a local SQLite database to avoid slow requests.",
+        "Swipeable card-stack interface for discovering movies.",
+        "React frontend with Redux Toolkit and Tailwind CSS.",
+        "Node/Express backend handling API integration and data sync.",
+        "Skeleton loading states to smooth backend cold starts.",
+      ],
+      technical: [
+        "Slow third-party responses: Caching API data locally.",
+        "Scalable statemanagement: Feature-based Redux structure separates UI state and server state.",
+      ],
+    },
+    {
       title: "Building-Management System",
       description:
         "My biggest (NDA protected) project yet, designed and implemented in a complex technical environment. The BMS enables users to controll and monitor the status of an entire realestade fleet. I started with a redesign of the old system and then implemented it including a more maintainable algorithm to connect all buildings down to the last room with our complex backend. All rooms show information about temperature, humidity and CO2 levels.",
@@ -100,35 +122,6 @@ export default function Work({ config }: TitleConfig) {
         "Designed an intuitive UX focused on usability and quality assurance",
       ],
       url: "https://activities-app-kappa.vercel.app/",
-    },
-    {
-      title: "CineKitchen",
-      description:
-        "My take on a cinema app, enabling users to plan a movie night with ease. *work in progress* - next features: route and arrival planning, admin board, ticket ordering/shop and more!",
-      iframe: "https://cinekitchen.vercel.app/",
-      features: [
-        "Authentication with NextAuth (credentials, sessions & JWT) using Prisma and SQLite.",
-        "Shareable movie lists for collaborative group movie planning.",
-        "Movie data synced from an external API and served from a local SQLite database to avoid slow requests.",
-        "Swipeable card-stack interface for discovering movies.",
-        "React frontend with Redux Toolkit and Tailwind CSS.",
-        "Node/Express backend handling API integration and data sync.",
-        "Skeleton loading states to smooth backend cold starts.",
-      ],
-      technical: [
-        "Slow third-party responses: Caching API data locally.",
-        "Scalable statemanagement: Feature-based Redux structure separates UI state and server state.",
-      ],
-      url: "https://cinekitchen.vercel.app/",
-      // imageSrc: ["/AppHubOne806.jpg", "/AppHubTwo822.jpg"],
-      // imageSrcSet: [
-      //   "/AppHubOne355.jpg 355w, /AppHubOne806.jpg 806w, /AppHubOne1612.jpg 1612w, /AppHubOne3224.jpg 3224w",
-      //   "/AppHubTwo362.jpg 362w, /AppHubTwo822.jpg 822w, /AppHubTwo1644.jpg 1644w, /AppHubTwo3288.jpg 3288w",
-      // ],
-      // imageSizes: [
-      //   "(max-width: 412px) 355px, (max-width: 1000px) 806px, (max-width: 1921px) 1612px",
-      //   "(max-width: 412px) 362px, (max-width: 1000px) 822px, (max-width: 1921px) 1644px",
-      // ],
     },
   ];
 
