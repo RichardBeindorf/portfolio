@@ -79,7 +79,7 @@ export default function Work({ config }: TitleConfig) {
     {
       title: "CineKitchen",
       description:
-        "My take on a cinema app, enabling users to plan a movie night with ease. *work in progress* - next features: showtimes, route and arrival planning, admin board, ticket ordering/shop and more!",
+        "My take on a cinema app, enabling users to plan a movie night with ease. *work in progress* - next features: showtimes, admin board, ticket ordering/shop and more!",
       iframe: "https://cinekitchen.vercel.app/",
       url: "https://cinekitchen.vercel.app/",
       gitHub:
@@ -92,6 +92,8 @@ export default function Work({ config }: TitleConfig) {
         "React frontend with Redux Toolkit and Tailwind CSS.",
         "Node/Express backend handling API integration and data sync.",
         "Skeleton loading states to smooth backend cold starts.",
+        "Dynamic route and arrival planning.",
+        "End to End testing via Playwright",
       ],
       technical: [
         "Slow third-party responses: Caching API data locally.",
