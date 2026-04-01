@@ -14,6 +14,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
 import { ChapterTitle, TitleWrapper } from "./story";
 import handlePopStateChange from "@/util/popStateHandler";
+import Link from "next/link";
 
 export default function Work({ config }: TitleConfig) {
   const {
@@ -65,7 +66,7 @@ export default function Work({ config }: TitleConfig) {
         "Created a custom UI/UX design",
         "Built animated application cards with expandable additional information",
       ],
-      url: "dashboard.buildlinx.io/overview",
+      // url: "dashboard.buildlinx.io/overview",
       imageSrc: ["/AppHubOne806.jpg", "/AppHubTwo822.jpg"],
       imageSrcSet: [
         "/AppHubOne355.jpg 355w, /AppHubOne806.jpg 806w, /AppHubOne1612.jpg 1612w, /AppHubOne3224.jpg 3224w",
@@ -93,7 +94,7 @@ export default function Work({ config }: TitleConfig) {
         "Node/Express backend handling API integration and data sync.",
         "Skeleton loading states to smooth backend cold starts.",
         "Dynamic route and arrival planning.",
-        "End to End testing via Playwright",
+        "End to End testing via Playwright.",
       ],
       technical: [
         "Slow third-party responses: Caching API data locally.",
@@ -469,6 +470,63 @@ export default function Work({ config }: TitleConfig) {
           <TopicWrapper>
             <Topic style={permanentMarker.style}>
               {projects[currentProject].title}
+              {projects[currentProject].url && (
+                <Link href={projects[currentProject].url}>
+                  <svg
+                    width="36"
+                    height="36"
+                    fill="none"
+                    style={{
+                      scale: "80%",
+                      transform: "translateY(20%)",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    <path
+                      stroke="#000"
+                      strokeLinecap="round"
+                      strokeWidth="2"
+                      d="M19 9.6c-2 0-10-.4-15.2.8-4.5 1-2.4 9.4-1.8 14q.2 1.5 1.2 2.4c5.3 4.2 17.7 0 22.6-.9q1.6-2.1 1.1-5.9 0-2-.4-6.4"
+                    />
+                    <path
+                      stroke="#000"
+                      strokeLinecap="round"
+                      strokeWidth="2"
+                      d="M15.2 19q.2 0 2.7-2.2l4-3.8 6.7-6"
+                    />
+                    <path
+                      stroke="#000"
+                      strokeLinecap="round"
+                      strokeWidth="2"
+                      d="M20.2 6.3a45 45 0 0 1 12-5.3c1 0 1.5 1.2 1.8 2.4q.3 4.3-.3 8.4c-.1 1.2-.1 2.2-.8 5.5"
+                    />
+                  </svg>
+                </Link>
+              )}
+              {projects[currentProject].gitHub && (
+                <Link
+                  href={projects[currentProject].gitHub}
+                  style={{
+                    height: "36px",
+                    display: "inline-block",
+                    transform: "translateY(15%)",
+                  }}
+                >
+                  <svg
+                    viewBox="0 0 380 380"
+                    fill="black"
+                    height={36}
+                    width={36}
+                  >
+                    <g id="LOGO">
+                      <path
+                        className="cls-1"
+                        d="M282.83,170.73l-.27-.69-26.14-68.22a6.81,6.81,0,0,0-2.69-3.24,7,7,0,0,0-8,.43,7,7,0,0,0-2.32,3.52l-17.65,54H154.29l-17.65-54A6.86,6.86,0,0,0,134.32,99a7,7,0,0,0-8-.43,6.87,6.87,0,0,0-2.69,3.24L97.44,170l-.26.69a48.54,48.54,0,0,0,16.1,56.1l.09.07.24.17,39.82,29.82,19.7,14.91,12,9.06a8.07,8.07,0,0,0,9.76,0l12-9.06,19.7-14.91,40.06-30,.1-.08A48.56,48.56,0,0,0,282.83,170.73Z"
+                      />
+                    </g>
+                  </svg>
+                </Link>
+              )}
             </Topic>
             <Text style={oswald300.style}>
               {projects[currentProject].description}
@@ -504,13 +562,13 @@ export default function Work({ config }: TitleConfig) {
                 <FeaturesTitle style={permanentMarker.style}>
                   Features
                 </FeaturesTitle>
-                <div>
+                <EntryWrapper>
                   {projects[currentProject].features.map((feature, index) => (
                     <FeatureEntry style={oswald300.style} key={index}>
                       {feature}
                     </FeatureEntry>
                   ))}
-                </div>
+                </EntryWrapper>
               </FeaturesWrapper>
             </DetailWrapper>
           </TopicWrapper>
@@ -592,6 +650,12 @@ const FeaturesWrapper = styled.div`
   flex-direction: column;
   gap: 10px;
   margin-top: 5px;
+`;
+
+const EntryWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 `;
 
 const FeatureEntry = styled.p`
