@@ -16,7 +16,7 @@ interface TitleProps {
   delayTime: number;
   resizeDelta: number | null;
   positionsObj: PositionSwapper;
-  spacerHeight: (spacerHeight: number) => void;
+  spacerHeight: (spacerHeight: number | undefined) => void;
 }
 
 export interface TitleConfig {

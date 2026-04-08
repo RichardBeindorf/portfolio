@@ -11,7 +11,7 @@ export default function Spacer({
 
   if (spacerRef.current) {
     spacerHeight
-      ? (spacerRef.current.style.height = spacerHeight * 1.3 + "px")
+      ? (spacerRef.current.style.height = spacerHeight * 1.5 + "px")
       : (spacerRef.current.style.height = "0px");
   }
 
@@ -32,6 +32,7 @@ export default function Spacer({
       id="spacer"
       ref={spacerRef}
       style={{ position: "relative", top: topValue }}
+      className="spacer"
     />
   );
 }

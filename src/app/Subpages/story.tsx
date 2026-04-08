@@ -333,8 +333,6 @@ export default function Story({ config }: TitleConfig) {
   useGSAP(() => {
     if (!storyLeft.current || !storyRight.current) return;
 
-    console.log("STORY PULL DIRECTION CHANGE  ");
-
     switch (pullDirection) {
       case "right":
         storyRight.current.play();
@@ -346,6 +344,7 @@ export default function Story({ config }: TitleConfig) {
         if (storyRight.current.progress() === 1) storyRight.current.reverse();
         if (storyLeft.current.progress() === 1) storyLeft.current.reverse();
         if (clicked) setClicked(false); // User clicks outside the title box to leave the screen
+        spacerHeight(undefined); // reversing the spacer here so its on 0 for any interaction closing the window
     }
   }, [pullDirection]);
 

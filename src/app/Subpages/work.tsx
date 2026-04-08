@@ -26,6 +26,7 @@ export default function Work({ config }: TitleConfig) {
     positionsObj,
     spacerHeight,
   } = config;
+
   const [clicked, setClicked] = useState(false);
   const [showEntries, setShowEntries] = useState(false);
   const [currentProject, setCurrentProject] = useState(0);
@@ -443,6 +444,7 @@ export default function Work({ config }: TitleConfig) {
         if (workMid.current.progress() === 1) workMid.current.reverse();
         if (workLeft.current.progress() === 1) workLeft.current.reverse();
         if (clicked) setClicked(false); // User clicks outside the title box to leave the screen
+        spacerHeight(undefined); // reversing the spacer here so its on 0 for any interaction closing the window
     }
   }, [pullDirection]);
 

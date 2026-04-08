@@ -317,6 +317,7 @@ export default function Passion({ config }: TitleConfig) {
         if (passionRight.current.progress() === 1)
           passionRight.current.reverse();
         if (clicked) setClicked(false); // User clicks outside the title box to leave the screen
+        spacerHeight(undefined); // reversing the spacer here so its on 0 for any interaction closing the window
     }
   }, [pullDirection]);
 
