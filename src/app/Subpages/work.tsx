@@ -118,7 +118,7 @@ export default function Work({ config }: TitleConfig) {
       title: "Leapout",
       description:
         "This was my first major milestone, a fully functional Activity App with location planning, activity database, weather report and much more!",
-      iframe: "https://activities-app-kappa.vercel.app/",
+      iframe: "https://leapoutrb.vercel.app/",
       features: [
         "Optimized database queries to deliver relevant search results",
         "Implemented an interactive activity map with dynamic location-based filtering",
