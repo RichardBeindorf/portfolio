@@ -47,13 +47,19 @@ export default function Work({ config }: TitleConfig) {
   const strokeWidth = 2.5 * Math.min(resizeDelta * 1.5, 1);
 
   const nextProject = () => {
-    spacerHeight(tainer.current.getBoundingClientRect().height);
     setCurrentProject((p) => (p + 1) % projects.length);
+    setTimeout(
+      () => spacerHeight(tainer.current.getBoundingClientRect().height),
+      50,
+    );
   };
 
   const prevProject = () => {
-    spacerHeight(tainer.current.getBoundingClientRect().height);
     setCurrentProject((p) => (p - 1 + projects.length) % projects.length);
+    setTimeout(
+      () => spacerHeight(tainer.current.getBoundingClientRect().height),
+      50,
+    );
   };
 
   const projects = [
@@ -473,7 +479,7 @@ export default function Work({ config }: TitleConfig) {
             <Topic style={permanentMarker.style}>
               {projects[currentProject].title}
               {projects[currentProject].url && (
-                <Link href={projects[currentProject].url}>
+                <Link href={projects[currentProject].url} target="_blank">
                   <svg
                     width="36"
                     height="36"

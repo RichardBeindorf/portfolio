@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Spacer({
   spacerHeight,
@@ -11,7 +11,7 @@ export default function Spacer({
 
   if (spacerRef.current) {
     spacerHeight
-      ? (spacerRef.current.style.height = spacerHeight * 1.5 + "px")
+      ? (spacerRef.current.style.height = spacerHeight * 1.2 + "px")
       : (spacerRef.current.style.height = "0px");
   }
 
