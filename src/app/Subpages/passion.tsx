@@ -3,12 +3,13 @@
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import styled from "styled-components";
-import { TitleWrapper } from "./story";
+import { TitleAndClose, TitleWrapper } from "./story";
 import { TitleConfig } from "../lowerHalf";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, oswald500, permanentMarker } from "@/styles/font";
 import handlePopStateChange from "@/util/popStateHandler";
+import CloseIcon from "@/util/closeIcon";
 
 export default function Passion({ config }: TitleConfig) {
   const {
@@ -19,6 +20,7 @@ export default function Passion({ config }: TitleConfig) {
     resizeDelta,
     positionsObj,
     spacerHeight,
+    mobileTest,
   } = config;
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -323,22 +325,35 @@ export default function Passion({ config }: TitleConfig) {
 
   return (
     <PassionContainer ref={tainer} $position={positionsObj.passion}>
-      <TitleWrapper>
-        <Title style={permanentMarker.style} onClick={handleClick} ref={title}>
-          Passion
-        </Title>
-        {clicked && !isAnimating.current ? (
-          <svg width={underlineWidth} height="20">
-            <path
-              ref={underline}
-              d="M 0 0 Q 20 20, 500 0"
-              stroke="#262626"
-              strokeWidth={`${strokeWidth}px`}
-              fill="transparent"
-            />
-          </svg>
-        ) : null}
-      </TitleWrapper>
+      <TitleAndClose>
+        <TitleWrapper>
+          <Title
+            style={permanentMarker.style}
+            onClick={handleClick}
+            ref={title}
+          >
+            Passion
+          </Title>
+          {clicked && !isAnimating.current ? (
+            <svg width={underlineWidth} height="20">
+              <path
+                ref={underline}
+                d="M 0 0 Q 20 20, 500 0"
+                stroke="#262626"
+                strokeWidth={`${strokeWidth}px`}
+                fill="transparent"
+              />
+            </svg>
+          ) : null}
+        </TitleWrapper>
+        {pullDirection === "left" && isAnimating.current === false && (
+          <CloseIcon
+            pullDirection={pullDirection}
+            pullDirectionProp={pullDirectionProp}
+            mobileTest={mobileTest}
+          />
+        )}
+      </TitleAndClose>
 
       <PassionContent className="contentWrapper">
         {showEntries && (

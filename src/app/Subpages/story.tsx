@@ -9,6 +9,7 @@ import { entryData } from "@/data/storyEntries";
 import { useLayoutEffect, useRef, useState } from "react";
 import { permanentMarker, oswald300, oswald500 } from "../../styles/font";
 import handlePopStateChange from "@/util/popStateHandler";
+import CloseIcon from "@/util/closeIcon";
 
 export default function Story({ config }: TitleConfig) {
   const {
@@ -19,6 +20,7 @@ export default function Story({ config }: TitleConfig) {
     resizeDelta,
     positionsObj,
     spacerHeight,
+    mobileTest,
   } = config;
   const [clicked, setClicked] = useState<boolean>(false);
   const [showEntries, setShowEntries] = useState(false);
@@ -350,27 +352,36 @@ export default function Story({ config }: TitleConfig) {
 
   return (
     <ChapterContainer ref={tainer} $position={positionsObj.story}>
-      <TitleWrapper>
-        <ChapterTitle
-          style={permanentMarker.style}
-          onClick={handleClick}
-          ref={title}
-        >
-          Story
-        </ChapterTitle>
+      <TitleAndClose>
+        <TitleWrapper>
+          <ChapterTitle
+            style={permanentMarker.style}
+            onClick={handleClick}
+            ref={title}
+          >
+            Story
+          </ChapterTitle>
 
-        {clicked && !isAnimating.current && (
-          <svg width={underlineWidth} height="20" className="underline">
-            <path
-              ref={underline}
-              d="M 0 0 Q 20 20, 500 0"
-              stroke="#262626"
-              strokeWidth={`${strokeWidth}px`}
-              fill="transparent"
-            />
-          </svg>
+          {clicked && !isAnimating.current && (
+            <svg width={underlineWidth} height="20" className="underline">
+              <path
+                ref={underline}
+                d="M 0 0 Q 20 20, 500 0"
+                stroke="#262626"
+                strokeWidth={`${strokeWidth}px`}
+                fill="transparent"
+              />
+            </svg>
+          )}
+        </TitleWrapper>
+        {pullDirection === "mid" && isAnimating.current === false && (
+          <CloseIcon
+            pullDirection={pullDirection}
+            pullDirectionProp={pullDirectionProp}
+            mobileTest={mobileTest}
+          />
         )}
-      </TitleWrapper>
+      </TitleAndClose>
 
       {showEntries && (
         <StoryEntryWrapper className="contentWrapper" ref={entriesRef}>
@@ -436,8 +447,14 @@ export const TitleWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  /* width: 150dvw; */
 
   margin-bottom: 5vh;
+`;
+
+export const TitleAndClose = styled.div`
+  display: flex;
+  width: 20%;
 `;
 
 const StoryEntryWrapper = styled.div`

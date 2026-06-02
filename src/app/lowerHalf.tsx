@@ -17,6 +17,7 @@ interface TitleProps {
   resizeDelta: number | null;
   positionsObj: PositionSwapper;
   spacerHeight: (spacerHeight: number | undefined) => void;
+  mobileTest: boolean;
 }
 
 export interface TitleConfig {
@@ -68,6 +69,7 @@ export default function LowerHalf({
       pullDirectionProp,
       spacerHeight: setSpacerHeight,
       positionsObj: positionsObj.current,
+      mobileTest,
     }),
     [pullDirection, resizeDelta],
   );

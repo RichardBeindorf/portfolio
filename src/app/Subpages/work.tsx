@@ -12,9 +12,10 @@ import RightArrow from "../SVG`s/rightArrow";
 import { DrawSVGPlugin, Flip } from "gsap/all";
 import { useLayoutEffect, useRef, useState } from "react";
 import { oswald300, permanentMarker } from "@/styles/font";
-import { ChapterTitle, TitleWrapper } from "./story";
+import { ChapterTitle, TitleAndClose, TitleWrapper } from "./story";
 import handlePopStateChange from "@/util/popStateHandler";
 import Link from "next/link";
+import CloseIcon from "@/util/closeIcon";
 
 export default function Work({ config }: TitleConfig) {
   const {
@@ -25,6 +26,7 @@ export default function Work({ config }: TitleConfig) {
     resizeDelta,
     positionsObj,
     spacerHeight,
+    mobileTest,
   } = config;
 
   const [clicked, setClicked] = useState(false);
@@ -456,22 +458,35 @@ export default function Work({ config }: TitleConfig) {
 
   return (
     <WorkContainer $position={positionsObj.work} ref={tainer}>
-      <TitleWrapper>
-        <Title style={permanentMarker.style} ref={title} onClick={handleClick}>
-          Work
-        </Title>
-        {showEntries && (
-          <svg width={underlineWidth} height="20">
-            <path
-              ref={underline}
-              d="M 0 0 Q 20 20, 500 0"
-              stroke="#262626"
-              strokeWidth={`${strokeWidth}px`}
-              fill="transparent"
-            />
-          </svg>
+      <TitleAndClose>
+        <TitleWrapper>
+          <Title
+            style={permanentMarker.style}
+            ref={title}
+            onClick={handleClick}
+          >
+            Work
+          </Title>
+          {showEntries && (
+            <svg width={underlineWidth} height="20">
+              <path
+                ref={underline}
+                d="M 0 0 Q 20 20, 500 0"
+                stroke="#262626"
+                strokeWidth={`${strokeWidth}px`}
+                fill="transparent"
+              />
+            </svg>
+          )}
+        </TitleWrapper>
+        {pullDirection === "right" && isAnimating.current === false && (
+          <CloseIcon
+            pullDirection={pullDirection}
+            pullDirectionProp={pullDirectionProp}
+            mobileTest={mobileTest}
+          />
         )}
-      </TitleWrapper>
+      </TitleAndClose>
 
       {showEntries && (
         <WorkEntryWrapper ref={entriesRef}>
