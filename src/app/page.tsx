@@ -44,7 +44,7 @@ export default function Home() {
   return (
     <>
       <h1 className="introTitle" ref={titleRef} style={permanentMarker.style}>
-        Hi, i`m Richard <br /> a &lt; Creative Developer /&gt; <br /> based in
+        Hi, i`m Richard <br /> a &lt; Product Owner /&gt; <br /> based in
         Hamburg
       </h1>
       <main id="smooth-wrapper">

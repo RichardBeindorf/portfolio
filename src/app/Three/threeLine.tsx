@@ -100,7 +100,7 @@ function ThreeLine({
 
   const line2 = useMemo(
     () => new Line2(line2Geometry, line2Material),
-    [line2Geometry, line2Material]
+    [line2Geometry, line2Material],
   );
   line2Ref.current = line2;
 
@@ -131,7 +131,7 @@ function ThreeLine({
     const worldPoints = points.current;
 
     const pointsToDraw = worldPoints.slice(
-      Math.max(0, worldPoints.length - maxValue.current)
+      Math.max(0, worldPoints.length - maxValue.current),
     );
 
     // distances will hold not the distance between sigular points but the overall distance to the point of origin accumulated
@@ -139,7 +139,7 @@ function ThreeLine({
 
     for (let i = 1; i < pointsToDraw.length; i++) {
       distances.push(
-        distances[i - 1] + pointsToDraw[i].distanceTo(pointsToDraw[i - 1])
+        distances[i - 1] + pointsToDraw[i].distanceTo(pointsToDraw[i - 1]),
       );
     }
 
